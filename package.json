@@ -1,0 +1,22 @@
+{
+  "name": "@demo-db/chinook-contract",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate": "node scripts/generate-data.mjs && python3 scripts/generate.py && node scripts/generate-model.mjs",
+    "validate": "python3 scripts/validate.py",
+    "test:data": "node --test scripts/test-data.mjs",
+    "test:tools": "node --test scripts/test-tools.mjs",
+    "tools:install": "node scripts/install-tools.mjs --dir .tools/bin",
+    "lint:model": "node scripts/run-tool.mjs modelspec lint --profile publish model",
+    "check:model-twin": "node scripts/run-tool.mjs modelspec export --check model/chinook.modelspec.hcl model/chinook.modelspec.json",
+    "check:meaning": "node scripts/check-meaning.mjs",
+    "check:schema": "node scripts/check-schema.mjs",
+    "check:ovdb": "node scripts/check-ovdb-manifest.mjs --repository https://github.com/demo-db/chinook",
+    "check:drift": "node scripts/check-data-drift.mjs \"$BASE\""
+  },
+  "dependencies": {
+    "yaml": "^2.8.1"
+  }
+}

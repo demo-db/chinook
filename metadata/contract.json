@@ -1,0 +1,2103 @@
+{
+  "contractVersion": 1,
+  "manifest": {
+    "contractVersion": 1,
+    "id": "chinook",
+    "name": "Chinook",
+    "description": "A digital music store database for learning SQL, joins, and data tooling.",
+    "domain": "Music retail",
+    "siteHost": "chinook.demodb.dev",
+    "aliases": [
+      "chinookdb.com"
+    ],
+    "source": {
+      "repository": "https://github.com/lerocha/chinook-database",
+      "revision": "7f67772503d71ba90f19283c38e93923addb43fa",
+      "path": "data-source/source.sqlite",
+      "sha256": "7651ba378ac2fcd0dfc3c66fb101f7a7eed3ba39a612ec642b96e20702061f15",
+      "license": "MIT",
+      "licenseFile": "data-source/LICENSE.md",
+      "notes": "The checked-in SQLite fixture is byte-for-byte the upstream SQLite file from the pinned revision."
+    },
+    "dataFile": "data-source/source.sqlite",
+    "semantics": {
+      "tableConcepts": {
+        "Customer": [
+          "customer"
+        ],
+        "Employee": [
+          "employee"
+        ],
+        "Invoice": [
+          "order"
+        ],
+        "InvoiceLine": [
+          "order-line"
+        ]
+      }
+    },
+    "tableDescriptions": {
+      "Artist": "Artists represented in the music catalogue.",
+      "Album": "Albums released by an artist.",
+      "Track": "Individual audio tracks available in the store.",
+      "Genre": "Music genres assigned to tracks.",
+      "MediaType": "File and encoding types used by tracks.",
+      "Playlist": "Named collections of tracks.",
+      "PlaylistTrack": "The many-to-many link between playlists and tracks.",
+      "Customer": "Customers who purchase music from the store.",
+      "Employee": "Store employees and their reporting relationships.",
+      "Invoice": "Orders raised for a customer.",
+      "InvoiceLine": "Individual tracks and quantities on an invoice."
+    },
+    "capabilities": {
+      "exports": [
+        "sqlite",
+        "csv",
+        "json",
+        "yaml",
+        "table-sql",
+        "mysql",
+        "postgresql",
+        "sqlserver"
+      ],
+      "ovdb": {
+        "available": true,
+        "canonicalUrl": "https://chinookdb.com/ovdb/dbs/chinook",
+        "connection": "https://cloud.openvaultdb.com/v1/databases/chinook",
+        "query": true,
+        "readOnly": true,
+        "deploymentVerified": true
+      },
+      "datatug": {
+        "available": true,
+        "mode": "static-json-and-ovdb"
+      }
+    },
+    "queries": [
+      {
+        "title": "Artists by track count",
+        "description": "Count tracks by artist.",
+        "sql": "SELECT Artist.Name, COUNT(Track.TrackId) AS Tracks FROM Artist JOIN Album USING (ArtistId) JOIN Track USING (AlbumId) GROUP BY Artist.ArtistId ORDER BY Tracks DESC LIMIT 10;"
+      },
+      {
+        "title": "Sales by billing country",
+        "description": "Compare invoice totals across countries.",
+        "sql": "SELECT BillingCountry, ROUND(SUM(Total), 2) AS Sales FROM Invoice GROUP BY BillingCountry ORDER BY Sales DESC LIMIT 10;"
+      }
+    ]
+  },
+  "schema": {
+    "contractVersion": 1,
+    "database": {
+      "id": "chinook",
+      "name": "Chinook"
+    },
+    "source": {
+      "repository": "https://github.com/lerocha/chinook-database",
+      "revision": "7f67772503d71ba90f19283c38e93923addb43fa",
+      "path": "data-source/source.sqlite",
+      "sha256": "7651ba378ac2fcd0dfc3c66fb101f7a7eed3ba39a612ec642b96e20702061f15",
+      "license": "MIT",
+      "licenseFile": "data-source/LICENSE.md",
+      "notes": "The checked-in SQLite fixture is byte-for-byte the upstream SQLite file from the pinned revision."
+    },
+    "tables": [
+      {
+        "name": "Album",
+        "kind": "table",
+        "description": "Albums released by an artist.",
+        "columns": [
+          {
+            "name": "AlbumId",
+            "type": "INTEGER",
+            "nullable": false,
+            "primaryKey": true,
+            "primaryKeyPosition": 1,
+            "defaultValue": null
+          },
+          {
+            "name": "Title",
+            "type": "NVARCHAR(160)",
+            "nullable": false,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "ArtistId",
+            "type": "INTEGER",
+            "nullable": false,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          }
+        ],
+        "primaryKey": [
+          {
+            "column": "AlbumId",
+            "position": 1
+          }
+        ],
+        "foreignKeys": [
+          {
+            "column": "ArtistId",
+            "table": "Artist",
+            "referencedColumn": "ArtistId",
+            "constraint": 0,
+            "position": 0
+          }
+        ],
+        "rowCount": 347,
+        "viewSql": null,
+        "rows": [
+          {
+            "AlbumId": 1,
+            "Title": "For Those About To Rock We Salute You",
+            "ArtistId": 1
+          },
+          {
+            "AlbumId": 2,
+            "Title": "Balls to the Wall",
+            "ArtistId": 2
+          },
+          {
+            "AlbumId": 3,
+            "Title": "Restless and Wild",
+            "ArtistId": 2
+          },
+          {
+            "AlbumId": 4,
+            "Title": "Let There Be Rock",
+            "ArtistId": 1
+          },
+          {
+            "AlbumId": 5,
+            "Title": "Big Ones",
+            "ArtistId": 3
+          },
+          {
+            "AlbumId": 6,
+            "Title": "Jagged Little Pill",
+            "ArtistId": 4
+          },
+          {
+            "AlbumId": 7,
+            "Title": "Facelift",
+            "ArtistId": 5
+          },
+          {
+            "AlbumId": 8,
+            "Title": "Warner 25 Anos",
+            "ArtistId": 6
+          },
+          {
+            "AlbumId": 9,
+            "Title": "Plays Metallica By Four Cellos",
+            "ArtistId": 7
+          },
+          {
+            "AlbumId": 10,
+            "Title": "Audioslave",
+            "ArtistId": 8
+          },
+          {
+            "AlbumId": 11,
+            "Title": "Out Of Exile",
+            "ArtistId": 8
+          },
+          {
+            "AlbumId": 12,
+            "Title": "BackBeat Soundtrack",
+            "ArtistId": 9
+          }
+        ]
+      },
+      {
+        "name": "Artist",
+        "kind": "table",
+        "description": "Artists represented in the music catalogue.",
+        "columns": [
+          {
+            "name": "ArtistId",
+            "type": "INTEGER",
+            "nullable": false,
+            "primaryKey": true,
+            "primaryKeyPosition": 1,
+            "defaultValue": null
+          },
+          {
+            "name": "Name",
+            "type": "NVARCHAR(120)",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          }
+        ],
+        "primaryKey": [
+          {
+            "column": "ArtistId",
+            "position": 1
+          }
+        ],
+        "foreignKeys": [],
+        "rowCount": 275,
+        "viewSql": null,
+        "rows": [
+          {
+            "ArtistId": 1,
+            "Name": "AC/DC"
+          },
+          {
+            "ArtistId": 2,
+            "Name": "Accept"
+          },
+          {
+            "ArtistId": 3,
+            "Name": "Aerosmith"
+          },
+          {
+            "ArtistId": 4,
+            "Name": "Alanis Morissette"
+          },
+          {
+            "ArtistId": 5,
+            "Name": "Alice In Chains"
+          },
+          {
+            "ArtistId": 6,
+            "Name": "Antônio Carlos Jobim"
+          },
+          {
+            "ArtistId": 7,
+            "Name": "Apocalyptica"
+          },
+          {
+            "ArtistId": 8,
+            "Name": "Audioslave"
+          },
+          {
+            "ArtistId": 9,
+            "Name": "BackBeat"
+          },
+          {
+            "ArtistId": 10,
+            "Name": "Billy Cobham"
+          },
+          {
+            "ArtistId": 11,
+            "Name": "Black Label Society"
+          },
+          {
+            "ArtistId": 12,
+            "Name": "Black Sabbath"
+          }
+        ]
+      },
+      {
+        "name": "Customer",
+        "kind": "table",
+        "description": "Customers who purchase music from the store.",
+        "columns": [
+          {
+            "name": "CustomerId",
+            "type": "INTEGER",
+            "nullable": false,
+            "primaryKey": true,
+            "primaryKeyPosition": 1,
+            "defaultValue": null
+          },
+          {
+            "name": "FirstName",
+            "type": "NVARCHAR(40)",
+            "nullable": false,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "LastName",
+            "type": "NVARCHAR(20)",
+            "nullable": false,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "Company",
+            "type": "NVARCHAR(80)",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "Address",
+            "type": "NVARCHAR(70)",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "City",
+            "type": "NVARCHAR(40)",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "State",
+            "type": "NVARCHAR(40)",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "Country",
+            "type": "NVARCHAR(40)",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "PostalCode",
+            "type": "NVARCHAR(10)",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "Phone",
+            "type": "NVARCHAR(24)",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "Fax",
+            "type": "NVARCHAR(24)",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "Email",
+            "type": "NVARCHAR(60)",
+            "nullable": false,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "SupportRepId",
+            "type": "INTEGER",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          }
+        ],
+        "primaryKey": [
+          {
+            "column": "CustomerId",
+            "position": 1
+          }
+        ],
+        "foreignKeys": [
+          {
+            "column": "SupportRepId",
+            "table": "Employee",
+            "referencedColumn": "EmployeeId",
+            "constraint": 0,
+            "position": 0
+          }
+        ],
+        "rowCount": 59,
+        "viewSql": null,
+        "rows": [
+          {
+            "CustomerId": 1,
+            "FirstName": "Luís",
+            "LastName": "Gonçalves",
+            "Company": "Embraer - Empresa Brasileira de Aeronáutica S.A.",
+            "Address": "Av. Brigadeiro Faria Lima, 2170",
+            "City": "São José dos Campos",
+            "State": "SP",
+            "Country": "Brazil",
+            "PostalCode": "12227-000",
+            "Phone": "+55 (12) 3923-5555",
+            "Fax": "+55 (12) 3923-5566",
+            "Email": "luisg@embraer.com.br",
+            "SupportRepId": 3
+          },
+          {
+            "CustomerId": 2,
+            "FirstName": "Leonie",
+            "LastName": "Köhler",
+            "Company": null,
+            "Address": "Theodor-Heuss-Straße 34",
+            "City": "Stuttgart",
+            "State": null,
+            "Country": "Germany",
+            "PostalCode": "70174",
+            "Phone": "+49 0711 2842222",
+            "Fax": null,
+            "Email": "leonekohler@surfeu.de",
+            "SupportRepId": 5
+          },
+          {
+            "CustomerId": 3,
+            "FirstName": "François",
+            "LastName": "Tremblay",
+            "Company": null,
+            "Address": "1498 rue Bélanger",
+            "City": "Montréal",
+            "State": "QC",
+            "Country": "Canada",
+            "PostalCode": "H2G 1A7",
+            "Phone": "+1 (514) 721-4711",
+            "Fax": null,
+            "Email": "ftremblay@gmail.com",
+            "SupportRepId": 3
+          },
+          {
+            "CustomerId": 4,
+            "FirstName": "Bjørn",
+            "LastName": "Hansen",
+            "Company": null,
+            "Address": "Ullevålsveien 14",
+            "City": "Oslo",
+            "State": null,
+            "Country": "Norway",
+            "PostalCode": "0171",
+            "Phone": "+47 22 44 22 22",
+            "Fax": null,
+            "Email": "bjorn.hansen@yahoo.no",
+            "SupportRepId": 4
+          },
+          {
+            "CustomerId": 5,
+            "FirstName": "František",
+            "LastName": "Wichterlová",
+            "Company": "JetBrains s.r.o.",
+            "Address": "Klanova 9/506",
+            "City": "Prague",
+            "State": null,
+            "Country": "Czech Republic",
+            "PostalCode": "14700",
+            "Phone": "+420 2 4172 5555",
+            "Fax": "+420 2 4172 5555",
+            "Email": "frantisekw@jetbrains.com",
+            "SupportRepId": 4
+          },
+          {
+            "CustomerId": 6,
+            "FirstName": "Helena",
+            "LastName": "Holý",
+            "Company": null,
+            "Address": "Rilská 3174/6",
+            "City": "Prague",
+            "State": null,
+            "Country": "Czech Republic",
+            "PostalCode": "14300",
+            "Phone": "+420 2 4177 0449",
+            "Fax": null,
+            "Email": "hholy@gmail.com",
+            "SupportRepId": 5
+          },
+          {
+            "CustomerId": 7,
+            "FirstName": "Astrid",
+            "LastName": "Gruber",
+            "Company": null,
+            "Address": "Rotenturmstraße 4, 1010 Innere Stadt",
+            "City": "Vienne",
+            "State": null,
+            "Country": "Austria",
+            "PostalCode": "1010",
+            "Phone": "+43 01 5134505",
+            "Fax": null,
+            "Email": "astrid.gruber@apple.at",
+            "SupportRepId": 5
+          },
+          {
+            "CustomerId": 8,
+            "FirstName": "Daan",
+            "LastName": "Peeters",
+            "Company": null,
+            "Address": "Grétrystraat 63",
+            "City": "Brussels",
+            "State": null,
+            "Country": "Belgium",
+            "PostalCode": "1000",
+            "Phone": "+32 02 219 03 03",
+            "Fax": null,
+            "Email": "daan_peeters@apple.be",
+            "SupportRepId": 4
+          },
+          {
+            "CustomerId": 9,
+            "FirstName": "Kara",
+            "LastName": "Nielsen",
+            "Company": null,
+            "Address": "Sønder Boulevard 51",
+            "City": "Copenhagen",
+            "State": null,
+            "Country": "Denmark",
+            "PostalCode": "1720",
+            "Phone": "+453 3331 9991",
+            "Fax": null,
+            "Email": "kara.nielsen@jubii.dk",
+            "SupportRepId": 4
+          },
+          {
+            "CustomerId": 10,
+            "FirstName": "Eduardo",
+            "LastName": "Martins",
+            "Company": "Woodstock Discos",
+            "Address": "Rua Dr. Falcão Filho, 155",
+            "City": "São Paulo",
+            "State": "SP",
+            "Country": "Brazil",
+            "PostalCode": "01007-010",
+            "Phone": "+55 (11) 3033-5446",
+            "Fax": "+55 (11) 3033-4564",
+            "Email": "eduardo@woodstock.com.br",
+            "SupportRepId": 4
+          },
+          {
+            "CustomerId": 11,
+            "FirstName": "Alexandre",
+            "LastName": "Rocha",
+            "Company": "Banco do Brasil S.A.",
+            "Address": "Av. Paulista, 2022",
+            "City": "São Paulo",
+            "State": "SP",
+            "Country": "Brazil",
+            "PostalCode": "01310-200",
+            "Phone": "+55 (11) 3055-3278",
+            "Fax": "+55 (11) 3055-8131",
+            "Email": "alero@uol.com.br",
+            "SupportRepId": 5
+          },
+          {
+            "CustomerId": 12,
+            "FirstName": "Roberto",
+            "LastName": "Almeida",
+            "Company": "Riotur",
+            "Address": "Praça Pio X, 119",
+            "City": "Rio de Janeiro",
+            "State": "RJ",
+            "Country": "Brazil",
+            "PostalCode": "20040-020",
+            "Phone": "+55 (21) 2271-7000",
+            "Fax": "+55 (21) 2271-7070",
+            "Email": "roberto.almeida@riotur.gov.br",
+            "SupportRepId": 3
+          }
+        ]
+      },
+      {
+        "name": "Employee",
+        "kind": "table",
+        "description": "Store employees and their reporting relationships.",
+        "columns": [
+          {
+            "name": "EmployeeId",
+            "type": "INTEGER",
+            "nullable": false,
+            "primaryKey": true,
+            "primaryKeyPosition": 1,
+            "defaultValue": null
+          },
+          {
+            "name": "LastName",
+            "type": "NVARCHAR(20)",
+            "nullable": false,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "FirstName",
+            "type": "NVARCHAR(20)",
+            "nullable": false,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "Title",
+            "type": "NVARCHAR(30)",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "ReportsTo",
+            "type": "INTEGER",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "BirthDate",
+            "type": "DATETIME",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "HireDate",
+            "type": "DATETIME",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "Address",
+            "type": "NVARCHAR(70)",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "City",
+            "type": "NVARCHAR(40)",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "State",
+            "type": "NVARCHAR(40)",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "Country",
+            "type": "NVARCHAR(40)",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "PostalCode",
+            "type": "NVARCHAR(10)",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "Phone",
+            "type": "NVARCHAR(24)",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "Fax",
+            "type": "NVARCHAR(24)",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "Email",
+            "type": "NVARCHAR(60)",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          }
+        ],
+        "primaryKey": [
+          {
+            "column": "EmployeeId",
+            "position": 1
+          }
+        ],
+        "foreignKeys": [
+          {
+            "column": "ReportsTo",
+            "table": "Employee",
+            "referencedColumn": "EmployeeId",
+            "constraint": 0,
+            "position": 0
+          }
+        ],
+        "rowCount": 8,
+        "viewSql": null,
+        "rows": [
+          {
+            "EmployeeId": 1,
+            "LastName": "Adams",
+            "FirstName": "Andrew",
+            "Title": "General Manager",
+            "ReportsTo": null,
+            "BirthDate": "1962-02-18 00:00:00",
+            "HireDate": "2002-08-14 00:00:00",
+            "Address": "11120 Jasper Ave NW",
+            "City": "Edmonton",
+            "State": "AB",
+            "Country": "Canada",
+            "PostalCode": "T5K 2N1",
+            "Phone": "+1 (780) 428-9482",
+            "Fax": "+1 (780) 428-3457",
+            "Email": "andrew@chinookcorp.com"
+          },
+          {
+            "EmployeeId": 2,
+            "LastName": "Edwards",
+            "FirstName": "Nancy",
+            "Title": "Sales Manager",
+            "ReportsTo": 1,
+            "BirthDate": "1958-12-08 00:00:00",
+            "HireDate": "2002-05-01 00:00:00",
+            "Address": "825 8 Ave SW",
+            "City": "Calgary",
+            "State": "AB",
+            "Country": "Canada",
+            "PostalCode": "T2P 2T3",
+            "Phone": "+1 (403) 262-3443",
+            "Fax": "+1 (403) 262-3322",
+            "Email": "nancy@chinookcorp.com"
+          },
+          {
+            "EmployeeId": 3,
+            "LastName": "Peacock",
+            "FirstName": "Jane",
+            "Title": "Sales Support Agent",
+            "ReportsTo": 2,
+            "BirthDate": "1973-08-29 00:00:00",
+            "HireDate": "2002-04-01 00:00:00",
+            "Address": "1111 6 Ave SW",
+            "City": "Calgary",
+            "State": "AB",
+            "Country": "Canada",
+            "PostalCode": "T2P 5M5",
+            "Phone": "+1 (403) 262-3443",
+            "Fax": "+1 (403) 262-6712",
+            "Email": "jane@chinookcorp.com"
+          },
+          {
+            "EmployeeId": 4,
+            "LastName": "Park",
+            "FirstName": "Margaret",
+            "Title": "Sales Support Agent",
+            "ReportsTo": 2,
+            "BirthDate": "1947-09-19 00:00:00",
+            "HireDate": "2003-05-03 00:00:00",
+            "Address": "683 10 Street SW",
+            "City": "Calgary",
+            "State": "AB",
+            "Country": "Canada",
+            "PostalCode": "T2P 5G3",
+            "Phone": "+1 (403) 263-4423",
+            "Fax": "+1 (403) 263-4289",
+            "Email": "margaret@chinookcorp.com"
+          },
+          {
+            "EmployeeId": 5,
+            "LastName": "Johnson",
+            "FirstName": "Steve",
+            "Title": "Sales Support Agent",
+            "ReportsTo": 2,
+            "BirthDate": "1965-03-03 00:00:00",
+            "HireDate": "2003-10-17 00:00:00",
+            "Address": "7727B 41 Ave",
+            "City": "Calgary",
+            "State": "AB",
+            "Country": "Canada",
+            "PostalCode": "T3B 1Y7",
+            "Phone": "1 (780) 836-9987",
+            "Fax": "1 (780) 836-9543",
+            "Email": "steve@chinookcorp.com"
+          },
+          {
+            "EmployeeId": 6,
+            "LastName": "Mitchell",
+            "FirstName": "Michael",
+            "Title": "IT Manager",
+            "ReportsTo": 1,
+            "BirthDate": "1973-07-01 00:00:00",
+            "HireDate": "2003-10-17 00:00:00",
+            "Address": "5827 Bowness Road NW",
+            "City": "Calgary",
+            "State": "AB",
+            "Country": "Canada",
+            "PostalCode": "T3B 0C5",
+            "Phone": "+1 (403) 246-9887",
+            "Fax": "+1 (403) 246-9899",
+            "Email": "michael@chinookcorp.com"
+          },
+          {
+            "EmployeeId": 7,
+            "LastName": "King",
+            "FirstName": "Robert",
+            "Title": "IT Staff",
+            "ReportsTo": 6,
+            "BirthDate": "1970-05-29 00:00:00",
+            "HireDate": "2004-01-02 00:00:00",
+            "Address": "590 Columbia Boulevard West",
+            "City": "Lethbridge",
+            "State": "AB",
+            "Country": "Canada",
+            "PostalCode": "T1K 5N8",
+            "Phone": "+1 (403) 456-9986",
+            "Fax": "+1 (403) 456-8485",
+            "Email": "robert@chinookcorp.com"
+          },
+          {
+            "EmployeeId": 8,
+            "LastName": "Callahan",
+            "FirstName": "Laura",
+            "Title": "IT Staff",
+            "ReportsTo": 6,
+            "BirthDate": "1968-01-09 00:00:00",
+            "HireDate": "2004-03-04 00:00:00",
+            "Address": "923 7 ST NW",
+            "City": "Lethbridge",
+            "State": "AB",
+            "Country": "Canada",
+            "PostalCode": "T1H 1Y8",
+            "Phone": "+1 (403) 467-3351",
+            "Fax": "+1 (403) 467-8772",
+            "Email": "laura@chinookcorp.com"
+          }
+        ]
+      },
+      {
+        "name": "Genre",
+        "kind": "table",
+        "description": "Music genres assigned to tracks.",
+        "columns": [
+          {
+            "name": "GenreId",
+            "type": "INTEGER",
+            "nullable": false,
+            "primaryKey": true,
+            "primaryKeyPosition": 1,
+            "defaultValue": null
+          },
+          {
+            "name": "Name",
+            "type": "NVARCHAR(120)",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          }
+        ],
+        "primaryKey": [
+          {
+            "column": "GenreId",
+            "position": 1
+          }
+        ],
+        "foreignKeys": [],
+        "rowCount": 25,
+        "viewSql": null,
+        "rows": [
+          {
+            "GenreId": 1,
+            "Name": "Rock"
+          },
+          {
+            "GenreId": 2,
+            "Name": "Jazz"
+          },
+          {
+            "GenreId": 3,
+            "Name": "Metal"
+          },
+          {
+            "GenreId": 4,
+            "Name": "Alternative & Punk"
+          },
+          {
+            "GenreId": 5,
+            "Name": "Rock And Roll"
+          },
+          {
+            "GenreId": 6,
+            "Name": "Blues"
+          },
+          {
+            "GenreId": 7,
+            "Name": "Latin"
+          },
+          {
+            "GenreId": 8,
+            "Name": "Reggae"
+          },
+          {
+            "GenreId": 9,
+            "Name": "Pop"
+          },
+          {
+            "GenreId": 10,
+            "Name": "Soundtrack"
+          },
+          {
+            "GenreId": 11,
+            "Name": "Bossa Nova"
+          },
+          {
+            "GenreId": 12,
+            "Name": "Easy Listening"
+          }
+        ]
+      },
+      {
+        "name": "Invoice",
+        "kind": "table",
+        "description": "Orders raised for a customer.",
+        "columns": [
+          {
+            "name": "InvoiceId",
+            "type": "INTEGER",
+            "nullable": false,
+            "primaryKey": true,
+            "primaryKeyPosition": 1,
+            "defaultValue": null
+          },
+          {
+            "name": "CustomerId",
+            "type": "INTEGER",
+            "nullable": false,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "InvoiceDate",
+            "type": "DATETIME",
+            "nullable": false,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "BillingAddress",
+            "type": "NVARCHAR(70)",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "BillingCity",
+            "type": "NVARCHAR(40)",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "BillingState",
+            "type": "NVARCHAR(40)",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "BillingCountry",
+            "type": "NVARCHAR(40)",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "BillingPostalCode",
+            "type": "NVARCHAR(10)",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "Total",
+            "type": "NUMERIC(10,2)",
+            "nullable": false,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          }
+        ],
+        "primaryKey": [
+          {
+            "column": "InvoiceId",
+            "position": 1
+          }
+        ],
+        "foreignKeys": [
+          {
+            "column": "CustomerId",
+            "table": "Customer",
+            "referencedColumn": "CustomerId",
+            "constraint": 0,
+            "position": 0
+          }
+        ],
+        "rowCount": 412,
+        "viewSql": null,
+        "rows": [
+          {
+            "InvoiceId": 1,
+            "CustomerId": 2,
+            "InvoiceDate": "2021-01-01 00:00:00",
+            "BillingAddress": "Theodor-Heuss-Straße 34",
+            "BillingCity": "Stuttgart",
+            "BillingState": null,
+            "BillingCountry": "Germany",
+            "BillingPostalCode": "70174",
+            "Total": 1.98
+          },
+          {
+            "InvoiceId": 2,
+            "CustomerId": 4,
+            "InvoiceDate": "2021-01-02 00:00:00",
+            "BillingAddress": "Ullevålsveien 14",
+            "BillingCity": "Oslo",
+            "BillingState": null,
+            "BillingCountry": "Norway",
+            "BillingPostalCode": "0171",
+            "Total": 3.96
+          },
+          {
+            "InvoiceId": 3,
+            "CustomerId": 8,
+            "InvoiceDate": "2021-01-03 00:00:00",
+            "BillingAddress": "Grétrystraat 63",
+            "BillingCity": "Brussels",
+            "BillingState": null,
+            "BillingCountry": "Belgium",
+            "BillingPostalCode": "1000",
+            "Total": 5.94
+          },
+          {
+            "InvoiceId": 4,
+            "CustomerId": 14,
+            "InvoiceDate": "2021-01-06 00:00:00",
+            "BillingAddress": "8210 111 ST NW",
+            "BillingCity": "Edmonton",
+            "BillingState": "AB",
+            "BillingCountry": "Canada",
+            "BillingPostalCode": "T6G 2C7",
+            "Total": 8.91
+          },
+          {
+            "InvoiceId": 5,
+            "CustomerId": 23,
+            "InvoiceDate": "2021-01-11 00:00:00",
+            "BillingAddress": "69 Salem Street",
+            "BillingCity": "Boston",
+            "BillingState": "MA",
+            "BillingCountry": "USA",
+            "BillingPostalCode": "2113",
+            "Total": 13.86
+          },
+          {
+            "InvoiceId": 6,
+            "CustomerId": 37,
+            "InvoiceDate": "2021-01-19 00:00:00",
+            "BillingAddress": "Berger Straße 10",
+            "BillingCity": "Frankfurt",
+            "BillingState": null,
+            "BillingCountry": "Germany",
+            "BillingPostalCode": "60316",
+            "Total": 0.99
+          },
+          {
+            "InvoiceId": 7,
+            "CustomerId": 38,
+            "InvoiceDate": "2021-02-01 00:00:00",
+            "BillingAddress": "Barbarossastraße 19",
+            "BillingCity": "Berlin",
+            "BillingState": null,
+            "BillingCountry": "Germany",
+            "BillingPostalCode": "10779",
+            "Total": 1.98
+          },
+          {
+            "InvoiceId": 8,
+            "CustomerId": 40,
+            "InvoiceDate": "2021-02-01 00:00:00",
+            "BillingAddress": "8, Rue Hanovre",
+            "BillingCity": "Paris",
+            "BillingState": null,
+            "BillingCountry": "France",
+            "BillingPostalCode": "75002",
+            "Total": 1.98
+          },
+          {
+            "InvoiceId": 9,
+            "CustomerId": 42,
+            "InvoiceDate": "2021-02-02 00:00:00",
+            "BillingAddress": "9, Place Louis Barthou",
+            "BillingCity": "Bordeaux",
+            "BillingState": null,
+            "BillingCountry": "France",
+            "BillingPostalCode": "33000",
+            "Total": 3.96
+          },
+          {
+            "InvoiceId": 10,
+            "CustomerId": 46,
+            "InvoiceDate": "2021-02-03 00:00:00",
+            "BillingAddress": "3 Chatham Street",
+            "BillingCity": "Dublin",
+            "BillingState": "Dublin",
+            "BillingCountry": "Ireland",
+            "BillingPostalCode": null,
+            "Total": 5.94
+          },
+          {
+            "InvoiceId": 11,
+            "CustomerId": 52,
+            "InvoiceDate": "2021-02-06 00:00:00",
+            "BillingAddress": "202 Hoxton Street",
+            "BillingCity": "London",
+            "BillingState": null,
+            "BillingCountry": "United Kingdom",
+            "BillingPostalCode": "N1 5LH",
+            "Total": 8.91
+          },
+          {
+            "InvoiceId": 12,
+            "CustomerId": 2,
+            "InvoiceDate": "2021-02-11 00:00:00",
+            "BillingAddress": "Theodor-Heuss-Straße 34",
+            "BillingCity": "Stuttgart",
+            "BillingState": null,
+            "BillingCountry": "Germany",
+            "BillingPostalCode": "70174",
+            "Total": 13.86
+          }
+        ]
+      },
+      {
+        "name": "InvoiceLine",
+        "kind": "table",
+        "description": "Individual tracks and quantities on an invoice.",
+        "columns": [
+          {
+            "name": "InvoiceLineId",
+            "type": "INTEGER",
+            "nullable": false,
+            "primaryKey": true,
+            "primaryKeyPosition": 1,
+            "defaultValue": null
+          },
+          {
+            "name": "InvoiceId",
+            "type": "INTEGER",
+            "nullable": false,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "TrackId",
+            "type": "INTEGER",
+            "nullable": false,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "UnitPrice",
+            "type": "NUMERIC(10,2)",
+            "nullable": false,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "Quantity",
+            "type": "INTEGER",
+            "nullable": false,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          }
+        ],
+        "primaryKey": [
+          {
+            "column": "InvoiceLineId",
+            "position": 1
+          }
+        ],
+        "foreignKeys": [
+          {
+            "column": "TrackId",
+            "table": "Track",
+            "referencedColumn": "TrackId",
+            "constraint": 0,
+            "position": 0
+          },
+          {
+            "column": "InvoiceId",
+            "table": "Invoice",
+            "referencedColumn": "InvoiceId",
+            "constraint": 1,
+            "position": 0
+          }
+        ],
+        "rowCount": 2240,
+        "viewSql": null,
+        "rows": [
+          {
+            "InvoiceLineId": 1,
+            "InvoiceId": 1,
+            "TrackId": 2,
+            "UnitPrice": 0.99,
+            "Quantity": 1
+          },
+          {
+            "InvoiceLineId": 2,
+            "InvoiceId": 1,
+            "TrackId": 4,
+            "UnitPrice": 0.99,
+            "Quantity": 1
+          },
+          {
+            "InvoiceLineId": 3,
+            "InvoiceId": 2,
+            "TrackId": 6,
+            "UnitPrice": 0.99,
+            "Quantity": 1
+          },
+          {
+            "InvoiceLineId": 4,
+            "InvoiceId": 2,
+            "TrackId": 8,
+            "UnitPrice": 0.99,
+            "Quantity": 1
+          },
+          {
+            "InvoiceLineId": 5,
+            "InvoiceId": 2,
+            "TrackId": 10,
+            "UnitPrice": 0.99,
+            "Quantity": 1
+          },
+          {
+            "InvoiceLineId": 6,
+            "InvoiceId": 2,
+            "TrackId": 12,
+            "UnitPrice": 0.99,
+            "Quantity": 1
+          },
+          {
+            "InvoiceLineId": 7,
+            "InvoiceId": 3,
+            "TrackId": 16,
+            "UnitPrice": 0.99,
+            "Quantity": 1
+          },
+          {
+            "InvoiceLineId": 8,
+            "InvoiceId": 3,
+            "TrackId": 20,
+            "UnitPrice": 0.99,
+            "Quantity": 1
+          },
+          {
+            "InvoiceLineId": 9,
+            "InvoiceId": 3,
+            "TrackId": 24,
+            "UnitPrice": 0.99,
+            "Quantity": 1
+          },
+          {
+            "InvoiceLineId": 10,
+            "InvoiceId": 3,
+            "TrackId": 28,
+            "UnitPrice": 0.99,
+            "Quantity": 1
+          },
+          {
+            "InvoiceLineId": 11,
+            "InvoiceId": 3,
+            "TrackId": 32,
+            "UnitPrice": 0.99,
+            "Quantity": 1
+          },
+          {
+            "InvoiceLineId": 12,
+            "InvoiceId": 3,
+            "TrackId": 36,
+            "UnitPrice": 0.99,
+            "Quantity": 1
+          }
+        ]
+      },
+      {
+        "name": "MediaType",
+        "kind": "table",
+        "description": "File and encoding types used by tracks.",
+        "columns": [
+          {
+            "name": "MediaTypeId",
+            "type": "INTEGER",
+            "nullable": false,
+            "primaryKey": true,
+            "primaryKeyPosition": 1,
+            "defaultValue": null
+          },
+          {
+            "name": "Name",
+            "type": "NVARCHAR(120)",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          }
+        ],
+        "primaryKey": [
+          {
+            "column": "MediaTypeId",
+            "position": 1
+          }
+        ],
+        "foreignKeys": [],
+        "rowCount": 5,
+        "viewSql": null,
+        "rows": [
+          {
+            "MediaTypeId": 1,
+            "Name": "MPEG audio file"
+          },
+          {
+            "MediaTypeId": 2,
+            "Name": "Protected AAC audio file"
+          },
+          {
+            "MediaTypeId": 3,
+            "Name": "Protected MPEG-4 video file"
+          },
+          {
+            "MediaTypeId": 4,
+            "Name": "Purchased AAC audio file"
+          },
+          {
+            "MediaTypeId": 5,
+            "Name": "AAC audio file"
+          }
+        ]
+      },
+      {
+        "name": "Playlist",
+        "kind": "table",
+        "description": "Named collections of tracks.",
+        "columns": [
+          {
+            "name": "PlaylistId",
+            "type": "INTEGER",
+            "nullable": false,
+            "primaryKey": true,
+            "primaryKeyPosition": 1,
+            "defaultValue": null
+          },
+          {
+            "name": "Name",
+            "type": "NVARCHAR(120)",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          }
+        ],
+        "primaryKey": [
+          {
+            "column": "PlaylistId",
+            "position": 1
+          }
+        ],
+        "foreignKeys": [],
+        "rowCount": 18,
+        "viewSql": null,
+        "rows": [
+          {
+            "PlaylistId": 1,
+            "Name": "Music"
+          },
+          {
+            "PlaylistId": 2,
+            "Name": "Movies"
+          },
+          {
+            "PlaylistId": 3,
+            "Name": "TV Shows"
+          },
+          {
+            "PlaylistId": 4,
+            "Name": "Audiobooks"
+          },
+          {
+            "PlaylistId": 5,
+            "Name": "90’s Music"
+          },
+          {
+            "PlaylistId": 6,
+            "Name": "Audiobooks"
+          },
+          {
+            "PlaylistId": 7,
+            "Name": "Movies"
+          },
+          {
+            "PlaylistId": 8,
+            "Name": "Music"
+          },
+          {
+            "PlaylistId": 9,
+            "Name": "Music Videos"
+          },
+          {
+            "PlaylistId": 10,
+            "Name": "TV Shows"
+          },
+          {
+            "PlaylistId": 11,
+            "Name": "Brazilian Music"
+          },
+          {
+            "PlaylistId": 12,
+            "Name": "Classical"
+          }
+        ]
+      },
+      {
+        "name": "PlaylistTrack",
+        "kind": "table",
+        "description": "The many-to-many link between playlists and tracks.",
+        "columns": [
+          {
+            "name": "PlaylistId",
+            "type": "INTEGER",
+            "nullable": false,
+            "primaryKey": true,
+            "primaryKeyPosition": 1,
+            "defaultValue": null
+          },
+          {
+            "name": "TrackId",
+            "type": "INTEGER",
+            "nullable": false,
+            "primaryKey": true,
+            "primaryKeyPosition": 2,
+            "defaultValue": null
+          }
+        ],
+        "primaryKey": [
+          {
+            "column": "PlaylistId",
+            "position": 1
+          },
+          {
+            "column": "TrackId",
+            "position": 2
+          }
+        ],
+        "foreignKeys": [
+          {
+            "column": "TrackId",
+            "table": "Track",
+            "referencedColumn": "TrackId",
+            "constraint": 0,
+            "position": 0
+          },
+          {
+            "column": "PlaylistId",
+            "table": "Playlist",
+            "referencedColumn": "PlaylistId",
+            "constraint": 1,
+            "position": 0
+          }
+        ],
+        "rowCount": 8715,
+        "viewSql": null,
+        "rows": [
+          {
+            "PlaylistId": 1,
+            "TrackId": 3402
+          },
+          {
+            "PlaylistId": 1,
+            "TrackId": 3389
+          },
+          {
+            "PlaylistId": 1,
+            "TrackId": 3390
+          },
+          {
+            "PlaylistId": 1,
+            "TrackId": 3391
+          },
+          {
+            "PlaylistId": 1,
+            "TrackId": 3392
+          },
+          {
+            "PlaylistId": 1,
+            "TrackId": 3393
+          },
+          {
+            "PlaylistId": 1,
+            "TrackId": 3394
+          },
+          {
+            "PlaylistId": 1,
+            "TrackId": 3395
+          },
+          {
+            "PlaylistId": 1,
+            "TrackId": 3396
+          },
+          {
+            "PlaylistId": 1,
+            "TrackId": 3397
+          },
+          {
+            "PlaylistId": 1,
+            "TrackId": 3398
+          },
+          {
+            "PlaylistId": 1,
+            "TrackId": 3399
+          }
+        ]
+      },
+      {
+        "name": "Track",
+        "kind": "table",
+        "description": "Individual audio tracks available in the store.",
+        "columns": [
+          {
+            "name": "TrackId",
+            "type": "INTEGER",
+            "nullable": false,
+            "primaryKey": true,
+            "primaryKeyPosition": 1,
+            "defaultValue": null
+          },
+          {
+            "name": "Name",
+            "type": "NVARCHAR(200)",
+            "nullable": false,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "AlbumId",
+            "type": "INTEGER",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "MediaTypeId",
+            "type": "INTEGER",
+            "nullable": false,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "GenreId",
+            "type": "INTEGER",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "Composer",
+            "type": "NVARCHAR(220)",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "Milliseconds",
+            "type": "INTEGER",
+            "nullable": false,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "Bytes",
+            "type": "INTEGER",
+            "nullable": true,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          },
+          {
+            "name": "UnitPrice",
+            "type": "NUMERIC(10,2)",
+            "nullable": false,
+            "primaryKey": false,
+            "primaryKeyPosition": null,
+            "defaultValue": null
+          }
+        ],
+        "primaryKey": [
+          {
+            "column": "TrackId",
+            "position": 1
+          }
+        ],
+        "foreignKeys": [
+          {
+            "column": "MediaTypeId",
+            "table": "MediaType",
+            "referencedColumn": "MediaTypeId",
+            "constraint": 0,
+            "position": 0
+          },
+          {
+            "column": "GenreId",
+            "table": "Genre",
+            "referencedColumn": "GenreId",
+            "constraint": 1,
+            "position": 0
+          },
+          {
+            "column": "AlbumId",
+            "table": "Album",
+            "referencedColumn": "AlbumId",
+            "constraint": 2,
+            "position": 0
+          }
+        ],
+        "rowCount": 3503,
+        "viewSql": null,
+        "rows": [
+          {
+            "TrackId": 1,
+            "Name": "For Those About To Rock (We Salute You)",
+            "AlbumId": 1,
+            "MediaTypeId": 1,
+            "GenreId": 1,
+            "Composer": "Angus Young, Malcolm Young, Brian Johnson",
+            "Milliseconds": 343719,
+            "Bytes": 11170334,
+            "UnitPrice": 0.99
+          },
+          {
+            "TrackId": 2,
+            "Name": "Balls to the Wall",
+            "AlbumId": 2,
+            "MediaTypeId": 2,
+            "GenreId": 1,
+            "Composer": "U. Dirkschneider, W. Hoffmann, H. Frank, P. Baltes, S. Kaufmann, G. Hoffmann",
+            "Milliseconds": 342562,
+            "Bytes": 5510424,
+            "UnitPrice": 0.99
+          },
+          {
+            "TrackId": 3,
+            "Name": "Fast As a Shark",
+            "AlbumId": 3,
+            "MediaTypeId": 2,
+            "GenreId": 1,
+            "Composer": "F. Baltes, S. Kaufman, U. Dirkscneider & W. Hoffman",
+            "Milliseconds": 230619,
+            "Bytes": 3990994,
+            "UnitPrice": 0.99
+          },
+          {
+            "TrackId": 4,
+            "Name": "Restless and Wild",
+            "AlbumId": 3,
+            "MediaTypeId": 2,
+            "GenreId": 1,
+            "Composer": "F. Baltes, R.A. Smith-Diesel, S. Kaufman, U. Dirkscneider & W. Hoffman",
+            "Milliseconds": 252051,
+            "Bytes": 4331779,
+            "UnitPrice": 0.99
+          },
+          {
+            "TrackId": 5,
+            "Name": "Princess of the Dawn",
+            "AlbumId": 3,
+            "MediaTypeId": 2,
+            "GenreId": 1,
+            "Composer": "Deaffy & R.A. Smith-Diesel",
+            "Milliseconds": 375418,
+            "Bytes": 6290521,
+            "UnitPrice": 0.99
+          },
+          {
+            "TrackId": 6,
+            "Name": "Put The Finger On You",
+            "AlbumId": 1,
+            "MediaTypeId": 1,
+            "GenreId": 1,
+            "Composer": "Angus Young, Malcolm Young, Brian Johnson",
+            "Milliseconds": 205662,
+            "Bytes": 6713451,
+            "UnitPrice": 0.99
+          },
+          {
+            "TrackId": 7,
+            "Name": "Let's Get It Up",
+            "AlbumId": 1,
+            "MediaTypeId": 1,
+            "GenreId": 1,
+            "Composer": "Angus Young, Malcolm Young, Brian Johnson",
+            "Milliseconds": 233926,
+            "Bytes": 7636561,
+            "UnitPrice": 0.99
+          },
+          {
+            "TrackId": 8,
+            "Name": "Inject The Venom",
+            "AlbumId": 1,
+            "MediaTypeId": 1,
+            "GenreId": 1,
+            "Composer": "Angus Young, Malcolm Young, Brian Johnson",
+            "Milliseconds": 210834,
+            "Bytes": 6852860,
+            "UnitPrice": 0.99
+          },
+          {
+            "TrackId": 9,
+            "Name": "Snowballed",
+            "AlbumId": 1,
+            "MediaTypeId": 1,
+            "GenreId": 1,
+            "Composer": "Angus Young, Malcolm Young, Brian Johnson",
+            "Milliseconds": 203102,
+            "Bytes": 6599424,
+            "UnitPrice": 0.99
+          },
+          {
+            "TrackId": 10,
+            "Name": "Evil Walks",
+            "AlbumId": 1,
+            "MediaTypeId": 1,
+            "GenreId": 1,
+            "Composer": "Angus Young, Malcolm Young, Brian Johnson",
+            "Milliseconds": 263497,
+            "Bytes": 8611245,
+            "UnitPrice": 0.99
+          },
+          {
+            "TrackId": 11,
+            "Name": "C.O.D.",
+            "AlbumId": 1,
+            "MediaTypeId": 1,
+            "GenreId": 1,
+            "Composer": "Angus Young, Malcolm Young, Brian Johnson",
+            "Milliseconds": 199836,
+            "Bytes": 6566314,
+            "UnitPrice": 0.99
+          },
+          {
+            "TrackId": 12,
+            "Name": "Breaking The Rules",
+            "AlbumId": 1,
+            "MediaTypeId": 1,
+            "GenreId": 1,
+            "Composer": "Angus Young, Malcolm Young, Brian Johnson",
+            "Milliseconds": 263288,
+            "Bytes": 8596840,
+            "UnitPrice": 0.99
+          }
+        ]
+      }
+    ]
+  },
+  "exports": [
+    {
+      "path": "artifacts/data/chinook.json",
+      "bytes": 1900157,
+      "sha256": "268b5cac2375ad24e39d3105d06b1fe9179b70a21fd8b7ed09b60fb0a49e974e"
+    },
+    {
+      "path": "artifacts/data/chinook.mysql.sql",
+      "bytes": 600574,
+      "sha256": "68768623bac1fe6f92c317235735c706a54a28cc76ab175c194e99f994dadbd6"
+    },
+    {
+      "path": "artifacts/data/chinook.postgresql.sql",
+      "bytes": 600200,
+      "sha256": "e3fde5c1a5b51a2a91429a702c9ca6e69ba56e6c7f5e112724d70c3d03db695e"
+    },
+    {
+      "path": "artifacts/data/chinook.sqlite",
+      "bytes": 1007616,
+      "sha256": "7651ba378ac2fcd0dfc3c66fb101f7a7eed3ba39a612ec642b96e20702061f15"
+    },
+    {
+      "path": "artifacts/data/chinook.sqlserver.sql",
+      "bytes": 601344,
+      "sha256": "5ea75c9e925ead917d3fabea6ed3cc8c1ff1d036b61e915c94631aafa2b0802b"
+    },
+    {
+      "path": "artifacts/data/chinook.yaml",
+      "bytes": 1362200,
+      "sha256": "2adec942f3c76600f258674585a1e5750dc7320aecdfc4bce827450d4cdfd8e6"
+    },
+    {
+      "path": "artifacts/data/csv/chinook.Album.csv",
+      "bytes": 10816,
+      "sha256": "7339f2504f6096e3621acab5bc0b5b4b02a9ffcedeaefb01d8249a20f33fdfd3"
+    },
+    {
+      "path": "artifacts/data/csv/chinook.Artist.csv",
+      "bytes": 7016,
+      "sha256": "f891d9c3a3c5148fabc4001987944a0481faf3211c992c1d12c77a3c13203b70"
+    },
+    {
+      "path": "artifacts/data/csv/chinook.Customer.csv",
+      "bytes": 6737,
+      "sha256": "214fcc549b0c675884a7f812d5618063bc70362a754ec8b1db752d7067771636"
+    },
+    {
+      "path": "artifacts/data/csv/chinook.Employee.csv",
+      "bytes": 1522,
+      "sha256": "a63a6d3f2802efe9358f6017b41420789b913d2e1986d9ee09942e576cf1e855"
+    },
+    {
+      "path": "artifacts/data/csv/chinook.Genre.csv",
+      "bytes": 328,
+      "sha256": "d56b3c1f0bc3b84e82babc7544f0bb71c36ef4de98695c4f0bc2e8872ab1615b"
+    },
+    {
+      "path": "artifacts/data/csv/chinook.Invoice.csv",
+      "bytes": 31590,
+      "sha256": "dffc4c38c116361518f9a3958168164dad5bfa787d1568a66d8fd61ec63fc517"
+    },
+    {
+      "path": "artifacts/data/csv/chinook.InvoiceLine.csv",
+      "bytes": 44673,
+      "sha256": "59708ed1db5058dc636101e442083980e6892fb2dddd93a5953601892998abfe"
+    },
+    {
+      "path": "artifacts/data/csv/chinook.MediaType.csv",
+      "bytes": 136,
+      "sha256": "1a8cedb7a35d6b8a8cfdac467d02da1b1dfa8ac7dde87aa199ed4c03a59bf550"
+    },
+    {
+      "path": "artifacts/data/csv/chinook.Playlist.csv",
+      "bytes": 298,
+      "sha256": "63932576edbd259b544915f364471d83009335701c5d74ad074f157968228346"
+    },
+    {
+      "path": "artifacts/data/csv/chinook.PlaylistTrack.csv",
+      "bytes": 58707,
+      "sha256": "63c474837f074228cad937b4d6f91a6c2c7cb0885e42f5244b182687b4df450f"
+    },
+    {
+      "path": "artifacts/data/csv/chinook.Track.csv",
+      "bytes": 241803,
+      "sha256": "493e8ef7aa98665e537e8ba8c263835fde531ef6b9709ed4496544890fee6871"
+    },
+    {
+      "path": "artifacts/data/json/chinook.Album.json",
+      "bytes": 30525,
+      "sha256": "75a013f41773393fcff58bc2fc120b3efa6b88a1d62094d4d0930d63f4aa572f"
+    },
+    {
+      "path": "artifacts/data/json/chinook.Artist.json",
+      "bytes": 17963,
+      "sha256": "6cb3dd3a5698a5d61af27fdc5b801bbfbd1f66e9f71b51ef7945bcaf87fffc53"
+    },
+    {
+      "path": "artifacts/data/json/chinook.Customer.json",
+      "bytes": 20966,
+      "sha256": "0f16fb0e608d9310445c02a106688bde714e749d7234d89d268dc3daf1dd65c7"
+    },
+    {
+      "path": "artifacts/data/json/chinook.Employee.json",
+      "bytes": 3594,
+      "sha256": "762a76861c15a4c5faf2f6e45dfe678e9474d2fdde8897425dbaed3749dcf3fd"
+    },
+    {
+      "path": "artifacts/data/json/chinook.Genre.json",
+      "bytes": 1293,
+      "sha256": "59fa7fc1ce25ec681238158e04318c3fb51e9bc79b5186250fd291f26cb95114"
+    },
+    {
+      "path": "artifacts/data/json/chinook.Invoice.json",
+      "bytes": 115781,
+      "sha256": "88eb7faede360988e9c0f8f8d107e5093db5e712141de14d868f8947b43c373c"
+    },
+    {
+      "path": "artifacts/data/json/chinook.InvoiceLine.json",
+      "bytes": 266385,
+      "sha256": "7a4d15811c5e0553609bb5c67e1240fde8e784052f5cdbeecc470e9d9e3e6544"
+    },
+    {
+      "path": "artifacts/data/json/chinook.MediaType.json",
+      "bytes": 337,
+      "sha256": "73d2eaf8406780565ec34e7498d90b94a6de89396a4161f6e9c2152f8aea245c"
+    },
+    {
+      "path": "artifacts/data/json/chinook.Playlist.json",
+      "bytes": 1041,
+      "sha256": "a5b7de153f5cc0c38d2ee50845b6f9098b25f111026e43fa22c3a1470088a54b"
+    },
+    {
+      "path": "artifacts/data/json/chinook.PlaylistTrack.json",
+      "bytes": 433436,
+      "sha256": "befe54115ddd8cc6ec65c48e43a1ae1233ff5a1d17939f28075662e7379a9735"
+    },
+    {
+      "path": "artifacts/data/json/chinook.Track.json",
+      "bytes": 813343,
+      "sha256": "ab753372c31a8bbacf435d5ce25797ba2478c2cfff6004d3bd2cb7e1e87e0669"
+    },
+    {
+      "path": "artifacts/data/metadata/checksums.json",
+      "bytes": 7871,
+      "sha256": "924661b7952832016a0aa4f93c21155917509333196b52ca59cf534e0ada64d2"
+    },
+    {
+      "path": "artifacts/data/metadata/source.json",
+      "bytes": 169,
+      "sha256": "2dc37e3cca1e1703b7c2efd0f33d9e4e587df8ff8ffaada82eb11469ed4f86aa"
+    },
+    {
+      "path": "artifacts/data/sql/chinook.Album.sql",
+      "bytes": 34267,
+      "sha256": "501c62e940ba2ca004edcd56e18b0992acc6c9f7c1e0218247d0472ee53b28cb"
+    },
+    {
+      "path": "artifacts/data/sql/chinook.Artist.sql",
+      "bytes": 22316,
+      "sha256": "444e18dcfef2e275f1d1cc3e727c61b41daf187cf636e1cf5ed17cd60d1a40d0"
+    },
+    {
+      "path": "artifacts/data/sql/chinook.Customer.sql",
+      "bytes": 19907,
+      "sha256": "5f0862e463c16aad744b7bc6705764049368dc5ca8185f5f2558bf87fad07a3e"
+    },
+    {
+      "path": "artifacts/data/sql/chinook.Employee.sql",
+      "bytes": 3880,
+      "sha256": "6788d8ba6a2d6d0d129ec5a3b5ae49230815b77ecf0dfb6c33bf80d8709ba21a"
+    },
+    {
+      "path": "artifacts/data/sql/chinook.Genre.sql",
+      "bytes": 1859,
+      "sha256": "aa8fe13dc432e27b63e3c081c2488261648aa315ecc5524c9996fd7a6fd6e084"
+    },
+    {
+      "path": "artifacts/data/sql/chinook.Invoice.sql",
+      "bytes": 111300,
+      "sha256": "976ebaf8d37e83a805f5cc4d0e1c3b3fcc7b0bf808fa317c8ceb1a3633bbc62a"
+    },
+    {
+      "path": "artifacts/data/sql/chinook.InvoiceLine.sql",
+      "bytes": 284646,
+      "sha256": "83c30b23c7619f4d6a40a7980104caa8a430df35619adc5b4872d471fa4f7743"
+    },
+    {
+      "path": "artifacts/data/sql/chinook.MediaType.sql",
+      "bytes": 655,
+      "sha256": "413a9d0f9b1c7d4b9c4d95923eabed6a671333433594218b753f73bf2b12adad"
+    },
+    {
+      "path": "artifacts/data/sql/chinook.Playlist.sql",
+      "bytes": 1572,
+      "sha256": "cb96698abdc3dfdbef28a267a7a64aa84abd4338e6268e418407c3e98b527894"
+    },
+    {
+      "path": "artifacts/data/sql/chinook.PlaylistTrack.sql",
+      "bytes": 625436,
+      "sha256": "5d9575d0e73b6685926e28c21a91c30ea46964fd982d4c9b880cc4512c854277"
+    },
+    {
+      "path": "artifacts/data/sql/chinook.Track.sql",
+      "bytes": 764934,
+      "sha256": "867e29ebdbe8d871a8743c837b14891e788948b6eda468d579b949481e7e97ae"
+    },
+    {
+      "path": "artifacts/data/yaml/chinook.Album.yaml",
+      "bytes": 21993,
+      "sha256": "92d02c2c21c0d11c369f7a69debfd5ae92b05eccc38cdd83ce5d6b0d593aec90"
+    },
+    {
+      "path": "artifacts/data/yaml/chinook.Artist.yaml",
+      "bytes": 12460,
+      "sha256": "e494d15238acf99776d540e5bc8eb05b0cd8a1b17e7986d15c3a7755a3ac70f3"
+    },
+    {
+      "path": "artifacts/data/yaml/chinook.Customer.yaml",
+      "bytes": 15686,
+      "sha256": "ffabf599cdadaff32ec8a44722a2dc9f0154cc705aaca293f27e362c88cdb4a9"
+    },
+    {
+      "path": "artifacts/data/yaml/chinook.Employee.yaml",
+      "bytes": 2719,
+      "sha256": "e998ab5a275bd0625c85eeb0dbfd5401b393f5e5d672b19b8f8308ca918448c1"
+    },
+    {
+      "path": "artifacts/data/yaml/chinook.Genre.yaml",
+      "bytes": 790,
+      "sha256": "fe5e65493b01148423ca450b02c890b3dc1f1cd9ea4e4d19ae91f925299d12db"
+    },
+    {
+      "path": "artifacts/data/yaml/chinook.Invoice.yaml",
+      "bytes": 89932,
+      "sha256": "26f715a90ff99a81b06022b031faf54173c58cbd70706072b3b74d9537869eee"
+    },
+    {
+      "path": "artifacts/data/yaml/chinook.InvoiceLine.yaml",
+      "bytes": 192462,
+      "sha256": "9d38a39ea4405dec2e79ecf58c57d426a61c7016570482eeaf3ce261b3c13986"
+    },
+    {
+      "path": "artifacts/data/yaml/chinook.MediaType.yaml",
+      "bytes": 234,
+      "sha256": "581c39390e0fba014f7377bea3adba06d0c23b9ee3c325a9f517df0fd0471384"
+    },
+    {
+      "path": "artifacts/data/yaml/chinook.Playlist.yaml",
+      "bytes": 678,
+      "sha256": "130ddd692ee752b316abc62531d5e62645df6f5b10ddf105879b427780cf1aee"
+    },
+    {
+      "path": "artifacts/data/yaml/chinook.PlaylistTrack.yaml",
+      "bytes": 276563,
+      "sha256": "dc3327a3ea24d92506efc82aeabe666b6045504f2d226ee19b4a6f4783fddb84"
+    },
+    {
+      "path": "artifacts/data/yaml/chinook.Track.yaml",
+      "bytes": 615698,
+      "sha256": "d86bc682deec243087416caa45c6c67698c1c2b924a6a29ad81cac31fcd1a48c"
+    }
+  ]
+}
