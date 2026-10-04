@@ -1,6 +1,8 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { join, posix } from 'node:path';
+import { createHash } from 'node:crypto';
+import Ajv2020 from 'ajv/dist/2020.js';
 import { parse as parseYaml } from 'yaml';
 import { cleanGitEnv } from './git-env.mjs';
 import { canonicalUrlProblem, enginePattern, homepageFieldProblem, idPattern, isRepositoryPath, manifestUrlProblem, maxIdLength } from './directory-rules.mjs';
@@ -20,8 +22,8 @@ import { canonicalUrlProblem, enginePattern, homepageFieldProblem, idPattern, is
 // commit yet). read() throws an Error whose message says why a file cannot be read (for example, too large).
 // checkOvdbManifest returns a list of problems; empty means the manifest is good.
 //
-// A manifest has one of two forms, the two the OVDB Directory accepts, and the forms never mix. The
-// Directory tells them apart by whether the manifest has local model files.
+// The publisher YAML has one of two forms: this repository's own model files or a pinned shared model.
+// The public JSON database descriptor is a separate typed format validated against its pinned schema.
 //
 // Own model (this repository's own manifest): `model.modelspec` (the JSON) and `model.hcl` (the source,
 // which the Directory index reports as `model.path`) are tracked files of this repository, as is
@@ -56,6 +58,9 @@ import { canonicalUrlProblem, enginePattern, homepageFieldProblem, idPattern, is
 // (`<address>.<Entity>` is an entity reference).
 
 const manifestFormat = 'ovdb-manifest/draft-1';
+const databaseFormat = 'ovdb-database/draft-1';
+const databaseSchemaPath = 'schemas/ovdb-database-draft-1.schema.json';
+const databaseSchemaSha256 = '2424ef00acd462ab5a8abc546fe2d1fffbbb5397e312332aedc77b3e73109488';
 // The SPDX identifiers a manifest may use for a licence. Small on purpose; add one when a database needs it.
 export const licenceIds = [
   '0BSD', 'AGPL-3.0-only', 'Apache-2.0', 'BSD-2-Clause', 'BSD-3-Clause', 'CC-BY-4.0', 'CC-BY-SA-4.0', 'CC0-1.0',
@@ -246,6 +251,7 @@ function analyseManifest(path, files, { repository } = {}) {
     return { problems: [error instanceof Error && error.name === 'YAMLParseError' ? `${path}: is not valid YAML: ${error.message}` : `${path}: ${error.message}`], notes };
   }
   if (!isObject(manifest)) return { problems: [`${path}: is not a mapping`], notes };
+  if (manifest.format === databaseFormat) return analyseDatabaseDescriptor(path, manifest, files);
 
   // No keys outside the allow-list, at any level.
   for (const [where, allowed] of Object.entries(allowedKeys)) {
@@ -540,5 +546,37 @@ function analyseManifest(path, files, { repository } = {}) {
     }
   }
   notes.unshift(`${path}: ${offlineNote}`);
+  return { problems, notes };
+}
+
+function analyseDatabaseDescriptor(path, descriptor, files) {
+  const problems = [];
+  const notes = [];
+  let schemaBytes;
+  try {
+    schemaBytes = Buffer.from(files.read(databaseSchemaPath), 'utf8');
+  } catch (error) {
+    return { problems: [`${path}: cannot read ${databaseSchemaPath}: ${error.message}`], notes };
+  }
+  const schemaSha256 = createHash('sha256').update(schemaBytes).digest('hex');
+  if (schemaSha256 !== databaseSchemaSha256) {
+    return { problems: [`${path}: ${databaseSchemaPath} SHA-256 differs from the pinned draft-1 schema (${schemaSha256})`], notes };
+  }
+  let schema;
+  try {
+    schema = JSON.parse(schemaBytes.toString('utf8'));
+  } catch (error) {
+    return { problems: [`${path}: ${databaseSchemaPath} is not valid JSON: ${error.message}`], notes };
+  }
+  let ajv;
+  let validate;
+  try {
+    ajv = new Ajv2020({ allErrors: true, strict: true, allowUnionTypes: true });
+    validate = ajv.compile(schema);
+  } catch (error) {
+    return { problems: [`${path}: cannot compile ${databaseSchemaPath}: ${error.message}`], notes };
+  }
+  if (!validate(descriptor)) problems.push(`${path}: invalid ${databaseFormat} descriptor: ${ajv.errorsText(validate.errors)}`);
+  notes.push(offlineNote);
   return { problems, notes };
 }
