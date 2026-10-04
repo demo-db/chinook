@@ -51,7 +51,7 @@ contract = {'contractVersion': manifest['contractVersion'], 'manifest': manifest
 (ROOT / 'metadata/schema.json').write_text(json.dumps(schema, indent=2, ensure_ascii=False) + '\n')
 (ROOT / 'metadata/contract.json').write_text(json.dumps(contract, indent=2, ensure_ascii=False) + '\n')
 checksums = {}
-for path in sorted([ROOT / 'manifest.json', ROOT / 'metadata/contract.json', ROOT / 'metadata/schema.json', *artifact_root.rglob('*')]):
+for path in sorted([ROOT / 'manifest.json', ROOT / 'metadata/contract.json', ROOT / 'metadata/schema.json', *(ROOT / 'schemas').rglob('*'), *artifact_root.rglob('*')]):
     if path.is_file() and path.name != 'checksums.json':
         checksums[path.relative_to(ROOT).as_posix()] = {'sha256': hashlib.sha256(path.read_bytes()).hexdigest(), 'bytes': path.stat().st_size}
 (ROOT / 'metadata/checksums.json').write_text(json.dumps({'contractVersion': 1, 'files': checksums}, indent=2) + '\n')

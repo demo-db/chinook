@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "generate": "node scripts/generate-data.mjs && python3 scripts/generate.py && node scripts/generate-model.mjs",
-    "validate": "python3 scripts/validate.py",
+    "generate": "node scripts/generate-data.mjs && python3 scripts/generate.py && node scripts/generate-model.mjs && node scripts/generate-public-manifest.mjs",
+    "validate": "python3 scripts/validate.py && node scripts/generate-public-manifest.mjs --check",
     "test:data": "node --test scripts/test-data.mjs",
     "test:tools": "node --test scripts/test-tools.mjs",
     "tools:install": "node scripts/install-tools.mjs --dir .tools/bin",
@@ -17,6 +17,7 @@
     "check:drift": "node scripts/check-data-drift.mjs \"$BASE\""
   },
   "dependencies": {
+    "ajv": "8.20.0",
     "yaml": "^2.8.1"
   }
 }

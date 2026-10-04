@@ -13,13 +13,13 @@ description: >-
 homepage: https://chinook.demodb.dev/
 
 # The canonical identity of the database. It stays the same if the deployment moves.
-url: https://chinookdb.com/ovdb/dbs/chinook
+url: https://demodb.dev/chinook/
 
 deployment:
   url: https://cloud.openvaultdb.com/ovdb/dbs/chinook
   engine: sqlite
   # The discovery document at the origin of the canonical url; it lists that url.
-  discovery: https://chinookdb.com/.well-known/openvaultdb
+  discovery: https://demodb.dev/.well-known/openvaultdb
   # Where a recordset's page is. Clients use this template and never build the route themselves.
   recordset_page: https://cloud.openvaultdb.com/ovdb/dbs/chinook/collections/{name}
 

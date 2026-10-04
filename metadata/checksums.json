@@ -206,16 +206,24 @@
       "bytes": 615698
     },
     "manifest.json": {
-      "sha256": "af01fed5d5da795686c680451310d3f44a1d498d3275f7d6e091db08528f9ed6",
-      "bytes": 2644
+      "sha256": "4e168c0091053817d71fbda43e3b23d711a6318d941ea9a2f34efab78baf00c6",
+      "bytes": 2736
     },
     "metadata/contract.json": {
-      "sha256": "f45550cf29832c832584cfac62478e3a034808e700d11eab725b721ba8465ba5",
-      "bytes": 60930
+      "sha256": "576b4ecb21bd3b263b7a3523b6a3c952c8388298eb0fa56a7950b42f63958272",
+      "bytes": 61026
     },
     "metadata/schema.json": {
       "sha256": "61cefa79b5a9a153ce7b8882fe8c79b1b7e18f1847060963b79e869951399945",
       "bytes": 45271
+    },
+    "ovdb-database.json": {
+      "sha256": "e851d1709633a43958fbabe9eb1710ea895838d8a2fb6c225adc21b085dbf26b",
+      "bytes": 20793
+    },
+    "schemas/ovdb-database-draft-1.schema.json": {
+      "sha256": "2424ef00acd462ab5a8abc546fe2d1fffbbb5397e312332aedc77b3e73109488",
+      "bytes": 5371
     }
   }
 }

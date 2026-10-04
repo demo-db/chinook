@@ -63,8 +63,10 @@
       ],
       "ovdb": {
         "available": true,
-        "canonicalUrl": "https://chinookdb.com/ovdb/dbs/chinook",
-        "connection": "https://cloud.openvaultdb.com/v1/databases/chinook",
+        "canonicalUrl": "https://demodb.dev/chinook/",
+        "serverId": "https://demodb.dev/ovdb",
+        "serverDbBaseUrl": "https://demodb.dev/ovdb/db/chinook/",
+        "connection": "https://demodb.dev/ovdb/v1/databases/chinook",
         "query": true,
         "readOnly": true,
         "deploymentVerified": true
