@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
+import { parse as parseYaml } from 'yaml';
 import { buildChecksums, checksumsPath, listDataFiles, serializeChecksums, sha256Hex, verifyChecksums } from './lib/checksums.mjs';
 import { evaluateDrift } from './lib/drift.mjs';
 
@@ -26,6 +27,18 @@ test('the hero demo file chinook.Invoice.json is pinned to the hash the demo pro
   assert.equal(JSON.parse(bytes).length, 412);
   const checksums = JSON.parse(await readFile(join(published, checksumsPath), 'utf8'));
   assert.deepEqual(checksums.files['json/chinook.Invoice.json'], { sha256: '88eb7faede360988e9c0f8f8d107e5093db5e712141de14d868f8947b43c373c', bytes: 115781 });
+});
+
+test('invoices stay distinct from orders and both line types share the declared commercial ancestor', async () => {
+  const manifest = JSON.parse(await readFile(join(root, 'manifest.json'), 'utf8'));
+  const meaning = parseYaml(await readFile(join(root, 'model', 'chinook.meaning.yaml'), 'utf8'));
+  const concepts = Object.fromEntries(meaning.concepts.map((concept) => [concept.id, concept]));
+  assert.deepEqual(manifest.semantics.tableConcepts.Invoice, ['invoice']);
+  assert.deepEqual(manifest.semantics.tableConcepts.InvoiceLine, ['invoice-line', 'commercial-line-item']);
+  assert.equal(manifest.tableDescriptions.Invoice, 'Billing invoices issued to customers for music purchases.');
+  assert.equal(concepts.invoice.extends, 'meaning://github.com/meaninggraph/core/invoice?ref=982916d73f0a35ff2558b0062f58aa3ac4f24d97');
+  assert.equal(concepts.invoice.synonyms.en.includes('order'), false);
+  assert.equal(concepts['invoice-line'].extends, 'meaning://github.com/meaninggraph/core/invoice-line?ref=982916d73f0a35ff2558b0062f58aa3ac4f24d97');
 });
 
 test('the published checksums file matches every published data file', async () => {

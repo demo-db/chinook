@@ -206,16 +206,16 @@
       "bytes": 615698
     },
     "manifest.json": {
-      "sha256": "8eb5bed1e0383b373c51761a2cd3740ccab56dbf46ad577693e5d587cea2d8b2",
-      "bytes": 2588
+      "sha256": "af01fed5d5da795686c680451310d3f44a1d498d3275f7d6e091db08528f9ed6",
+      "bytes": 2644
     },
     "metadata/contract.json": {
-      "sha256": "3e31adb5051a452265162d360bb7123237be3585e54bef69da0c5a43dd77c0d9",
-      "bytes": 60836
+      "sha256": "f45550cf29832c832584cfac62478e3a034808e700d11eab725b721ba8465ba5",
+      "bytes": 60930
     },
     "metadata/schema.json": {
-      "sha256": "1c1f1210ba3fed7d2425e00868d6cd50c051cd95a98367dea7bf1ba8c8611648",
-      "bytes": 45243
+      "sha256": "61cefa79b5a9a153ce7b8882fe8c79b1b7e18f1847060963b79e869951399945",
+      "bytes": 45271
     }
   }
 }
