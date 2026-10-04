@@ -2,13 +2,11 @@
 // (CC0-1.0, like the Directory's files).
 //
 // MIRRORS `scripts/lib/urls.mjs` and `scripts/lib/directory.mjs` of openvaultdb/directory: publicHttpsProblem,
-// hostProblem, hasOvdbMarker and homepageProblem are copied from urls.mjs (the file's opening comment is not
-// repeated; it includes the refusal of any port, even :443, and of any percent escape in a path), and from
-// directory.mjs the canonical-url rule (urlProblem), the id pattern (at most 80 characters), the
-// deployment.engine pattern and the `homepage` field check, and from git.mjs isRepositoryPath. When the
-// Directory changes one of them, change it here. The list of single-field edits in scripts/test-model.mjs
-// ("the checker refuses every one of ...") pins the agreement: each edit was refused by the Directory's own
-// manifestProblems when it was added, and the checker must refuse it too.
+// hostProblem and homepageProblem are copied from urls.mjs (the file's opening comment is not repeated; it
+// includes the refusal of any port, even :443, and of any percent escape in a path), and from directory.mjs
+// the generic canonical-identity URL rule, id pattern, deployment.engine pattern and `homepage` field check,
+// and from git.mjs isRepositoryPath. When the Directory changes one of them, change it here. Tests pin the
+// accepted canonical identity forms and unsafe URL refusals.
 
 // ---- scripts/lib/urls.mjs ----
 
@@ -27,10 +25,6 @@ const privateSuffixes = [
 // the registered name, or a publisher's own site, there). That is acceptable because
 // the marker is a naming convention, not proof that the publisher owns the origin (see
 // the README).
-const twoLabelSuffixes = new Set([
-  'co.uk', 'org.uk', 'ac.uk', 'gov.uk', 'me.uk', 'com.au', 'net.au', 'org.au', 'co.nz', 'co.jp', 'co.in', 'co.za', 'com.br', 'com.cn', 'com.mx', 'com.tr', 'com.ar',
-]);
-
 // A problem with the host of `url` for a public mapping, or null.
 export function hostProblem(url) {
   const host = url.hostname.toLowerCase();
@@ -79,20 +73,6 @@ export function publicHttpsProblem(value, { template = false } = {}) {
   return null;
 }
 
-// Whether the canonical url has `ovdb` as a complete path segment or as a
-// subdomain. A subdomain is a host label that is left of the registered name:
-// the registered name is the last two labels, or the last three under a two-label
-// suffix such as co.uk. So ovdb.acme.com and x.ovdb.acme.co.uk count; ovdb.com and
-// ovdb.co.uk (where ovdb is the registered name itself) do not. In the path,
-// acme.com/ovdb/x counts and acme.com/ovdbx/x does not.
-export function hasOvdbMarker(value) {
-  const url = new URL(value);
-  if (url.pathname.split('/').includes('ovdb')) return true;
-  const labels = url.hostname.toLowerCase().split('.');
-  const suffixLabels = twoLabelSuffixes.has(labels.slice(-2).join('.')) ? 2 : 1;
-  return labels.slice(0, labels.length - suffixLabels - 1).includes('ovdb');
-}
-
 // What the index guarantees about a manifest's `homepage`, on top of publicHttpsProblem (https, no
 // userinfo, query or fragment, no port, a public host written canonically): at most 200 characters; a
 // lower-case host of two or more dot-separated labels of ASCII letters, digits and hyphen (no label starts
@@ -138,14 +118,10 @@ export function manifestUrlProblem(value, options = {}) {
 
 // ---- scripts/lib/directory.mjs and scripts/lib/git.mjs ----
 
-// A problem with `value` as a database's canonical url, or null: a public https URL without a trailing
-// slash, with `ovdb` as a complete path segment or as a subdomain (see hasOvdbMarker).
+// A problem with `value` as a database's canonical identity, or null. Identity paths may be at the root,
+// nested, and may end in a slash; safety and canonical spelling are enforced by manifestUrlProblem.
 export function canonicalUrlProblem(value) {
-  const problem = manifestUrlProblem(value);
-  if (problem) return problem;
-  if (value.endsWith('/')) return 'must not have a trailing slash';
-  if (!hasOvdbMarker(value)) return 'must have ovdb as a complete path segment or as a subdomain (https://acme.com/ovdb/sales or https://ovdb.acme.com/sales)';
-  return null;
+  return manifestUrlProblem(value);
 }
 
 // A problem with the manifest's `homepage` as the Directory checks the field, or null.
