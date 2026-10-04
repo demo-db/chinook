@@ -883,7 +883,7 @@
     {
       "name": "Invoice",
       "kind": "table",
-      "description": "Orders raised for a customer.",
+      "description": "Billing invoices issued to customers for music purchases.",
       "columns": [
         {
           "name": "InvoiceId",

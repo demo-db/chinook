@@ -23,7 +23,7 @@ const descriptions = {
   PlaylistTrack: 'The many-to-many link between playlists and tracks.',
   Customer: 'Customers who purchase music from the store.',
   Employee: 'Store employees and their reporting relationships.',
-  Invoice: 'Orders raised for a customer.',
+  Invoice: 'Billing invoices issued to customers for music purchases.',
   InvoiceLine: 'Individual tracks and quantities on an invoice.',
 };
 
