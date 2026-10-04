@@ -1,0 +1,59 @@
+name: Provider validation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  provider:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
+        with:
+          version: 9
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Install the SHA-pinned ModelSpec and MeaningGraph tools
+        run: pnpm tools:install
+      - run: pnpm generate
+      - run: pnpm validate
+      - run: pnpm test:data
+      - run: pnpm test:tools
+      - name: Cache the MeaningGraph core commit pinned by the meaning file
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: .cache/meaning-sources
+          key: meaning-sources-${{ hashFiles('model/*.meaning.yaml') }}
+      - name: OVDB publisher manifest pre-check
+        run: pnpm check:ovdb
+      - name: Generated provider files are committed
+        run: |
+          if [ -n "$(git status --porcelain -- artifacts metadata model)" ]; then
+            git status --short -- artifacts metadata model
+            echo "::error::generated provider files are stale; run pnpm generate and commit the results"
+            exit 1
+          fi
+      - name: ModelSpec lint (publish profile)
+        run: pnpm lint:model
+      - name: ModelSpec JSON matches HCL export
+        run: pnpm check:model-twin
+      - name: MeaningGraph check
+        run: pnpm check:meaning
+      - name: Embedded meaning schema matches pinned core
+        run: pnpm check:schema
+      - name: Published data changes require source provenance
+        env:
+          BASE: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || github.event.before }}
+        run: pnpm check:drift

@@ -1,0 +1,56 @@
+{
+  "contractVersion": 1,
+  "id": "chinook",
+  "name": "Chinook",
+  "description": "A digital music store database for learning SQL, joins, and data tooling.",
+  "domain": "Music retail",
+  "siteHost": "chinook.demodb.dev",
+  "aliases": ["chinookdb.com"],
+  "source": {
+    "repository": "https://github.com/lerocha/chinook-database",
+    "revision": "7f67772503d71ba90f19283c38e93923addb43fa",
+    "path": "data-source/source.sqlite",
+    "sha256": "7651ba378ac2fcd0dfc3c66fb101f7a7eed3ba39a612ec642b96e20702061f15",
+    "license": "MIT",
+    "licenseFile": "data-source/LICENSE.md",
+    "notes": "The checked-in SQLite fixture is byte-for-byte the upstream SQLite file from the pinned revision."
+  },
+  "dataFile": "data-source/source.sqlite",
+  "semantics": {
+    "tableConcepts": {
+      "Customer": ["customer"],
+      "Employee": ["employee"],
+      "Invoice": ["order"],
+      "InvoiceLine": ["order-line"]
+    }
+  },
+  "tableDescriptions": {
+    "Artist": "Artists represented in the music catalogue.",
+    "Album": "Albums released by an artist.",
+    "Track": "Individual audio tracks available in the store.",
+    "Genre": "Music genres assigned to tracks.",
+    "MediaType": "File and encoding types used by tracks.",
+    "Playlist": "Named collections of tracks.",
+    "PlaylistTrack": "The many-to-many link between playlists and tracks.",
+    "Customer": "Customers who purchase music from the store.",
+    "Employee": "Store employees and their reporting relationships.",
+    "Invoice": "Orders raised for a customer.",
+    "InvoiceLine": "Individual tracks and quantities on an invoice."
+  },
+  "capabilities": {
+    "exports": ["sqlite", "csv", "json", "yaml", "table-sql", "mysql", "postgresql", "sqlserver"],
+    "ovdb": {
+      "available": true,
+      "canonicalUrl": "https://chinookdb.com/ovdb/dbs/chinook",
+      "connection": "https://cloud.openvaultdb.com/v1/databases/chinook",
+      "query": true,
+      "readOnly": true,
+      "deploymentVerified": true
+    },
+    "datatug": { "available": true, "mode": "static-json-and-ovdb" }
+  },
+  "queries": [
+    { "title": "Artists by track count", "description": "Count tracks by artist.", "sql": "SELECT Artist.Name, COUNT(Track.TrackId) AS Tracks FROM Artist JOIN Album USING (ArtistId) JOIN Track USING (AlbumId) GROUP BY Artist.ArtistId ORDER BY Tracks DESC LIMIT 10;" },
+    { "title": "Sales by billing country", "description": "Compare invoice totals across countries.", "sql": "SELECT BillingCountry, ROUND(SUM(Total), 2) AS Sales FROM Invoice GROUP BY BillingCountry ORDER BY Sales DESC LIMIT 10;" }
+  ]
+}

@@ -1,0 +1,4 @@
+*.sqlite binary
+artifacts/** -diff
+data-source/sql/*.sql -diff
+data-source/LICENSE.md -diff
