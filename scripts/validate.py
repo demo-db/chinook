@@ -57,6 +57,22 @@ for rel, item in contract_checksums.items():
     raw = (ROOT / rel).read_bytes()
     assert len(raw) == item['bytes'] and hashlib.sha256(raw).hexdigest() == item['sha256'], f'contract checksum mismatch: {rel}'
 
+public = json.loads((ROOT / 'ovdb-database.json').read_text())
+assert public['format'] == 'ovdb-database/draft-1'
+assert public['id'] == public['serverDbBaseUrl'].replace('/ovdb/db/chinook/', '/chinook/')
+assert public['id'] == manifest['capabilities']['ovdb']['canonicalUrl'] == 'https://demodb.dev/chinook/'
+assert public['localId'] == 'chinook' and public['serverId'] == 'https://demodb.dev/ovdb'
+assert public['apiUrl'] == 'https://demodb.dev/ovdb/v1/databases/chinook'
+assert public['capabilities'] == {'read': True, 'query': True, 'write': False}
+assert [r['name'] for r in public['recordsets']] == [r['name'] for r in schema['tables'] if r['kind'] == 'table']
+for recordset in public['recordsets']:
+    assert 'rows' not in recordset and 'viewSql' not in recordset
+    source_table = next(table for table in schema['tables'] if table['name'] == recordset['name'])
+    assert recordset['columns'] == [{key: column[key] for key in ('name', 'type', 'nullable', 'primaryKey', 'primaryKeyPosition', 'defaultValue')} for column in source_table['columns']]
+    assert recordset['primaryKey'] == source_table['primaryKey']
+    assert recordset['foreignKeys'] == source_table['foreignKeys']
+assert contract_checksums['schemas/ovdb-database-draft-1.schema.json']['sha256'] == '2424ef00acd462ab5a8abc546fe2d1fffbbb5397e312332aedc77b3e73109488'
+
 # Validate representative site queries against the canonical database.
 for query in manifest['queries']:
     conn.execute(query['sql']).fetchall()
