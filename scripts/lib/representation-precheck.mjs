@@ -118,9 +118,14 @@ export function precheckRepresentation(envelope, files, manifest, outerRepositor
     }
     const artifacts = new Map();
     if (snapshot) {
-      if (!repository(snapshot.generator?.repository) || !/^[0-9a-f]{40}$/.test(snapshot.generator?.revision ?? '') || !Array.isArray(snapshot.artifacts) || snapshot.artifacts.length > 10000) bad(`${label}: snapshot generator/artifact bounds invalid`);
+      try {
+        exactFields(snapshot, ['generator', 'artifacts']);
+        exactFields(snapshot.generator, ['repository', 'revision']);
+        for (const artifact of snapshot.artifacts ?? []) exactFields(artifact, ['path', 'sha256']);
+      } catch (error) { bad(`${label}: snapshot ${error.message}`); }
+      if (!repository(snapshot.generator?.repository) || typeof snapshot.generator?.revision !== 'string' || !/^[0-9a-f]{40}$/.test(snapshot.generator.revision) || !Array.isArray(snapshot.artifacts) || snapshot.artifacts.length > 10000) bad(`${label}: snapshot generator/artifact bounds invalid`);
       else for (const artifact of snapshot.artifacts) {
-        if (!exactKeys(artifact, ['path', 'sha256']) || !path(artifact.path) || !/^[0-9a-f]{64}$/.test(artifact.sha256) || artifacts.has(artifact.path)) bad(`${label}: invalid or duplicate snapshot artifact`);
+        if (!object(artifact) || !path(artifact.path) || typeof artifact.sha256 !== 'string' || !/^[0-9a-f]{64}$/.test(artifact.sha256) || artifacts.has(artifact.path)) bad(`${label}: invalid or duplicate snapshot artifact`);
         else artifacts.set(artifact.path, artifact.sha256);
       }
     }
@@ -139,7 +144,14 @@ export function precheckRepresentation(envelope, files, manifest, outerRepositor
       }
       const provenance = localObject(c.native.provenance, `${label}.native.provenance`, 'json', 2 * MiB);
       if (provenance) {
-        if (!object(provenance) || !Object.hasOwn(provenance, 'native_key') || !Object.hasOwn(provenance, 'snapshot') || Object.keys(provenance).some((key) => !['native_key', 'snapshot', 'snapshot_association'].includes(key))) bad(`${label}: native provenance root fields invalid`);
+        try {
+          // Match Go's open metadata projections; consumed fields keep exact spelling.
+          exactFields(provenance, ['native_key', 'snapshot', 'snapshot_association']);
+          exactFields(provenance.snapshot, ['outputs', 'counts']);
+          if (!object(provenance.snapshot.outputs) || !object(provenance.snapshot.counts)) throw new Error('original outputs/counts must be objects');
+          if (!Object.hasOwn(provenance, 'snapshot_association')) for (const output of Object.values(provenance.snapshot.outputs)) exactFields(output, ['sha256']);
+        } catch (error) { bad(`${label}: provenance ${error.message}`); }
+        if (!object(provenance) || !Object.hasOwn(provenance, 'native_key') || !Object.hasOwn(provenance, 'snapshot')) bad(`${label}: native provenance root fields invalid`);
         const n = provenance.native_key;
         if (!exactKeys(n, ['module', 'entity', 'property', 'namespace', 'model', 'binding', 'dataset', 'records', 'duplicates']) || n.module !== c.target.module || n.entity !== c.target.entity || n.property !== c.target.property || n.namespace !== c.target.namespace || !sameRef(n.model, c.target.model) || !sameRef(n.binding, c.target.binding.document) || !sameRef(n.dataset, c.native.dataset) || !Number.isSafeInteger(n.records) || n.records < 0 || n.duplicates !== 0) bad(`${label}: native provenance scope/refs/counts mismatch`);
         if (Object.hasOwn(provenance, 'snapshot_association')) {
@@ -152,6 +164,8 @@ export function precheckRepresentation(envelope, files, manifest, outerRepositor
             const original = localObject(source, `${label}.snapshot_association.source`, 'json', 2 * MiB);
             if (original) {
               const selected = original.outputs?.[outputKey];
+              try { exactFields(selected, ['file', 'sha256']); }
+              catch (error) { bad(`${label}: original output ${error.message}`); }
               if (!object(selected) || selected.file !== c.native.dataset.path || selected.sha256 !== c.native.dataset.sha256 || !Number.isSafeInteger(original.counts?.[c.target.entity]) || original.counts[c.target.entity] < 0 || original.counts[c.target.entity] !== n?.records) bad(`${label}: original snapshot selected output/count mismatch`);
               const originalBytes = rawMetadata.get(`${source.path}:${source.sha256}:json:${2 * MiB}`);
               const provenanceBytes = rawMetadata.get(`${c.native.provenance.path}:${c.native.provenance.sha256}:json:${2 * MiB}`);
@@ -196,4 +210,11 @@ export function precheckRepresentation(envelope, files, manifest, outerRepositor
   if (problems.length === 0) notes.push(`${doc.format}: provider-local attachment/reference bytes and selected manifest, model, binding, snapshot and provenance associations checked`);
   notes.push('representation_contract is an offline partial precheck: external metadata/data bytes, full ModelSpec and core meaning, immutable dependency readers, independent semantic continuity/admission, Directory publication and runtime remain unresolved');
   return { problems, notes };
+}
+
+// Protocol fields are ASCII. Unicode long-s and Kelvin-sign also fold to ASCII
+// under Go strings.EqualFold; unrelated metadata names remain unconsumed.
+function exactFields(value, fields) {
+  if (!object(value)) throw new Error('expected metadata object');
+  for (const key of Object.keys(value)) if (!fields.includes(key) && fields.some((field) => field.toLowerCase() === key.toLowerCase().replace(/ſ/g, 's'))) throw new Error(`non-exact JSON field ${key}`);
 }
