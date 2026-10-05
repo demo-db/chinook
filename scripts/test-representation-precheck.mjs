@@ -61,6 +61,20 @@ export function fixture(format = 3, prefix = '') {
 
 function check(f) { return precheckRepresentation(f.attachment, f.reader, f.manifest, providerRepo); }
 function repack(f) { f.attachment = f.put('source/contract.json', f.doc); }
+function resizeLocalArtifact(f, artifact, size) {
+  const original = f.files.get(artifact.path);
+  assert.ok(size >= original.length);
+  const padded = Buffer.concat([original, Buffer.alloc(size - original.length, 0x20)]);
+  f.files.set(artifact.path, padded);
+  artifact.sha256 = sha(padded);
+  const snapshotRef = f.contract.target.snapshot;
+  const snapshot = JSON.parse(f.files.get(snapshotRef.path).toString('utf8'));
+  snapshot.artifacts.find((entry) => entry.path === artifact.path).sha256 = artifact.sha256;
+  const snapshotBytes = bytes(snapshot);
+  f.files.set(snapshotRef.path, snapshotBytes);
+  snapshotRef.sha256 = sha(snapshotBytes);
+  repack(f);
+}
 
 test('frozen formats 1, 2 and 3 check local committed bytes and state unresolved proof', () => {
   for (const version of [1, 2, 3]) {
@@ -112,6 +126,18 @@ test('strict JSON refuses malformed UTF-8, BOM, scalar escapes and duplicate dec
   for (const bad of [Buffer.from([0xff]), Buffer.from([0xef, 0xbb, 0xbf, 0x7b, 0x7d]), bytes('"\\ud800"'), bytes('{"a":1,"\\u0061":2}')]) {
     assert.throws(() => parseStrictJson(bad, 1024), /UTF-8|BOM|surrogate|duplicate/);
   }
+});
+
+test('native provenance accepts exactly 2 MiB and refuses one byte over; other metadata retains 4 MiB', () => {
+  const native = fixture(3);
+  resizeLocalArtifact(native, native.contract.native.provenance, 2 * 1024 * 1024);
+  assert.deepEqual(check(native).problems, []);
+  resizeLocalArtifact(native, native.contract.native.provenance, 2 * 1024 * 1024 + 1);
+  assert.match(check(native).problems.join('\n'), /native\.provenance.*oversize|native\.provenance.*exceeds/);
+
+  const bridge = fixture(2);
+  resizeLocalArtifact(bridge, bridge.contract.bridge.artifact, 2 * 1024 * 1024 + 1);
+  assert.deepEqual(check(bridge).problems, []);
 });
 
 test('committed HEAD fixture exercises the same regular-file reader as the publisher', () => {

@@ -58,15 +58,15 @@ export function precheckRepresentation(envelope, files, manifest, outerRepositor
 
   const metadata = new Map();
   const rawMetadata = new Map();
-  const local = (ref, label, parse = 'json') => {
+  const local = (ref, label, parse = 'json', limit = 4 * MiB) => {
     if (!ownRef(ref)) { bad(`${label} must be provider-local`); return undefined; }
-    const key = `${ref.path}:${ref.sha256}:${parse}`;
+    const key = `${ref.path}:${ref.sha256}:${parse}:${limit}`;
     if (metadata.has(key)) return metadata.get(key);
     try {
       if (!path(ref.path)) throw new Error('unsafe reference path');
-      const bytes = read(ref.path, ref.sha256, 4 * MiB);
+      const bytes = read(ref.path, ref.sha256, limit);
       rawMetadata.set(key, bytes);
-      const value = parse === 'json' ? parseStrictJson(bytes, 4 * MiB, ref.path) : parse === 'yaml' ? parseYaml(new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(bytes), { uniqueKeys: true }) : bytes;
+      const value = parse === 'json' ? parseStrictJson(bytes, limit, ref.path) : parse === 'yaml' ? parseYaml(new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(bytes), { uniqueKeys: true }) : bytes;
       metadata.set(key, value);
       return value;
     } catch (error) { bad(`${label}: ${error.message}`); return undefined; }
@@ -125,7 +125,7 @@ export function precheckRepresentation(envelope, files, manifest, outerRepositor
         if (!Array.isArray(entity?.key) || entity.key.length !== 1 || entity.key[0] !== c.target.property || property?.required !== true) bad(`${label}: native target key must be one required selected property`);
         if (c.native.serving_identity_column && (c.native.serving_identity_column === c.target.property || !entity?.properties?.[c.native.serving_identity_column])) bad(`${label}: invalid serving identity column`);
       }
-      const provenance = local(c.native.provenance, `${label}.native.provenance`);
+      const provenance = local(c.native.provenance, `${label}.native.provenance`, 'json', 2 * MiB);
       if (provenance) {
         if (!object(provenance) || !Object.hasOwn(provenance, 'native_key') || !Object.hasOwn(provenance, 'snapshot') || Object.keys(provenance).some((key) => !['native_key', 'snapshot', 'snapshot_association'].includes(key))) bad(`${label}: native provenance root fields invalid`);
         const n = provenance.native_key;
@@ -137,15 +137,15 @@ export function precheckRepresentation(envelope, files, manifest, outerRepositor
           if (!exactKeys(association, ['source', 'output_key']) || !exactKeys(source, ['path', 'sha256']) || !path(source.path) || !/^[0-9a-f]{64}$/.test(source.sha256) || !/^[A-Za-z0-9_-]{1,128}$/.test(outputKey ?? '') || [c.native.provenance.path, c.target.snapshot.path, c.native.dataset.path].includes(source.path) || artifacts.get(source.path) !== source.sha256) {
             bad(`${label}: malformed original snapshot association`);
           } else {
-            const original = local(source, `${label}.snapshot_association.source`);
+            const original = local(source, `${label}.snapshot_association.source`, 'json', 2 * MiB);
             if (original) {
               const selected = original.outputs?.[outputKey];
               if (!object(selected) || selected.file !== c.native.dataset.path || selected.sha256 !== c.native.dataset.sha256 || !Number.isSafeInteger(original.counts?.[c.target.entity]) || original.counts[c.target.entity] < 0 || original.counts[c.target.entity] !== n?.records) bad(`${label}: original snapshot selected output/count mismatch`);
-              const originalBytes = rawMetadata.get(`${source.path}:${source.sha256}:json`);
-              const provenanceBytes = rawMetadata.get(`${c.native.provenance.path}:${c.native.provenance.sha256}:json`);
+              const originalBytes = rawMetadata.get(`${source.path}:${source.sha256}:json:${2 * MiB}`);
+              const provenanceBytes = rawMetadata.get(`${c.native.provenance.path}:${c.native.provenance.sha256}:json:${2 * MiB}`);
               if (originalBytes && provenanceBytes) {
-                const originalTokens = parseStrictJson(originalBytes, 4 * MiB, source.path, { losslessNumbers: true });
-                const embeddedTokens = parseStrictJson(provenanceBytes, 4 * MiB, c.native.provenance.path, { losslessNumbers: true }).snapshot;
+                const originalTokens = parseStrictJson(originalBytes, 2 * MiB, source.path, { losslessNumbers: true });
+                const embeddedTokens = parseStrictJson(provenanceBytes, 2 * MiB, c.native.provenance.path, { losslessNumbers: true }).snapshot;
                 if (!isDeepStrictEqual(originalTokens, embeddedTokens)) bad(`${label}: embedded snapshot differs from exact original values/number tokens`);
               }
             }
