@@ -1,0 +1,8 @@
+format: meaning/draft-1
+concepts:
+  - id: target-entity
+    extends: meaning://github.com/example/meaning/concept?ref=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    bindings:
+      - model: modelspec:///target.Entities
+        property: id
+        role: identifier

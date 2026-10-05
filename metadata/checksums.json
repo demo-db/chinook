@@ -224,6 +224,18 @@
     "schemas/ovdb-database-draft-1.schema.json": {
       "sha256": "2424ef00acd462ab5a8abc546fe2d1fffbbb5397e312332aedc77b3e73109488",
       "bytes": 5371
+    },
+    "schemas/representation/schema.json": {
+      "sha256": "c75eb5cae7201a9c10432239ece5ffd93a750f191c9b04129c89169f4449d844",
+      "bytes": 7893
+    },
+    "schemas/representation/schema2.json": {
+      "sha256": "fa281400fbe063d1abbcbf5c7578dd23932dd798ee91810e0906ffa2431dc0bc",
+      "bytes": 15702
+    },
+    "schemas/representation/schema3.json": {
+      "sha256": "3f7405034aaad25bc27a347d9cc66a6fab90c7561d8276aa8e97ee0c361ead22",
+      "bytes": 10019
     }
   }
 }
