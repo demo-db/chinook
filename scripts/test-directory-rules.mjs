@@ -1,8 +1,13 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { tmpdir } from 'node:os';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 import { test } from 'node:test';
 import { canonicalUrlProblem } from './lib/directory-rules.mjs';
-import { checkManifest } from './lib/ovdb-manifest.mjs';
+import { checkManifest, licenceIds, reportOvdbManifest } from './lib/ovdb-manifest.mjs';
 import { directoryOptInProblem } from './check-directory-opt-in.mjs';
 
 test('database identities accept public root, nested, legacy, and trailing-slash URLs', () => {
@@ -57,5 +62,126 @@ test('database identities still reject unsafe hosts, paths, and URL components',
     ['https://demodb.dev/northwind\\hidden/', /backslash/],
   ]) {
     assert.match(canonicalUrlProblem(identity), message, identity);
+  }
+});
+
+const root = fileURLToPath(new URL('../', import.meta.url));
+const repository = 'https://github.com/demo-db/chinook';
+const acceptedCompounds = [
+  'CC0-1.0 AND CC-BY-4.0',
+  'CC-BY-4.0 AND CC0-1.0',
+  'MIT AND Apache-2.0',
+  'MIT AND ISC AND 0BSD',
+  'MIT AND ISC AND 0BSD AND CC0-1.0',
+  'AGPL-3.0-only AND BSD-2-Clause AND BSD-3-Clause AND GPL-2.0-only',
+];
+const over64 = 'AGPL-3.0-only AND GPL-2.0-only AND GPL-3.0-only AND LGPL-3.0-only';
+const fiveTerms = 'MIT AND ISC AND 0BSD AND CC0-1.0 AND MPL-2.0';
+
+function licenceFixture(value, { shared = false, field = 'data', encode = stringifyYaml } = {}) {
+  const manifest = parseYaml(readFileSync(join(root, 'ovdb.yaml'), 'utf8'));
+  if (shared) {
+    manifest.model = { address: `modelspec://github.com/example/model/chinook?ref=${'a'.repeat(40)}` };
+    manifest.meaning = {
+      address: `meaning://github.com/example/graph?ref=${'b'.repeat(40)}`,
+      file: 'model/chinook.meaning.yaml', graph: { id: 'chinook' },
+    };
+  }
+  manifest.licences[field] = value;
+  const text = encode(manifest);
+  const files = {
+    kind: () => 'file',
+    read: (path) => path === 'ovdb.yaml' ? text
+      : path === 'OVDB.md' ? '---\novdb: 1\npublish: [./ovdb.yaml]\n---\n'
+        : readFileSync(join(root, path), 'utf8'),
+  };
+  return { manifest, files };
+}
+
+function licenceProblems(value, options) {
+  const { files } = licenceFixture(value, options);
+  const problems = checkManifest('ovdb.yaml', files, { repository });
+  const report = reportOvdbManifest(files, { repository });
+  assert.deepEqual(report.problems, problems, 'both public checking paths agree');
+  assert.ok(report.notes.some((note) => note.includes('offline pre-check')));
+  return problems;
+}
+
+test('data licence conjunctions are generic, bounded, and accepted in own/shared JSON/YAML manifests', () => {
+  assert.deepEqual(licenceIds, [
+    '0BSD', 'AGPL-3.0-only', 'Apache-2.0', 'BSD-2-Clause', 'BSD-3-Clause', 'CC-BY-4.0', 'CC-BY-SA-4.0', 'CC0-1.0',
+    'GPL-2.0-only', 'GPL-3.0-only', 'ISC', 'LGPL-3.0-only', 'MIT', 'MPL-2.0', 'ODC-By-1.0', 'ODbL-1.0', 'PDDL-1.0', 'Unlicense',
+  ]);
+  assert.equal(Buffer.byteLength(acceptedCompounds.at(-1)), 64);
+  assert.equal(Buffer.byteLength(over64), 65);
+  assert.ok(Buffer.byteLength(fiveTerms) < 64);
+  for (const shared of [false, true]) {
+    for (const encode of [stringifyYaml, JSON.stringify]) {
+      for (const value of [...licenceIds, ...acceptedCompounds]) {
+        assert.deepEqual(licenceProblems(value, { shared, encode }), [], `${shared}: ${value}`);
+      }
+    }
+  }
+});
+
+test('data conjunction grammar refuses unsupported expressions and decoded scalar types', () => {
+  const invalid = [
+    over64, fiveTerms, 'MIT AND MIT', 'MIT AND ISC AND MIT',
+    ' MIT AND ISC', 'MIT AND ISC ', 'MIT  AND ISC', 'MIT AND  ISC',
+    'MIT AND', 'AND MIT', ' AND MIT', 'MIT AND ', 'MIT AND  AND ISC',
+    'mit AND ISC', 'MIT and ISC', 'MIT And ISC', 'MIT AND apache-2.0',
+    'MIT\tAND ISC', 'MIT AND\tISC', 'MIT AND ISC\n', 'MIT AND ISC\r',
+    'MIT\u00a0AND ISC', 'MIT AND\u2003ISC', 'MIT AND ISC\u0000',
+    'MIT OR ISC', 'MIT WITH ISC', '(MIT AND ISC)', 'MIT AND (ISC)',
+    'MIT AND ISC OR 0BSD', 'MIT AND ISC WITH 0BSD', 'MIT AND GPL-2.0+',
+    'MIT AND LicenseRef-x', 'DocumentRef-x:MIT AND ISC', 'MIT AND Unknown-1.0',
+    'MIT AND CC-BY-SA-3.0', 'MIT AND Unlicense-extra',
+    ['MIT', 'ISC'], { licence: 'MIT AND ISC' }, 123, null,
+  ];
+  for (const shared of [false, true]) {
+    for (const encode of [stringifyYaml, JSON.stringify]) {
+      for (const value of invalid) {
+        assert.match(licenceProblems(value, { shared, encode }).join('\n'), /licences\.data/, JSON.stringify(value));
+      }
+    }
+  }
+});
+
+test('legacy publisher atoms and model/meaning retain their exact known-ID rules', () => {
+  for (const value of ['Unknown-1.0', 'LicenseRef-x', 'GPL-2.0+', 'mit', 'CC-BY-SA-3.0']) {
+    for (const field of ['data', 'model', 'meaning']) {
+      assert.match(licenceProblems(value, { shared: true, field }).join('\n'), new RegExp(`licences\\.${field}`));
+    }
+  }
+  for (const field of ['model', 'meaning']) {
+    for (const value of licenceIds) assert.deepEqual(licenceProblems(value, { shared: true, field }), []);
+    for (const shared of [false, true]) {
+      for (const value of acceptedCompounds) {
+        assert.match(licenceProblems(value, { shared, field }).join('\n'), new RegExp(`licences\\.${field} must be a known SPDX licence id`));
+      }
+    }
+  }
+});
+
+test('the public descriptor generator preserves the full authored data expression', (t) => {
+  // Run the actual generator against copied inputs, so the provider's real licences stay unchanged.
+  const fixtureRoot = mkdtempSync(join(tmpdir(), 'chinook-licences-'));
+  t.after(() => rmSync(fixtureRoot, { recursive: true, force: true }));
+  for (const path of ['scripts/generate-public-manifest.mjs', 'manifest.json',
+    'metadata/schema.json', 'metadata/checksums.json', 'schemas/ovdb-database-draft-1.schema.json']) {
+    mkdirSync(dirname(join(fixtureRoot, path)), { recursive: true });
+    copyFileSync(join(root, path), join(fixtureRoot, path));
+  }
+  symlinkSync(join(root, 'node_modules'), join(fixtureRoot, 'node_modules'), 'dir');
+  for (const value of acceptedCompounds) {
+    const { manifest } = licenceFixture(value);
+    writeFileSync(join(fixtureRoot, 'ovdb.yaml'), stringifyYaml(manifest));
+    execFileSync(process.execPath, [join(fixtureRoot, 'scripts/generate-public-manifest.mjs')], { stdio: 'pipe' });
+    const descriptor = JSON.parse(readFileSync(join(fixtureRoot, 'ovdb-database.json'), 'utf8'));
+    assert.deepEqual(descriptor.licences, manifest.licences);
+    const files = { read: (path) => readFileSync(join(fixtureRoot, path), 'utf8') };
+    assert.deepEqual(checkManifest('ovdb-database.json', files), []);
+    // Verify the generated descriptor and checksum still agree with the unnormalized input.
+    execFileSync(process.execPath, [join(fixtureRoot, 'scripts/generate-public-manifest.mjs'), '--check'], { stdio: 'pipe' });
   }
 });
