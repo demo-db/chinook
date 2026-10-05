@@ -6,6 +6,7 @@ import Ajv2020 from 'ajv/dist/2020.js';
 import { parse as parseYaml } from 'yaml';
 import { cleanGitEnv } from './git-env.mjs';
 import { canonicalUrlProblem, enginePattern, homepageFieldProblem, idPattern, isRepositoryPath, manifestUrlProblem, maxIdLength } from './directory-rules.mjs';
+import { precheckRepresentation } from './representation-precheck.mjs';
 
 // Checks the OpenVaultDB publisher manifest: the root OVDB.md that opts the repository in and the
 // manifest files it lists.
@@ -93,7 +94,7 @@ const discoveryPath = '/.well-known/openvaultdb';
 
 // The keys a manifest may have. Anything else is refused, so a stray secret cannot ride along.
 const allowedKeys = {
-  '': ['format', 'id', 'title', 'description', 'url', 'deployment', 'model', 'meaning', 'publisher', 'licences', 'recordsets', 'recordsets_partial', 'homepage'],
+  '': ['format', 'id', 'title', 'description', 'url', 'deployment', 'model', 'meaning', 'publisher', 'licences', 'recordsets', 'recordsets_partial', 'homepage', 'representation_contract'],
   deployment: ['url', 'engine', 'discovery', 'recordset_page'],
   model: ['modelspec', 'hcl', 'address', 'name'],
   meaning: ['file', 'graph', 'address'],
@@ -124,6 +125,16 @@ export function gitRepoFiles(root) {
         return git('cat-file', 'blob', `HEAD:./${path}`); // ./ : relative to `root`, which need not be the top of the repository
       } catch (error) {
         if (error.code === 'ENOBUFS') throw new Error(`${path} is larger than ${maxFileBytes / 1024 / 1024} MB, which is more than a manifest file may be`);
+        throw new Error(`${path} cannot be read at HEAD: ${String(error.stderr ?? '').trim().split('\n').at(-1) || error.message}`);
+      }
+    },
+    readBytes(path, limit) {
+      try {
+        return execFileSync('git', ['--literal-pathspecs', '-C', root, 'cat-file', 'blob', `HEAD:./${path}`], {
+          stdio: 'pipe', env: cleanGitEnv(), maxBuffer: limit + 1, encoding: 'buffer',
+        });
+      } catch (error) {
+        if (error.code === 'ENOBUFS') throw new Error(`${path} exceeds ${limit} bytes`);
         throw new Error(`${path} cannot be read at HEAD: ${String(error.stderr ?? '').trim().split('\n').at(-1) || error.message}`);
       }
     },
@@ -544,6 +555,11 @@ function analyseManifest(path, files, { repository } = {}) {
       if (missing.length) bad(`recordsets lacks ModelSpec entities: ${missing.join(', ')}`);
       if (extra.length) bad(`recordsets names things that are not ModelSpec entities: ${extra.join(', ')}`);
     }
+  }
+  if (manifest.representation_contract !== undefined) {
+    const checked = precheckRepresentation(manifest.representation_contract, files, manifest, repo);
+    problems.push(...checked.problems.map((message) => `${path}: ${message}`));
+    notes.push(...checked.notes.map((message) => `${path}: ${message}`));
   }
   notes.unshift(`${path}: ${offlineNote}`);
   return { problems, notes };

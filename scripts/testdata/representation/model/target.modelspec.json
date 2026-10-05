@@ -1,0 +1,1 @@
+{"modelspec":"1.0-draft","module":{"name":"target"},"entities":{"Entities":{"key":["id"],"properties":{"id":{"type":"string","required":true},"serving_id":{"type":"string"}}},"Bridge":{"properties":{"raw_label":{"type":"string"},"target_key":{"type":"string"}}}}}
