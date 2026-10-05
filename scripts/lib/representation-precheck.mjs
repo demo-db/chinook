@@ -17,7 +17,12 @@ const object = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 const ownRef = (r) => !Object.hasOwn(r, 'repository') && !Object.hasOwn(r, 'revision');
 const sameRef = (a, b) => object(a) && object(b) && exactKeys(a, ['path', 'sha256']) && a.path === b.path && a.sha256 === b.sha256;
 const exactKeys = (v, keys) => object(v) && Object.keys(v).length === keys.length && keys.every((key) => Object.hasOwn(v, key));
-const repository = (s) => /^https:\/\/github\.com\/[a-z0-9_.-]+\/[a-z0-9_.-]+$/.test(s) && !s.endsWith('.git') && !s.includes('/./') && !s.endsWith('/..');
+const repository = (s) => {
+  const match = typeof s === 'string' && /^https:\/\/github\.com\/([a-z0-9_.-]+)\/([a-z0-9_.-]+)$/.exec(s);
+  return Boolean(match) && ![match[1], match[2]].some((part) => part === '.' || part === '..') && !match[2].endsWith('.git');
+};
+// Reference property order is not part of a source scope's identity.
+const canonical = (v) => Array.isArray(v) ? v.map(canonical) : object(v) ? Object.fromEntries(Object.keys(v).sort().map((key) => [key, canonical(v[key])])) : v;
 const path = (s) => typeof s === 'string' && Buffer.byteLength(s) <= 1024 && /^(?:[A-Za-z0-9_.-]+|\$records)(?:\/(?:[A-Za-z0-9_.-]+|\$records))*$/.test(s) && !s.split('/').some((part) => part === '.' || part === '..' || part.toLowerCase() === '.git' || part.includes('$') && part !== '$records');
 
 export function checkRepresentationEnvelope(envelope) {
@@ -75,10 +80,15 @@ export function precheckRepresentation(envelope, files, manifest, outerRepositor
     if (!repository(ref?.repository) || !/^[0-9a-f]{40}$/.test(ref?.revision ?? '') || ref.repository === outerRepository) bad(`${label} must name another immutable repository/revision`);
     else notes.push(`${label} ${ref.repository}@${ref.revision}:${ref.path} external bytes and meaning unresolved offline`);
   };
+  const localObject = (ref, label, parse = 'json', limit = 4 * MiB) => {
+    const value = local(ref, label, parse, limit);
+    if (value !== undefined && !object(value)) { bad(`${label}: metadata root must be an object`); return undefined; }
+    return value;
+  };
   const seenSources = new Set();
   for (const [index, c] of doc.contracts.entries()) {
     const label = `contracts[${index}]`;
-    const sourceKey = JSON.stringify(c.source);
+    const sourceKey = JSON.stringify(canonical(c.source));
     if (seenSources.has(sourceKey)) bad(`${label}: duplicate source scope`);
     seenSources.add(sourceKey);
     external(c.source.schema, `${label}.source.schema`);
@@ -91,18 +101,20 @@ export function precheckRepresentation(envelope, files, manifest, outerRepositor
     for (const [field, ref] of [['target.model', c.target.model], ['target.snapshot', c.target.snapshot], ['target.binding.document', c.target.binding.document]]) {
       if (!ownRef(ref)) bad(`${label}.${field} must be provider-local`);
     }
-    const model = local(c.target.model, `${label}.target.model`);
-    const snapshot = local(c.target.snapshot, `${label}.target.snapshot`);
-    const binding = local(c.target.binding.document, `${label}.target.binding.document`, 'yaml');
+    const model = localObject(c.target.model, `${label}.target.model`);
+    const snapshot = localObject(c.target.snapshot, `${label}.target.snapshot`);
+    const binding = localObject(c.target.binding.document, `${label}.target.binding.document`, 'yaml');
     if (manifest.model?.modelspec && c.target.model.path !== manifest.model.modelspec) bad(`${label}: target model path differs from manifest.model.modelspec`);
     else if (!manifest.model?.modelspec) notes.push(`${label}: shared model target association is unresolved offline`);
+    if (manifest.model?.modelspec && c.target.binding.document.path !== manifest.meaning?.file) bad(`${label}: target binding path differs from manifest.meaning.file`);
+    else if (!manifest.model?.modelspec) notes.push(`${label}: shared meaning target association is unresolved offline`);
     if (!manifest.recordsets?.includes(c.target.entity)) bad(`${label}: target entity is absent from manifest recordsets`);
     const property = model?.entities?.[c.target.entity]?.properties?.[c.target.property];
     if (model && (model.modelspec !== '1.0-draft' || model.module?.name !== c.target.module || !property || property.type !== c.target.datatype)) bad(`${label}: target ModelSpec module/entity/property/datatype mismatch`);
     if (binding) {
       const address = `meaning://${c.target.binding.meaning.document.repository.slice(8)}/${c.target.binding.meaning.concept}?ref=${c.target.binding.meaning.document.revision}`;
       const concepts = binding.concepts;
-      if (binding.format !== 'meaning/draft-1' || !Array.isArray(concepts) || !concepts.some((x) => x.id === c.target.binding.concept && x.extends === address && x.bindings?.some((b) => b.model === `modelspec:///${c.target.module}.${c.target.entity}` && b.property === c.target.property && b.role === c.target.binding.role))) bad(`${label}: local target binding does not identify pinned concept/property/role`);
+      if (binding.format !== 'meaning/draft-1' || !Array.isArray(concepts) || !concepts.every((x) => object(x) && (x.bindings === undefined || Array.isArray(x.bindings) && x.bindings.every(object))) || !concepts.some((x) => x.id === c.target.binding.concept && x.extends === address && x.bindings?.some((b) => b.model === `modelspec:///${c.target.module}.${c.target.entity}` && b.property === c.target.property && b.role === c.target.binding.role))) bad(`${label}: local target binding does not identify pinned concept/property/role`);
     }
     const artifacts = new Map();
     if (snapshot) {
@@ -125,7 +137,7 @@ export function precheckRepresentation(envelope, files, manifest, outerRepositor
         if (!Array.isArray(entity?.key) || entity.key.length !== 1 || entity.key[0] !== c.target.property || property?.required !== true) bad(`${label}: native target key must be one required selected property`);
         if (c.native.serving_identity_column && (c.native.serving_identity_column === c.target.property || !entity?.properties?.[c.native.serving_identity_column])) bad(`${label}: invalid serving identity column`);
       }
-      const provenance = local(c.native.provenance, `${label}.native.provenance`, 'json', 2 * MiB);
+      const provenance = localObject(c.native.provenance, `${label}.native.provenance`, 'json', 2 * MiB);
       if (provenance) {
         if (!object(provenance) || !Object.hasOwn(provenance, 'native_key') || !Object.hasOwn(provenance, 'snapshot') || Object.keys(provenance).some((key) => !['native_key', 'snapshot', 'snapshot_association'].includes(key))) bad(`${label}: native provenance root fields invalid`);
         const n = provenance.native_key;
@@ -137,7 +149,7 @@ export function precheckRepresentation(envelope, files, manifest, outerRepositor
           if (!exactKeys(association, ['source', 'output_key']) || !exactKeys(source, ['path', 'sha256']) || !path(source.path) || !/^[0-9a-f]{64}$/.test(source.sha256) || !/^[A-Za-z0-9_-]{1,128}$/.test(outputKey ?? '') || [c.native.provenance.path, c.target.snapshot.path, c.native.dataset.path].includes(source.path) || artifacts.get(source.path) !== source.sha256) {
             bad(`${label}: malformed original snapshot association`);
           } else {
-            const original = local(source, `${label}.snapshot_association.source`, 'json', 2 * MiB);
+            const original = localObject(source, `${label}.snapshot_association.source`, 'json', 2 * MiB);
             if (original) {
               const selected = original.outputs?.[outputKey];
               if (!object(selected) || selected.file !== c.native.dataset.path || selected.sha256 !== c.native.dataset.sha256 || !Number.isSafeInteger(original.counts?.[c.target.entity]) || original.counts[c.target.entity] < 0 || original.counts[c.target.entity] !== n?.records) bad(`${label}: original snapshot selected output/count mismatch`);
@@ -159,22 +171,25 @@ export function precheckRepresentation(envelope, files, manifest, outerRepositor
         const columns = model.entities?.[c.bridge.table]?.properties;
         if (!columns || c.bridge.raw_label_column === c.bridge.target_key_column || columns[c.bridge.raw_label_column]?.type !== 'string' || columns[c.bridge.target_key_column]?.type !== 'string' || c.bridge.serving_identity_column && (c.bridge.serving_identity_column === c.bridge.raw_label_column || c.bridge.serving_identity_column === c.bridge.target_key_column || !columns[c.bridge.serving_identity_column])) bad(`${label}: bridge columns missing or overlapping in local model`);
       }
-      const bridge = local(c.bridge.artifact, `${label}.bridge.artifact`);
-      const keys = local(c.target.keys, `${label}.target.keys`);
+      const bridge = localObject(c.bridge.artifact, `${label}.bridge.artifact`);
+      const keys = localObject(c.target.keys, `${label}.target.keys`);
+      let bridgeRowsValid = false;
       associated(c.bridge.artifact, 'bridge.artifact'); associated(c.target.keys, 'target.keys');
       if (bridge) {
         if (!exactKeys(bridge, ['table', 'rows']) || bridge.table !== c.bridge.table || !Array.isArray(bridge.rows) || bridge.rows.length < 1 || bridge.rows.length > 10000) bad(`${label}: bridge table/rows invalid`);
         else {
           const labels = new Set();
+          bridgeRowsValid = true;
           for (const row of bridge.rows) {
-            if (!exactKeys(row, ['raw_label', 'target_key']) || typeof row.raw_label !== 'string' || !row.raw_label || typeof row.target_key !== 'string' || !row.target_key || labels.has(row.raw_label)) bad(`${label}: bridge row collision/shape invalid`);
-            labels.add(row.raw_label);
+            if (!exactKeys(row, ['raw_label', 'target_key']) || typeof row.raw_label !== 'string' || !row.raw_label || typeof row.target_key !== 'string' || !row.target_key || labels.has(row.raw_label)) {
+              bad(`${label}: bridge row collision/shape invalid`); bridgeRowsValid = false;
+            } else labels.add(row.raw_label);
           }
         }
       }
       if (keys) {
         if (!exactKeys(keys, ['namespace', 'keys']) || keys.namespace !== c.target.namespace || !Array.isArray(keys.keys) || keys.keys.length < 1 || keys.keys.length > 10000 || keys.keys.some((x) => typeof x !== 'string' || !x) || new Set(keys.keys).size !== keys.keys.length) bad(`${label}: target key index invalid`);
-        else if (bridge?.rows?.some((row) => !keys.keys.includes(row.target_key))) bad(`${label}: bridge target key absent from index`);
+        else if (bridgeRowsValid && bridge.rows.some((row) => !keys.keys.includes(row.target_key))) bad(`${label}: bridge target key absent from index`);
       }
     }
   }

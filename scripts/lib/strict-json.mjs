@@ -1,5 +1,7 @@
 import { TextDecoder } from 'node:util';
 
+const escapes = { '"': '"', '\\': '\\', '/': '/', b: '\b', f: '\f', n: '\n', r: '\r', t: '\t' };
+
 // JSON.parse accepts duplicate object members and unpaired escaped surrogates.
 // Scan the complete grammar before returning its value so neither can be lost.
 export function parseStrictJson(bytes, limit, label = 'JSON', { losslessNumbers = false } = {}) {
@@ -20,7 +22,7 @@ export function parseStrictJson(bytes, limit, label = 'JSON', { losslessNumbers 
       if (ch.charCodeAt(0) < 0x20) fail('control character in string');
       if (ch !== '\\') { value += ch; continue; }
       const escaped = source[at++];
-      if ('"\\/bfnrt'.includes(escaped ?? '\0')) { value += escaped; continue; }
+      if (Object.hasOwn(escapes, escaped)) { value += escapes[escaped]; continue; }
       if (escaped !== 'u' || !/^[0-9a-fA-F]{4}$/.test(source.slice(at, at + 4))) fail('invalid escape');
       const scalar = parseInt(source.slice(at, at + 4), 16); at += 4;
       if (scalar >= 0xdc00 && scalar <= 0xdfff) fail('unpaired low surrogate');
