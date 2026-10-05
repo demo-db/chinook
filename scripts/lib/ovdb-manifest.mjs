@@ -62,11 +62,20 @@ const manifestFormat = 'ovdb-manifest/draft-1';
 const databaseFormat = 'ovdb-database/draft-1';
 const databaseSchemaPath = 'schemas/ovdb-database-draft-1.schema.json';
 const databaseSchemaSha256 = '2424ef00acd462ab5a8abc546fe2d1fffbbb5397e312332aedc77b3e73109488';
-// The SPDX identifiers a manifest may use for a licence. Small on purpose; add one when a database needs it.
+// The SPDX atoms a manifest may use for a licence. Small on purpose; add one when a database needs it.
 export const licenceIds = [
   '0BSD', 'AGPL-3.0-only', 'Apache-2.0', 'BSD-2-Clause', 'BSD-3-Clause', 'CC-BY-4.0', 'CC-BY-SA-4.0', 'CC0-1.0',
   'GPL-2.0-only', 'GPL-3.0-only', 'ISC', 'LGPL-3.0-only', 'MIT', 'MPL-2.0', 'ODC-By-1.0', 'ODbL-1.0', 'PDDL-1.0', 'Unlicense',
 ];
+// Only data may express simultaneous licences: exact ASCII separators, distinct known atoms,
+// 2–4 terms and at most 64 bytes. Keep legacy atom and model/meaning acceptance unchanged.
+function isDataLicence(value) {
+  if (licenceIds.includes(value)) return true;
+  if (typeof value !== 'string' || Buffer.byteLength(value, 'utf8') > 64) return false;
+  const atoms = value.split(' AND ');
+  return atoms.length >= 2 && atoms.length <= 4 && new Set(atoms).size === atoms.length
+    && atoms.every((atom) => licenceIds.includes(atom));
+}
 const segment = '[A-Za-z0-9_.-]+';
 const moduleName = '[A-Za-z][A-Za-z0-9_]*';
 const pinPattern = '(?:\\?ref=([0-9a-f]{40}))?';
@@ -374,7 +383,10 @@ function analyseManifest(path, files, { repository } = {}) {
     const value = manifest.licences?.[field];
     if (value === undefined && !local && field !== 'data') continue;
     if (!isText(value)) bad(`licences.${field} is required`);
-    else if (!licenceIds.includes(value)) bad(`licences.${field} must be a known SPDX licence id (${licenceIds.join(', ')}), got ${JSON.stringify(value)}`);
+    else if (field === 'data' ? !isDataLicence(value) : !licenceIds.includes(value)) {
+      const profile = field === 'data' ? ' or 2–4 distinct known ids joined by exact " AND " (at most 64 bytes)' : '';
+      bad(`licences.${field} must be a known SPDX licence id${profile} (${licenceIds.join(', ')}), got ${JSON.stringify(value)}`);
+    }
   }
 
   // What the model declares: set only when the model is known (a parsed own model file).
