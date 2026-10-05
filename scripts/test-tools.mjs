@@ -624,7 +624,8 @@ test('check-schema asks the pinned tool for its schema and source, compares with
 test('the pinned commit is written in the meaning file and the README (which the model tests compare), and nowhere else outside the tests', () => {
   const tracked = execFileSync('git', ['-C', root, 'ls-files', '-z', '--', 'scripts', '.github', 'docs', 'src', 'model', 'package.json', 'wrangler.jsonc', 'astro.config.mjs', '*.md', '*.yaml'], { env: cleanGitEnv(), encoding: 'utf8' }).split('\0').filter(Boolean);
   const holders = tracked.filter((path) => existsSync(join(root, path)) && lstatSync(join(root, path)).isFile() && read(path).includes(filePin[0])).sort();
-  assert.deepEqual(holders.filter((path) => !/^scripts\/test-/.test(path)), ['README.md', 'model/chinook.meaning.yaml']);
+  const isTestOnly = (path) => /^scripts\/test-/.test(path) || path === 'scripts/testdata/representation-receipts.json';
+  assert.deepEqual(holders.filter((path) => !isTestOnly(path)), ['README.md', 'model/chinook.meaning.yaml']);
 });
 
 // ---------------------------------------------------------------- the provider CI workflow
