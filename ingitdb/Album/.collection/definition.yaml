@@ -1,0 +1,49 @@
+record_file:
+    name: records.json
+    format: json
+    type: map[$record_id]map[$field_name]any
+columns:
+    AlbumId:
+        type: int
+        required: true
+    Title:
+        type: string
+        required: true
+    ArtistId:
+        type: int
+        required: true
+columns_order:
+    - AlbumId
+    - Title
+    - ArtistId
+primary_key:
+    - AlbumId
+source_schema:
+    key_mode: source-primary-key
+    source_definition_json: '{"dialect":"sqlite","createSql":"CREATE TABLE [Album]\n(\n    [AlbumId] INTEGER  NOT NULL,\n    [Title] NVARCHAR(160)  NOT NULL,\n    [ArtistId] INTEGER  NOT NULL,\n    CONSTRAINT [PK_Album] PRIMARY KEY  ([AlbumId]),\n    FOREIGN KEY ([ArtistId]) REFERENCES [Artist] ([ArtistId]) \n\t\tON DELETE NO ACTION ON UPDATE NO ACTION\n)","columns":[{"name":"AlbumId","declaredType":"INTEGER","notNull":true,"primaryKeyPosition":1},{"name":"Title","declaredType":"NVARCHAR(160)","notNull":true},{"name":"ArtistId","declaredType":"INTEGER","notNull":true}],"indexes":[{"name":"IFK_AlbumArtistId","unique":false,"origin":"c","createSql":"CREATE INDEX [IFK_AlbumArtistId] ON [Album] ([ArtistId])","columns":[{"position":0,"name":"ArtistId","key":true,"collation":"BINARY"},{"position":1,"key":false,"collation":"BINARY"}]}]}'
+    constraint_validation: provider-preflight-passed
+    relationship_comparison: provider-native
+    fields:
+        - name: AlbumId
+          type: int
+          nullable: false
+        - name: Title
+          type: string
+          nullable: false
+        - name: ArtistId
+          type: int
+          nullable: false
+    indexes:
+        - name: IFK_AlbumArtistId
+          fields:
+            - ArtistId
+    foreign_keys:
+        - name: Album_fk_0
+          fields:
+            - ArtistId
+          referenced_collection: Artist
+          referenced_fields:
+            - ArtistId
+          source_enforcement: disabled
+          on_update: NO ACTION
+          on_delete: NO ACTION

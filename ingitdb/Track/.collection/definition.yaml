@@ -1,0 +1,116 @@
+record_file:
+    name: records.json
+    format: json
+    type: map[$record_id]map[$field_name]any
+columns:
+    TrackId:
+        type: int
+        required: true
+    Name:
+        type: string
+        required: true
+    AlbumId:
+        type: int
+    MediaTypeId:
+        type: int
+        required: true
+    GenreId:
+        type: int
+    Composer:
+        type: string
+    Milliseconds:
+        type: int
+        required: true
+    Bytes:
+        type: int
+    UnitPrice:
+        type: string
+        required: true
+columns_order:
+    - TrackId
+    - Name
+    - AlbumId
+    - MediaTypeId
+    - GenreId
+    - Composer
+    - Milliseconds
+    - Bytes
+    - UnitPrice
+primary_key:
+    - TrackId
+source_schema:
+    key_mode: source-primary-key
+    source_definition_json: '{"dialect":"sqlite","createSql":"CREATE TABLE [Track]\n(\n    [TrackId] INTEGER  NOT NULL,\n    [Name] NVARCHAR(200)  NOT NULL,\n    [AlbumId] INTEGER,\n    [MediaTypeId] INTEGER  NOT NULL,\n    [GenreId] INTEGER,\n    [Composer] NVARCHAR(220),\n    [Milliseconds] INTEGER  NOT NULL,\n    [Bytes] INTEGER,\n    [UnitPrice] NUMERIC(10,2)  NOT NULL,\n    CONSTRAINT [PK_Track] PRIMARY KEY  ([TrackId]),\n    FOREIGN KEY ([AlbumId]) REFERENCES [Album] ([AlbumId]) \n\t\tON DELETE NO ACTION ON UPDATE NO ACTION,\n    FOREIGN KEY ([GenreId]) REFERENCES [Genre] ([GenreId]) \n\t\tON DELETE NO ACTION ON UPDATE NO ACTION,\n    FOREIGN KEY ([MediaTypeId]) REFERENCES [MediaType] ([MediaTypeId]) \n\t\tON DELETE NO ACTION ON UPDATE NO ACTION\n)","columns":[{"name":"TrackId","declaredType":"INTEGER","notNull":true,"primaryKeyPosition":1},{"name":"Name","declaredType":"NVARCHAR(200)","notNull":true},{"name":"AlbumId","declaredType":"INTEGER","notNull":false},{"name":"MediaTypeId","declaredType":"INTEGER","notNull":true},{"name":"GenreId","declaredType":"INTEGER","notNull":false},{"name":"Composer","declaredType":"NVARCHAR(220)","notNull":false},{"name":"Milliseconds","declaredType":"INTEGER","notNull":true},{"name":"Bytes","declaredType":"INTEGER","notNull":false},{"name":"UnitPrice","declaredType":"NUMERIC(10,2)","notNull":true}],"indexes":[{"name":"IFK_TrackMediaTypeId","unique":false,"origin":"c","createSql":"CREATE INDEX [IFK_TrackMediaTypeId] ON [Track] ([MediaTypeId])","columns":[{"position":0,"name":"MediaTypeId","key":true,"collation":"BINARY"},{"position":1,"key":false,"collation":"BINARY"}]},{"name":"IFK_TrackGenreId","unique":false,"origin":"c","createSql":"CREATE INDEX [IFK_TrackGenreId] ON [Track] ([GenreId])","columns":[{"position":0,"name":"GenreId","key":true,"collation":"BINARY"},{"position":1,"key":false,"collation":"BINARY"}]},{"name":"IFK_TrackAlbumId","unique":false,"origin":"c","createSql":"CREATE INDEX [IFK_TrackAlbumId] ON [Track] ([AlbumId])","columns":[{"position":0,"name":"AlbumId","key":true,"collation":"BINARY"},{"position":1,"key":false,"collation":"BINARY"}]}]}'
+    constraint_validation: provider-preflight-passed
+    relationship_comparison: provider-native
+    storage_class_files:
+        - source-storage-0001.jsonl
+    fields:
+        - name: TrackId
+          type: int
+          nullable: false
+        - name: Name
+          type: string
+          nullable: false
+        - name: AlbumId
+          type: int
+          nullable: true
+        - name: MediaTypeId
+          type: int
+          nullable: false
+        - name: GenreId
+          type: int
+          nullable: true
+        - name: Composer
+          type: string
+          nullable: true
+        - name: Milliseconds
+          type: int
+          nullable: false
+        - name: Bytes
+          type: int
+          nullable: true
+        - name: UnitPrice
+          type: decimal
+          nullable: false
+          precision: 10
+          scale: 2
+          encoding: decimal-string
+    indexes:
+        - name: IFK_TrackMediaTypeId
+          fields:
+            - MediaTypeId
+        - name: IFK_TrackGenreId
+          fields:
+            - GenreId
+        - name: IFK_TrackAlbumId
+          fields:
+            - AlbumId
+    foreign_keys:
+        - name: Track_fk_0
+          fields:
+            - MediaTypeId
+          referenced_collection: MediaType
+          referenced_fields:
+            - MediaTypeId
+          source_enforcement: disabled
+          on_update: NO ACTION
+          on_delete: NO ACTION
+        - name: Track_fk_1
+          fields:
+            - GenreId
+          referenced_collection: Genre
+          referenced_fields:
+            - GenreId
+          source_enforcement: disabled
+          on_update: NO ACTION
+          on_delete: NO ACTION
+        - name: Track_fk_2
+          fields:
+            - AlbumId
+          referenced_collection: Album
+          referenced_fields:
+            - AlbumId
+          source_enforcement: disabled
+          on_update: NO ACTION
+          on_delete: NO ACTION

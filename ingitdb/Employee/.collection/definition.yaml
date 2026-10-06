@@ -1,0 +1,121 @@
+record_file:
+    name: records.json
+    format: json
+    type: map[$record_id]map[$field_name]any
+columns:
+    EmployeeId:
+        type: int
+        required: true
+    LastName:
+        type: string
+        required: true
+    FirstName:
+        type: string
+        required: true
+    Title:
+        type: string
+    ReportsTo:
+        type: int
+    BirthDate:
+        type: datetime
+    HireDate:
+        type: datetime
+    Address:
+        type: string
+    City:
+        type: string
+    State:
+        type: string
+    Country:
+        type: string
+    PostalCode:
+        type: string
+    Phone:
+        type: string
+    Fax:
+        type: string
+    Email:
+        type: string
+columns_order:
+    - EmployeeId
+    - LastName
+    - FirstName
+    - Title
+    - ReportsTo
+    - BirthDate
+    - HireDate
+    - Address
+    - City
+    - State
+    - Country
+    - PostalCode
+    - Phone
+    - Fax
+    - Email
+primary_key:
+    - EmployeeId
+source_schema:
+    key_mode: source-primary-key
+    source_definition_json: '{"dialect":"sqlite","createSql":"CREATE TABLE [Employee]\n(\n    [EmployeeId] INTEGER  NOT NULL,\n    [LastName] NVARCHAR(20)  NOT NULL,\n    [FirstName] NVARCHAR(20)  NOT NULL,\n    [Title] NVARCHAR(30),\n    [ReportsTo] INTEGER,\n    [BirthDate] DATETIME,\n    [HireDate] DATETIME,\n    [Address] NVARCHAR(70),\n    [City] NVARCHAR(40),\n    [State] NVARCHAR(40),\n    [Country] NVARCHAR(40),\n    [PostalCode] NVARCHAR(10),\n    [Phone] NVARCHAR(24),\n    [Fax] NVARCHAR(24),\n    [Email] NVARCHAR(60),\n    CONSTRAINT [PK_Employee] PRIMARY KEY  ([EmployeeId]),\n    FOREIGN KEY ([ReportsTo]) REFERENCES [Employee] ([EmployeeId]) \n\t\tON DELETE NO ACTION ON UPDATE NO ACTION\n)","columns":[{"name":"EmployeeId","declaredType":"INTEGER","notNull":true,"primaryKeyPosition":1},{"name":"LastName","declaredType":"NVARCHAR(20)","notNull":true},{"name":"FirstName","declaredType":"NVARCHAR(20)","notNull":true},{"name":"Title","declaredType":"NVARCHAR(30)","notNull":false},{"name":"ReportsTo","declaredType":"INTEGER","notNull":false},{"name":"BirthDate","declaredType":"DATETIME","notNull":false},{"name":"HireDate","declaredType":"DATETIME","notNull":false},{"name":"Address","declaredType":"NVARCHAR(70)","notNull":false},{"name":"City","declaredType":"NVARCHAR(40)","notNull":false},{"name":"State","declaredType":"NVARCHAR(40)","notNull":false},{"name":"Country","declaredType":"NVARCHAR(40)","notNull":false},{"name":"PostalCode","declaredType":"NVARCHAR(10)","notNull":false},{"name":"Phone","declaredType":"NVARCHAR(24)","notNull":false},{"name":"Fax","declaredType":"NVARCHAR(24)","notNull":false},{"name":"Email","declaredType":"NVARCHAR(60)","notNull":false}],"indexes":[{"name":"IFK_EmployeeReportsTo","unique":false,"origin":"c","createSql":"CREATE INDEX [IFK_EmployeeReportsTo] ON [Employee] ([ReportsTo])","columns":[{"position":0,"name":"ReportsTo","key":true,"collation":"BINARY"},{"position":1,"key":false,"collation":"BINARY"}]}]}'
+    constraint_validation: provider-preflight-passed
+    relationship_comparison: provider-native
+    fields:
+        - name: EmployeeId
+          type: int
+          nullable: false
+        - name: LastName
+          type: string
+          nullable: false
+        - name: FirstName
+          type: string
+          nullable: false
+        - name: Title
+          type: string
+          nullable: true
+        - name: ReportsTo
+          type: int
+          nullable: true
+        - name: BirthDate
+          type: time
+          nullable: true
+        - name: HireDate
+          type: time
+          nullable: true
+        - name: Address
+          type: string
+          nullable: true
+        - name: City
+          type: string
+          nullable: true
+        - name: State
+          type: string
+          nullable: true
+        - name: Country
+          type: string
+          nullable: true
+        - name: PostalCode
+          type: string
+          nullable: true
+        - name: Phone
+          type: string
+          nullable: true
+        - name: Fax
+          type: string
+          nullable: true
+        - name: Email
+          type: string
+          nullable: true
+    indexes:
+        - name: IFK_EmployeeReportsTo
+          fields:
+            - ReportsTo
+    foreign_keys:
+        - name: Employee_fk_0
+          fields:
+            - ReportsTo
+          referenced_collection: Employee
+          referenced_fields:
+            - EmployeeId
+          source_enforcement: disabled
+          on_update: NO ACTION
+          on_delete: NO ACTION

@@ -1,0 +1,27 @@
+record_file:
+    name: records.json
+    format: json
+    type: map[$record_id]map[$field_name]any
+columns:
+    MediaTypeId:
+        type: int
+        required: true
+    Name:
+        type: string
+columns_order:
+    - MediaTypeId
+    - Name
+primary_key:
+    - MediaTypeId
+source_schema:
+    key_mode: source-primary-key
+    source_definition_json: '{"dialect":"sqlite","createSql":"CREATE TABLE [MediaType]\n(\n    [MediaTypeId] INTEGER  NOT NULL,\n    [Name] NVARCHAR(120),\n    CONSTRAINT [PK_MediaType] PRIMARY KEY  ([MediaTypeId])\n)","columns":[{"name":"MediaTypeId","declaredType":"INTEGER","notNull":true,"primaryKeyPosition":1},{"name":"Name","declaredType":"NVARCHAR(120)","notNull":false}]}'
+    constraint_validation: provider-preflight-passed
+    relationship_comparison: provider-native
+    fields:
+        - name: MediaTypeId
+          type: int
+          nullable: false
+        - name: Name
+          type: string
+          nullable: true
