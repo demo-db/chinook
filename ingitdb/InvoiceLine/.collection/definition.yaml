@@ -1,0 +1,80 @@
+record_file:
+    name: records.json
+    format: json
+    type: map[$record_id]map[$field_name]any
+columns:
+    InvoiceLineId:
+        type: int
+        required: true
+    InvoiceId:
+        type: int
+        required: true
+    TrackId:
+        type: int
+        required: true
+    UnitPrice:
+        type: string
+        required: true
+    Quantity:
+        type: int
+        required: true
+columns_order:
+    - InvoiceLineId
+    - InvoiceId
+    - TrackId
+    - UnitPrice
+    - Quantity
+primary_key:
+    - InvoiceLineId
+source_schema:
+    key_mode: source-primary-key
+    source_definition_json: '{"dialect":"sqlite","createSql":"CREATE TABLE [InvoiceLine]\n(\n    [InvoiceLineId] INTEGER  NOT NULL,\n    [InvoiceId] INTEGER  NOT NULL,\n    [TrackId] INTEGER  NOT NULL,\n    [UnitPrice] NUMERIC(10,2)  NOT NULL,\n    [Quantity] INTEGER  NOT NULL,\n    CONSTRAINT [PK_InvoiceLine] PRIMARY KEY  ([InvoiceLineId]),\n    FOREIGN KEY ([InvoiceId]) REFERENCES [Invoice] ([InvoiceId]) \n\t\tON DELETE NO ACTION ON UPDATE NO ACTION,\n    FOREIGN KEY ([TrackId]) REFERENCES [Track] ([TrackId]) \n\t\tON DELETE NO ACTION ON UPDATE NO ACTION\n)","columns":[{"name":"InvoiceLineId","declaredType":"INTEGER","notNull":true,"primaryKeyPosition":1},{"name":"InvoiceId","declaredType":"INTEGER","notNull":true},{"name":"TrackId","declaredType":"INTEGER","notNull":true},{"name":"UnitPrice","declaredType":"NUMERIC(10,2)","notNull":true},{"name":"Quantity","declaredType":"INTEGER","notNull":true}],"indexes":[{"name":"IFK_InvoiceLineTrackId","unique":false,"origin":"c","createSql":"CREATE INDEX [IFK_InvoiceLineTrackId] ON [InvoiceLine] ([TrackId])","columns":[{"position":0,"name":"TrackId","key":true,"collation":"BINARY"},{"position":1,"key":false,"collation":"BINARY"}]},{"name":"IFK_InvoiceLineInvoiceId","unique":false,"origin":"c","createSql":"CREATE INDEX [IFK_InvoiceLineInvoiceId] ON [InvoiceLine] ([InvoiceId])","columns":[{"position":0,"name":"InvoiceId","key":true,"collation":"BINARY"},{"position":1,"key":false,"collation":"BINARY"}]}]}'
+    constraint_validation: provider-preflight-passed
+    relationship_comparison: provider-native
+    storage_class_files:
+        - source-storage-0001.jsonl
+    fields:
+        - name: InvoiceLineId
+          type: int
+          nullable: false
+        - name: InvoiceId
+          type: int
+          nullable: false
+        - name: TrackId
+          type: int
+          nullable: false
+        - name: UnitPrice
+          type: decimal
+          nullable: false
+          precision: 10
+          scale: 2
+          encoding: decimal-string
+        - name: Quantity
+          type: int
+          nullable: false
+    indexes:
+        - name: IFK_InvoiceLineTrackId
+          fields:
+            - TrackId
+        - name: IFK_InvoiceLineInvoiceId
+          fields:
+            - InvoiceId
+    foreign_keys:
+        - name: InvoiceLine_fk_0
+          fields:
+            - TrackId
+          referenced_collection: Track
+          referenced_fields:
+            - TrackId
+          source_enforcement: disabled
+          on_update: NO ACTION
+          on_delete: NO ACTION
+        - name: InvoiceLine_fk_1
+          fields:
+            - InvoiceId
+          referenced_collection: Invoice
+          referenced_fields:
+            - InvoiceId
+          source_enforcement: disabled
+          on_update: NO ACTION
+          on_delete: NO ACTION

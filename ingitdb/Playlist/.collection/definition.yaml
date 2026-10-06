@@ -1,0 +1,27 @@
+record_file:
+    name: records.json
+    format: json
+    type: map[$record_id]map[$field_name]any
+columns:
+    PlaylistId:
+        type: int
+        required: true
+    Name:
+        type: string
+columns_order:
+    - PlaylistId
+    - Name
+primary_key:
+    - PlaylistId
+source_schema:
+    key_mode: source-primary-key
+    source_definition_json: '{"dialect":"sqlite","createSql":"CREATE TABLE [Playlist]\n(\n    [PlaylistId] INTEGER  NOT NULL,\n    [Name] NVARCHAR(120),\n    CONSTRAINT [PK_Playlist] PRIMARY KEY  ([PlaylistId])\n)","columns":[{"name":"PlaylistId","declaredType":"INTEGER","notNull":true,"primaryKeyPosition":1},{"name":"Name","declaredType":"NVARCHAR(120)","notNull":false}]}'
+    constraint_validation: provider-preflight-passed
+    relationship_comparison: provider-native
+    fields:
+        - name: PlaylistId
+          type: int
+          nullable: false
+        - name: Name
+          type: string
+          nullable: true

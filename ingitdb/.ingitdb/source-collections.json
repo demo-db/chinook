@@ -1,0 +1,16 @@
+{
+  "format": "datatug-source-collections/v1",
+  "collections": {
+    "Album": "Album",
+    "Artist": "Artist",
+    "Customer": "Customer",
+    "Employee": "Employee",
+    "Genre": "Genre",
+    "Invoice": "Invoice",
+    "InvoiceLine": "InvoiceLine",
+    "MediaType": "MediaType",
+    "Playlist": "Playlist",
+    "PlaylistTrack": "PlaylistTrack",
+    "Track": "Track"
+  }
+}

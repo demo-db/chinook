@@ -1,0 +1,55 @@
+record_file:
+    name: records.json
+    format: json
+    type: map[$record_id]map[$field_name]any
+columns:
+    PlaylistId:
+        type: int
+        required: true
+    TrackId:
+        type: int
+        required: true
+columns_order:
+    - PlaylistId
+    - TrackId
+primary_key:
+    - PlaylistId
+    - TrackId
+source_schema:
+    key_mode: source-primary-key
+    source_definition_json: '{"dialect":"sqlite","createSql":"CREATE TABLE [PlaylistTrack]\n(\n    [PlaylistId] INTEGER  NOT NULL,\n    [TrackId] INTEGER  NOT NULL,\n    CONSTRAINT [PK_PlaylistTrack] PRIMARY KEY  ([PlaylistId], [TrackId]),\n    FOREIGN KEY ([PlaylistId]) REFERENCES [Playlist] ([PlaylistId]) \n\t\tON DELETE NO ACTION ON UPDATE NO ACTION,\n    FOREIGN KEY ([TrackId]) REFERENCES [Track] ([TrackId]) \n\t\tON DELETE NO ACTION ON UPDATE NO ACTION\n)","columns":[{"name":"PlaylistId","declaredType":"INTEGER","notNull":true,"primaryKeyPosition":1},{"name":"TrackId","declaredType":"INTEGER","notNull":true,"primaryKeyPosition":2}],"indexes":[{"name":"IFK_PlaylistTrackTrackId","unique":false,"origin":"c","createSql":"CREATE INDEX [IFK_PlaylistTrackTrackId] ON [PlaylistTrack] ([TrackId])","columns":[{"position":0,"name":"TrackId","key":true,"collation":"BINARY"},{"position":1,"key":false,"collation":"BINARY"}]},{"name":"IFK_PlaylistTrackPlaylistId","unique":false,"origin":"c","createSql":"CREATE INDEX [IFK_PlaylistTrackPlaylistId] ON [PlaylistTrack] ([PlaylistId])","columns":[{"position":0,"name":"PlaylistId","key":true,"collation":"BINARY"},{"position":1,"key":false,"collation":"BINARY"}]},{"name":"sqlite_autoindex_PlaylistTrack_1","unique":true,"origin":"pk","columns":[{"position":0,"name":"PlaylistId","key":true,"collation":"BINARY"},{"position":1,"name":"TrackId","key":true,"collation":"BINARY"},{"position":2,"key":false,"collation":"BINARY"}]}]}'
+    constraint_validation: provider-preflight-passed
+    relationship_comparison: provider-native
+    fields:
+        - name: PlaylistId
+          type: int
+          nullable: false
+        - name: TrackId
+          type: int
+          nullable: false
+    indexes:
+        - name: IFK_PlaylistTrackTrackId
+          fields:
+            - TrackId
+        - name: IFK_PlaylistTrackPlaylistId
+          fields:
+            - PlaylistId
+    foreign_keys:
+        - name: PlaylistTrack_fk_0
+          fields:
+            - TrackId
+          referenced_collection: Track
+          referenced_fields:
+            - TrackId
+          source_enforcement: disabled
+          on_update: NO ACTION
+          on_delete: NO ACTION
+        - name: PlaylistTrack_fk_1
+          fields:
+            - PlaylistId
+          referenced_collection: Playlist
+          referenced_fields:
+            - PlaylistId
+          source_enforcement: disabled
+          on_update: NO ACTION
+          on_delete: NO ACTION

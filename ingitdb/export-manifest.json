@@ -1,5 +1,10 @@
 {
-  "format": "demodb-ingitdb-export/v1",
+  "format": "demodb-storage-export/v2",
+  "generator": "datatug-dalgo-to-ingitdb",
+  "recordFormat": "json",
+  "generatorVersion": "0.61.1",
+  "generatorCommit": "e983dd2732b31c8d59cf80c5367ec07c4d9d5f48",
+  "generatorSha256": "567fa6b0f278bb64c659322b8a2a6cd53f8aeca65a20a2ec5e48e191bba44bbf",
   "datasetId": "chinook",
   "source": {
     "repository": "https://github.com/lerocha/chinook-database",
@@ -14,7 +19,7 @@
   "tables": [
     {
       "nativeName": "Album",
-      "collection": "album_f05e840e",
+      "collection": "Album",
       "rows": 347,
       "primaryKey": [
         "AlbumId"
@@ -68,6 +73,8 @@
         {
           "nativeName": "AlbumId",
           "declaredType": "INTEGER",
+          "bigqueryName": "albumid",
+          "bigqueryType": "INTEGER",
           "sourceNotNull": true,
           "primaryKeyPosition": 1,
           "sourceDeclaredNullable": false,
@@ -79,6 +86,8 @@
         {
           "nativeName": "Title",
           "declaredType": "NVARCHAR(160)",
+          "bigqueryName": "title",
+          "bigqueryType": "STRING",
           "sourceNotNull": true,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": false,
@@ -90,6 +99,8 @@
         {
           "nativeName": "ArtistId",
           "declaredType": "INTEGER",
+          "bigqueryName": "artistid",
+          "bigqueryType": "INTEGER",
           "sourceNotNull": true,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": false,
@@ -100,13 +111,27 @@
         }
       ],
       "records": {
-        "path": "album_f05e840e/records.json",
-        "sha256": "ea3931ce0f5500231c93443ba0e2b801e82b656db1aa394c6a814ac6c4aeb5cf"
+        "path": "Album/records.json",
+        "sha256": "e510066a8cc129441c61b8d63783277f126972f90b6b907d5b41d5c9b26a2e7c"
+      },
+      "files": {
+        "ingitdb": {
+          "path": "ingitdb/Album/records.json",
+          "sha256": "e510066a8cc129441c61b8d63783277f126972f90b6b907d5b41d5c9b26a2e7c"
+        },
+        "bigqueryRows": {
+          "path": "bigquery/Album/rows.ndjson",
+          "sha256": "1d10b0cc66b98d9199afda448b1bccfa120f7d4c6a5ac86331a8018ace8e094b"
+        },
+        "bigquerySchema": {
+          "path": "bigquery/Album/schema.json",
+          "sha256": "def989d9b3c5df4997cd2bf5815d757bfb3fb4b18fd14c6e003cae63ee2ae490"
+        }
       }
     },
     {
       "nativeName": "Artist",
-      "collection": "artist_1d3981ba",
+      "collection": "Artist",
       "rows": 275,
       "primaryKey": [
         "ArtistId"
@@ -120,6 +145,8 @@
         {
           "nativeName": "ArtistId",
           "declaredType": "INTEGER",
+          "bigqueryName": "artistid",
+          "bigqueryType": "INTEGER",
           "sourceNotNull": true,
           "primaryKeyPosition": 1,
           "sourceDeclaredNullable": false,
@@ -131,6 +158,8 @@
         {
           "nativeName": "Name",
           "declaredType": "NVARCHAR(120)",
+          "bigqueryName": "name",
+          "bigqueryType": "STRING",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -141,13 +170,27 @@
         }
       ],
       "records": {
-        "path": "artist_1d3981ba/records.json",
-        "sha256": "1bfe6bc3d1b832a504e8e589ecaa888a97d2830c42cd10581938bdef812f668d"
+        "path": "Artist/records.json",
+        "sha256": "df02fb81df3636d7dab08929d8d838d84e4282513cdb41a5bfbb5b8450a45fd4"
+      },
+      "files": {
+        "ingitdb": {
+          "path": "ingitdb/Artist/records.json",
+          "sha256": "df02fb81df3636d7dab08929d8d838d84e4282513cdb41a5bfbb5b8450a45fd4"
+        },
+        "bigqueryRows": {
+          "path": "bigquery/Artist/rows.ndjson",
+          "sha256": "51e1d65adf79aed5f6aeb3e455f8e9127607d8c99d4acd12461a32d5728a68be"
+        },
+        "bigquerySchema": {
+          "path": "bigquery/Artist/schema.json",
+          "sha256": "10af4b7196a0f4ffc5c68c141c719f30ca24ffaa51ed3cf24e1f79713f03f07c"
+        }
       }
     },
     {
       "nativeName": "Customer",
-      "collection": "customer_bf376338",
+      "collection": "Customer",
       "rows": 59,
       "primaryKey": [
         "CustomerId"
@@ -201,6 +244,8 @@
         {
           "nativeName": "CustomerId",
           "declaredType": "INTEGER",
+          "bigqueryName": "customerid",
+          "bigqueryType": "INTEGER",
           "sourceNotNull": true,
           "primaryKeyPosition": 1,
           "sourceDeclaredNullable": false,
@@ -212,6 +257,8 @@
         {
           "nativeName": "FirstName",
           "declaredType": "NVARCHAR(40)",
+          "bigqueryName": "firstname",
+          "bigqueryType": "STRING",
           "sourceNotNull": true,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": false,
@@ -223,6 +270,8 @@
         {
           "nativeName": "LastName",
           "declaredType": "NVARCHAR(20)",
+          "bigqueryName": "lastname",
+          "bigqueryType": "STRING",
           "sourceNotNull": true,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": false,
@@ -234,6 +283,8 @@
         {
           "nativeName": "Company",
           "declaredType": "NVARCHAR(80)",
+          "bigqueryName": "company",
+          "bigqueryType": "STRING",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -245,6 +296,8 @@
         {
           "nativeName": "Address",
           "declaredType": "NVARCHAR(70)",
+          "bigqueryName": "address",
+          "bigqueryType": "STRING",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -256,6 +309,8 @@
         {
           "nativeName": "City",
           "declaredType": "NVARCHAR(40)",
+          "bigqueryName": "city",
+          "bigqueryType": "STRING",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -267,6 +322,8 @@
         {
           "nativeName": "State",
           "declaredType": "NVARCHAR(40)",
+          "bigqueryName": "state",
+          "bigqueryType": "STRING",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -278,6 +335,8 @@
         {
           "nativeName": "Country",
           "declaredType": "NVARCHAR(40)",
+          "bigqueryName": "country",
+          "bigqueryType": "STRING",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -289,6 +348,8 @@
         {
           "nativeName": "PostalCode",
           "declaredType": "NVARCHAR(10)",
+          "bigqueryName": "postalcode",
+          "bigqueryType": "STRING",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -300,6 +361,8 @@
         {
           "nativeName": "Phone",
           "declaredType": "NVARCHAR(24)",
+          "bigqueryName": "phone",
+          "bigqueryType": "STRING",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -311,6 +374,8 @@
         {
           "nativeName": "Fax",
           "declaredType": "NVARCHAR(24)",
+          "bigqueryName": "fax",
+          "bigqueryType": "STRING",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -322,6 +387,8 @@
         {
           "nativeName": "Email",
           "declaredType": "NVARCHAR(60)",
+          "bigqueryName": "email",
+          "bigqueryType": "STRING",
           "sourceNotNull": true,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": false,
@@ -333,6 +400,8 @@
         {
           "nativeName": "SupportRepId",
           "declaredType": "INTEGER",
+          "bigqueryName": "supportrepid",
+          "bigqueryType": "INTEGER",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -343,13 +412,27 @@
         }
       ],
       "records": {
-        "path": "customer_bf376338/records.json",
-        "sha256": "6960427c7d0b858b0158943c303045ee773665076664c343b46928ad1aa9ac64"
+        "path": "Customer/records.json",
+        "sha256": "eff7a4b3569f71f766b9d940aecce4623b5391c88fd36059a8aaf6c8e74fcb0f"
+      },
+      "files": {
+        "ingitdb": {
+          "path": "ingitdb/Customer/records.json",
+          "sha256": "eff7a4b3569f71f766b9d940aecce4623b5391c88fd36059a8aaf6c8e74fcb0f"
+        },
+        "bigqueryRows": {
+          "path": "bigquery/Customer/rows.ndjson",
+          "sha256": "6ca0f048de1a50bbf2d0fd4b047fc0a791acdf8d06cbb5c2d33e9d87da509a48"
+        },
+        "bigquerySchema": {
+          "path": "bigquery/Customer/schema.json",
+          "sha256": "39dc46813d291c3d475427163ce77b0ed7a81f719327f5de8efece655f8e15b6"
+        }
       }
     },
     {
       "nativeName": "Employee",
-      "collection": "employee_14014e6a",
+      "collection": "Employee",
       "rows": 8,
       "primaryKey": [
         "EmployeeId"
@@ -403,6 +486,8 @@
         {
           "nativeName": "EmployeeId",
           "declaredType": "INTEGER",
+          "bigqueryName": "employeeid",
+          "bigqueryType": "INTEGER",
           "sourceNotNull": true,
           "primaryKeyPosition": 1,
           "sourceDeclaredNullable": false,
@@ -414,6 +499,8 @@
         {
           "nativeName": "LastName",
           "declaredType": "NVARCHAR(20)",
+          "bigqueryName": "lastname",
+          "bigqueryType": "STRING",
           "sourceNotNull": true,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": false,
@@ -425,6 +512,8 @@
         {
           "nativeName": "FirstName",
           "declaredType": "NVARCHAR(20)",
+          "bigqueryName": "firstname",
+          "bigqueryType": "STRING",
           "sourceNotNull": true,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": false,
@@ -436,6 +525,8 @@
         {
           "nativeName": "Title",
           "declaredType": "NVARCHAR(30)",
+          "bigqueryName": "title",
+          "bigqueryType": "STRING",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -447,6 +538,8 @@
         {
           "nativeName": "ReportsTo",
           "declaredType": "INTEGER",
+          "bigqueryName": "reportsto",
+          "bigqueryType": "INTEGER",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -458,28 +551,34 @@
         {
           "nativeName": "BirthDate",
           "declaredType": "DATETIME",
+          "bigqueryName": "birthdate",
+          "bigqueryType": "STRING",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
           "defaultValue": null,
-          "ingitdbType": "string",
+          "ingitdbType": "datetime",
           "exportRequired": false,
           "encoding": "native-json"
         },
         {
           "nativeName": "HireDate",
           "declaredType": "DATETIME",
+          "bigqueryName": "hiredate",
+          "bigqueryType": "STRING",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
           "defaultValue": null,
-          "ingitdbType": "string",
+          "ingitdbType": "datetime",
           "exportRequired": false,
           "encoding": "native-json"
         },
         {
           "nativeName": "Address",
           "declaredType": "NVARCHAR(70)",
+          "bigqueryName": "address",
+          "bigqueryType": "STRING",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -491,6 +590,8 @@
         {
           "nativeName": "City",
           "declaredType": "NVARCHAR(40)",
+          "bigqueryName": "city",
+          "bigqueryType": "STRING",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -502,6 +603,8 @@
         {
           "nativeName": "State",
           "declaredType": "NVARCHAR(40)",
+          "bigqueryName": "state",
+          "bigqueryType": "STRING",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -513,6 +616,8 @@
         {
           "nativeName": "Country",
           "declaredType": "NVARCHAR(40)",
+          "bigqueryName": "country",
+          "bigqueryType": "STRING",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -524,6 +629,8 @@
         {
           "nativeName": "PostalCode",
           "declaredType": "NVARCHAR(10)",
+          "bigqueryName": "postalcode",
+          "bigqueryType": "STRING",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -535,6 +642,8 @@
         {
           "nativeName": "Phone",
           "declaredType": "NVARCHAR(24)",
+          "bigqueryName": "phone",
+          "bigqueryType": "STRING",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -546,6 +655,8 @@
         {
           "nativeName": "Fax",
           "declaredType": "NVARCHAR(24)",
+          "bigqueryName": "fax",
+          "bigqueryType": "STRING",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -557,6 +668,8 @@
         {
           "nativeName": "Email",
           "declaredType": "NVARCHAR(60)",
+          "bigqueryName": "email",
+          "bigqueryType": "STRING",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -567,13 +680,27 @@
         }
       ],
       "records": {
-        "path": "employee_14014e6a/records.json",
-        "sha256": "bf95c56bace5e2081dfc9a1366198670242c9da85b4718aa68c3f195c68ee258"
+        "path": "Employee/records.json",
+        "sha256": "e7de5837ca28e5cb1a3f44a0b9712ed00261c8bb08114bccac07b74fd69b1356"
+      },
+      "files": {
+        "ingitdb": {
+          "path": "ingitdb/Employee/records.json",
+          "sha256": "e7de5837ca28e5cb1a3f44a0b9712ed00261c8bb08114bccac07b74fd69b1356"
+        },
+        "bigqueryRows": {
+          "path": "bigquery/Employee/rows.ndjson",
+          "sha256": "3b7b06ed7194a9bcdcb992050a22a13bca1032e9a37de8134140e1051aebe5d6"
+        },
+        "bigquerySchema": {
+          "path": "bigquery/Employee/schema.json",
+          "sha256": "68dd065953a113ce2d78f10e11c950105bbe005c3d747303f6f5d36e6e767b6e"
+        }
       }
     },
     {
       "nativeName": "Genre",
-      "collection": "genre_6da795a8",
+      "collection": "Genre",
       "rows": 25,
       "primaryKey": [
         "GenreId"
@@ -587,6 +714,8 @@
         {
           "nativeName": "GenreId",
           "declaredType": "INTEGER",
+          "bigqueryName": "genreid",
+          "bigqueryType": "INTEGER",
           "sourceNotNull": true,
           "primaryKeyPosition": 1,
           "sourceDeclaredNullable": false,
@@ -598,6 +727,8 @@
         {
           "nativeName": "Name",
           "declaredType": "NVARCHAR(120)",
+          "bigqueryName": "name",
+          "bigqueryType": "STRING",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -608,13 +739,27 @@
         }
       ],
       "records": {
-        "path": "genre_6da795a8/records.json",
-        "sha256": "463664e5179e68fa23da2aa4a6ef7063d4e475cf28450ed65dc15ed21d03b815"
+        "path": "Genre/records.json",
+        "sha256": "c236644f147e4362cc65a8f7ea6f5c93575a56829b5d9e3016a8ba9eb081a961"
+      },
+      "files": {
+        "ingitdb": {
+          "path": "ingitdb/Genre/records.json",
+          "sha256": "c236644f147e4362cc65a8f7ea6f5c93575a56829b5d9e3016a8ba9eb081a961"
+        },
+        "bigqueryRows": {
+          "path": "bigquery/Genre/rows.ndjson",
+          "sha256": "16a6405655d49d557089e716a128065276c7a66202f51b5622cb877c7c97391e"
+        },
+        "bigquerySchema": {
+          "path": "bigquery/Genre/schema.json",
+          "sha256": "b745ddfd3a113703092846f8192801d547bdce12c0d3527eccef8bf2fed4bdf4"
+        }
       }
     },
     {
       "nativeName": "Invoice",
-      "collection": "invoice_b832002d",
+      "collection": "Invoice",
       "rows": 412,
       "primaryKey": [
         "InvoiceId"
@@ -668,6 +813,8 @@
         {
           "nativeName": "InvoiceId",
           "declaredType": "INTEGER",
+          "bigqueryName": "invoiceid",
+          "bigqueryType": "INTEGER",
           "sourceNotNull": true,
           "primaryKeyPosition": 1,
           "sourceDeclaredNullable": false,
@@ -679,6 +826,8 @@
         {
           "nativeName": "CustomerId",
           "declaredType": "INTEGER",
+          "bigqueryName": "customerid",
+          "bigqueryType": "INTEGER",
           "sourceNotNull": true,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": false,
@@ -690,17 +839,21 @@
         {
           "nativeName": "InvoiceDate",
           "declaredType": "DATETIME",
+          "bigqueryName": "invoicedate",
+          "bigqueryType": "STRING",
           "sourceNotNull": true,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": false,
           "defaultValue": null,
-          "ingitdbType": "string",
+          "ingitdbType": "datetime",
           "exportRequired": true,
           "encoding": "native-json"
         },
         {
           "nativeName": "BillingAddress",
           "declaredType": "NVARCHAR(70)",
+          "bigqueryName": "billingaddress",
+          "bigqueryType": "STRING",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -712,6 +865,8 @@
         {
           "nativeName": "BillingCity",
           "declaredType": "NVARCHAR(40)",
+          "bigqueryName": "billingcity",
+          "bigqueryType": "STRING",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -723,6 +878,8 @@
         {
           "nativeName": "BillingState",
           "declaredType": "NVARCHAR(40)",
+          "bigqueryName": "billingstate",
+          "bigqueryType": "STRING",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -734,6 +891,8 @@
         {
           "nativeName": "BillingCountry",
           "declaredType": "NVARCHAR(40)",
+          "bigqueryName": "billingcountry",
+          "bigqueryType": "STRING",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -745,6 +904,8 @@
         {
           "nativeName": "BillingPostalCode",
           "declaredType": "NVARCHAR(10)",
+          "bigqueryName": "billingpostalcode",
+          "bigqueryType": "STRING",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -756,23 +917,39 @@
         {
           "nativeName": "Total",
           "declaredType": "NUMERIC(10,2)",
+          "bigqueryName": "total",
+          "bigqueryType": "NUMERIC",
           "sourceNotNull": true,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": false,
           "defaultValue": null,
           "ingitdbType": "string",
           "exportRequired": true,
-          "encoding": "decimal-string-from-source"
+          "encoding": "decimal-string"
         }
       ],
       "records": {
-        "path": "invoice_b832002d/records.json",
-        "sha256": "75ab7c86291c39d304678a8f2cc3260490f213a423bd79de72ecebe764ae5cfa"
+        "path": "Invoice/records.json",
+        "sha256": "9242e930fc55ca936aff127f178d6cce651b287dd7b9b40ba8b8e8252ac8b88d"
+      },
+      "files": {
+        "ingitdb": {
+          "path": "ingitdb/Invoice/records.json",
+          "sha256": "9242e930fc55ca936aff127f178d6cce651b287dd7b9b40ba8b8e8252ac8b88d"
+        },
+        "bigqueryRows": {
+          "path": "bigquery/Invoice/rows.ndjson",
+          "sha256": "fe366af1cdbe080c3fdb65e06fbe56cea397fed8324073f9460a6e2652f5bee4"
+        },
+        "bigquerySchema": {
+          "path": "bigquery/Invoice/schema.json",
+          "sha256": "ca78ffe6fdf32a3ffefb795f085649747f7ace04a676d9719e2b3445a336d172"
+        }
       }
     },
     {
       "nativeName": "InvoiceLine",
-      "collection": "invoiceline_f8219145",
+      "collection": "InvoiceLine",
       "rows": 2240,
       "primaryKey": [
         "InvoiceLineId"
@@ -863,6 +1040,8 @@
         {
           "nativeName": "InvoiceLineId",
           "declaredType": "INTEGER",
+          "bigqueryName": "invoicelineid",
+          "bigqueryType": "INTEGER",
           "sourceNotNull": true,
           "primaryKeyPosition": 1,
           "sourceDeclaredNullable": false,
@@ -874,6 +1053,8 @@
         {
           "nativeName": "InvoiceId",
           "declaredType": "INTEGER",
+          "bigqueryName": "invoiceid",
+          "bigqueryType": "INTEGER",
           "sourceNotNull": true,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": false,
@@ -885,6 +1066,8 @@
         {
           "nativeName": "TrackId",
           "declaredType": "INTEGER",
+          "bigqueryName": "trackid",
+          "bigqueryType": "INTEGER",
           "sourceNotNull": true,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": false,
@@ -896,17 +1079,21 @@
         {
           "nativeName": "UnitPrice",
           "declaredType": "NUMERIC(10,2)",
+          "bigqueryName": "unitprice",
+          "bigqueryType": "NUMERIC",
           "sourceNotNull": true,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": false,
           "defaultValue": null,
           "ingitdbType": "string",
           "exportRequired": true,
-          "encoding": "decimal-string-from-source"
+          "encoding": "decimal-string"
         },
         {
           "nativeName": "Quantity",
           "declaredType": "INTEGER",
+          "bigqueryName": "quantity",
+          "bigqueryType": "INTEGER",
           "sourceNotNull": true,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": false,
@@ -917,13 +1104,27 @@
         }
       ],
       "records": {
-        "path": "invoiceline_f8219145/records.json",
-        "sha256": "0212dfa1a6a6f55fb3c44922fbf927cb37f1ed878e14eda5c0909599c1900fe9"
+        "path": "InvoiceLine/records.json",
+        "sha256": "04edc48a250fe3d4e45efee978901c081b7c4a808c10c30f5839df65d9eae856"
+      },
+      "files": {
+        "ingitdb": {
+          "path": "ingitdb/InvoiceLine/records.json",
+          "sha256": "04edc48a250fe3d4e45efee978901c081b7c4a808c10c30f5839df65d9eae856"
+        },
+        "bigqueryRows": {
+          "path": "bigquery/InvoiceLine/rows.ndjson",
+          "sha256": "9fe55ddc558beeff2002e33943cd2549793f6b8f875280a8baff2c58d8db2602"
+        },
+        "bigquerySchema": {
+          "path": "bigquery/InvoiceLine/schema.json",
+          "sha256": "d36a2766694b2ea3b6e721ffdd2ca5c94ad8baeef0e4dacd69bafb8326d4c571"
+        }
       }
     },
     {
       "nativeName": "MediaType",
-      "collection": "mediatype_4597b279",
+      "collection": "MediaType",
       "rows": 5,
       "primaryKey": [
         "MediaTypeId"
@@ -937,6 +1138,8 @@
         {
           "nativeName": "MediaTypeId",
           "declaredType": "INTEGER",
+          "bigqueryName": "mediatypeid",
+          "bigqueryType": "INTEGER",
           "sourceNotNull": true,
           "primaryKeyPosition": 1,
           "sourceDeclaredNullable": false,
@@ -948,6 +1151,8 @@
         {
           "nativeName": "Name",
           "declaredType": "NVARCHAR(120)",
+          "bigqueryName": "name",
+          "bigqueryType": "STRING",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -958,13 +1163,27 @@
         }
       ],
       "records": {
-        "path": "mediatype_4597b279/records.json",
-        "sha256": "39960917f0222d4dfe7629668424cdebdf010ea47de466ace3e148d32d08d18c"
+        "path": "MediaType/records.json",
+        "sha256": "9315ca4c0c784d84607e92632113dac05472d226ab6974710221eb244d62af8b"
+      },
+      "files": {
+        "ingitdb": {
+          "path": "ingitdb/MediaType/records.json",
+          "sha256": "9315ca4c0c784d84607e92632113dac05472d226ab6974710221eb244d62af8b"
+        },
+        "bigqueryRows": {
+          "path": "bigquery/MediaType/rows.ndjson",
+          "sha256": "53779009de27b62b9706666757d17146bfc4cf81097411486fa1d3496416d2bd"
+        },
+        "bigquerySchema": {
+          "path": "bigquery/MediaType/schema.json",
+          "sha256": "dd5254de1b1396afaa72a9ed818f6edc25b8a225755dfb16b3efdd11c0dbdde2"
+        }
       }
     },
     {
       "nativeName": "Playlist",
-      "collection": "playlist_7af36c50",
+      "collection": "Playlist",
       "rows": 18,
       "primaryKey": [
         "PlaylistId"
@@ -978,6 +1197,8 @@
         {
           "nativeName": "PlaylistId",
           "declaredType": "INTEGER",
+          "bigqueryName": "playlistid",
+          "bigqueryType": "INTEGER",
           "sourceNotNull": true,
           "primaryKeyPosition": 1,
           "sourceDeclaredNullable": false,
@@ -989,6 +1210,8 @@
         {
           "nativeName": "Name",
           "declaredType": "NVARCHAR(120)",
+          "bigqueryName": "name",
+          "bigqueryType": "STRING",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -999,13 +1222,27 @@
         }
       ],
       "records": {
-        "path": "playlist_7af36c50/records.json",
-        "sha256": "fef64809fb6ad57b24a071ccb8d2a7679afad26be0d31ed0e20dd390827a8408"
+        "path": "Playlist/records.json",
+        "sha256": "910a3c5d3f043b43c98ee2be3042fb71d5eeac737ae307bc159a79a81ae3366e"
+      },
+      "files": {
+        "ingitdb": {
+          "path": "ingitdb/Playlist/records.json",
+          "sha256": "910a3c5d3f043b43c98ee2be3042fb71d5eeac737ae307bc159a79a81ae3366e"
+        },
+        "bigqueryRows": {
+          "path": "bigquery/Playlist/rows.ndjson",
+          "sha256": "56c47607cbdad1323fa8c0f168b418529fbec3abe5fb79b479661d317576a485"
+        },
+        "bigquerySchema": {
+          "path": "bigquery/Playlist/schema.json",
+          "sha256": "b7e9c79a0b6d85658014a7b96d12e654fa2f2f57dbf741a79323700523768151"
+        }
       }
     },
     {
       "nativeName": "PlaylistTrack",
-      "collection": "playlisttrack_d0483a81",
+      "collection": "PlaylistTrack",
       "rows": 8715,
       "primaryKey": [
         "PlaylistId",
@@ -1112,6 +1349,8 @@
         {
           "nativeName": "PlaylistId",
           "declaredType": "INTEGER",
+          "bigqueryName": "playlistid",
+          "bigqueryType": "INTEGER",
           "sourceNotNull": true,
           "primaryKeyPosition": 1,
           "sourceDeclaredNullable": false,
@@ -1123,6 +1362,8 @@
         {
           "nativeName": "TrackId",
           "declaredType": "INTEGER",
+          "bigqueryName": "trackid",
+          "bigqueryType": "INTEGER",
           "sourceNotNull": true,
           "primaryKeyPosition": 2,
           "sourceDeclaredNullable": false,
@@ -1133,13 +1374,27 @@
         }
       ],
       "records": {
-        "path": "playlisttrack_d0483a81/records.json",
-        "sha256": "5a0b84b741a38e6ef973dd23b30b8df40128bfe93c28d0e50610e274f7c6f73f"
+        "path": "PlaylistTrack/records.json",
+        "sha256": "1f46b297dff5331a67559899f98c767079679322314dd4100b2a461f11e696ec"
+      },
+      "files": {
+        "ingitdb": {
+          "path": "ingitdb/PlaylistTrack/records.json",
+          "sha256": "1f46b297dff5331a67559899f98c767079679322314dd4100b2a461f11e696ec"
+        },
+        "bigqueryRows": {
+          "path": "bigquery/PlaylistTrack/rows.ndjson",
+          "sha256": "a8cc7f9091df4301874b5e7c43d5336181f610fbd48937bba064199c37c16422"
+        },
+        "bigquerySchema": {
+          "path": "bigquery/PlaylistTrack/schema.json",
+          "sha256": "84333b21fccba086b4d98531a67fbba342f0eca24e3ebf7a3004ff16c2b80237"
+        }
       }
     },
     {
       "nativeName": "Track",
-      "collection": "track_051f01f0",
+      "collection": "Track",
       "rows": 3503,
       "primaryKey": [
         "TrackId"
@@ -1267,6 +1522,8 @@
         {
           "nativeName": "TrackId",
           "declaredType": "INTEGER",
+          "bigqueryName": "trackid",
+          "bigqueryType": "INTEGER",
           "sourceNotNull": true,
           "primaryKeyPosition": 1,
           "sourceDeclaredNullable": false,
@@ -1278,6 +1535,8 @@
         {
           "nativeName": "Name",
           "declaredType": "NVARCHAR(200)",
+          "bigqueryName": "name",
+          "bigqueryType": "STRING",
           "sourceNotNull": true,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": false,
@@ -1289,6 +1548,8 @@
         {
           "nativeName": "AlbumId",
           "declaredType": "INTEGER",
+          "bigqueryName": "albumid",
+          "bigqueryType": "INTEGER",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -1300,6 +1561,8 @@
         {
           "nativeName": "MediaTypeId",
           "declaredType": "INTEGER",
+          "bigqueryName": "mediatypeid",
+          "bigqueryType": "INTEGER",
           "sourceNotNull": true,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": false,
@@ -1311,6 +1574,8 @@
         {
           "nativeName": "GenreId",
           "declaredType": "INTEGER",
+          "bigqueryName": "genreid",
+          "bigqueryType": "INTEGER",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -1322,6 +1587,8 @@
         {
           "nativeName": "Composer",
           "declaredType": "NVARCHAR(220)",
+          "bigqueryName": "composer",
+          "bigqueryType": "STRING",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -1333,6 +1600,8 @@
         {
           "nativeName": "Milliseconds",
           "declaredType": "INTEGER",
+          "bigqueryName": "milliseconds",
+          "bigqueryType": "INTEGER",
           "sourceNotNull": true,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": false,
@@ -1344,6 +1613,8 @@
         {
           "nativeName": "Bytes",
           "declaredType": "INTEGER",
+          "bigqueryName": "bytes",
+          "bigqueryType": "INTEGER",
           "sourceNotNull": false,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": true,
@@ -1355,21 +1626,55 @@
         {
           "nativeName": "UnitPrice",
           "declaredType": "NUMERIC(10,2)",
+          "bigqueryName": "unitprice",
+          "bigqueryType": "NUMERIC",
           "sourceNotNull": true,
           "primaryKeyPosition": 0,
           "sourceDeclaredNullable": false,
           "defaultValue": null,
           "ingitdbType": "string",
           "exportRequired": true,
-          "encoding": "decimal-string-from-source"
+          "encoding": "decimal-string"
         }
       ],
       "records": {
-        "path": "track_051f01f0/records.json",
-        "sha256": "cf6592b76448e539ff0ac969f1b61be2cec303e6fcd8d29d620bb576f6f72c37"
+        "path": "Track/records.json",
+        "sha256": "f85430d5cbb63175ade0ddb20882250b8b4634588c001bff3dcb31a910462f8d"
+      },
+      "files": {
+        "ingitdb": {
+          "path": "ingitdb/Track/records.json",
+          "sha256": "f85430d5cbb63175ade0ddb20882250b8b4634588c001bff3dcb31a910462f8d"
+        },
+        "bigqueryRows": {
+          "path": "bigquery/Track/rows.ndjson",
+          "sha256": "1b2ea25ff0ce0067448fdac7f486d381d41da73e371bcb16bb87d1d3899ef603"
+        },
+        "bigquerySchema": {
+          "path": "bigquery/Track/schema.json",
+          "sha256": "57d8c1e277c8cdd7b01e138337335f882f56b00248079b05a08b3fa534591aa9"
+        }
       }
     }
   ],
+  "sourceCollections": {
+    "path": "ingitdb/.ingitdb/source-collections.json",
+    "sha256": "f2396b09f82a4483ddb31dbb3029cd395dd7105cc1d5060d60afc6e09fc7ffd8"
+  },
   "views": [],
-  "status": "prepared-not-hosted"
+  "status": "prepared-not-hosted",
+  "nativeParity": {
+    "format": "demodb-datatug-parity/v1",
+    "sourceSha256": "7651ba378ac2fcd0dfc3c66fb101f7a7eed3ba39a612ec642b96e20702061f15",
+    "tables": 11,
+    "rows": 15607,
+    "dataChecked": true,
+    "metadataAndDataMatch": true,
+    "sourceOrphans": 0,
+    "errorCount": 0,
+    "report": {
+      "path": "ingitdb/native-parity-report.json",
+      "sha256": "11728d87c62d6ec973c561d2600f8e2c0830ea33003dc30f8645e4e268e9dcf8"
+    }
+  }
 }

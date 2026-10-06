@@ -1,0 +1,91 @@
+record_file:
+    name: records.json
+    format: json
+    type: map[$record_id]map[$field_name]any
+columns:
+    InvoiceId:
+        type: int
+        required: true
+    CustomerId:
+        type: int
+        required: true
+    InvoiceDate:
+        type: datetime
+        required: true
+    BillingAddress:
+        type: string
+    BillingCity:
+        type: string
+    BillingState:
+        type: string
+    BillingCountry:
+        type: string
+    BillingPostalCode:
+        type: string
+    Total:
+        type: string
+        required: true
+columns_order:
+    - InvoiceId
+    - CustomerId
+    - InvoiceDate
+    - BillingAddress
+    - BillingCity
+    - BillingState
+    - BillingCountry
+    - BillingPostalCode
+    - Total
+primary_key:
+    - InvoiceId
+source_schema:
+    key_mode: source-primary-key
+    source_definition_json: '{"dialect":"sqlite","createSql":"CREATE TABLE [Invoice]\n(\n    [InvoiceId] INTEGER  NOT NULL,\n    [CustomerId] INTEGER  NOT NULL,\n    [InvoiceDate] DATETIME  NOT NULL,\n    [BillingAddress] NVARCHAR(70),\n    [BillingCity] NVARCHAR(40),\n    [BillingState] NVARCHAR(40),\n    [BillingCountry] NVARCHAR(40),\n    [BillingPostalCode] NVARCHAR(10),\n    [Total] NUMERIC(10,2)  NOT NULL,\n    CONSTRAINT [PK_Invoice] PRIMARY KEY  ([InvoiceId]),\n    FOREIGN KEY ([CustomerId]) REFERENCES [Customer] ([CustomerId]) \n\t\tON DELETE NO ACTION ON UPDATE NO ACTION\n)","columns":[{"name":"InvoiceId","declaredType":"INTEGER","notNull":true,"primaryKeyPosition":1},{"name":"CustomerId","declaredType":"INTEGER","notNull":true},{"name":"InvoiceDate","declaredType":"DATETIME","notNull":true},{"name":"BillingAddress","declaredType":"NVARCHAR(70)","notNull":false},{"name":"BillingCity","declaredType":"NVARCHAR(40)","notNull":false},{"name":"BillingState","declaredType":"NVARCHAR(40)","notNull":false},{"name":"BillingCountry","declaredType":"NVARCHAR(40)","notNull":false},{"name":"BillingPostalCode","declaredType":"NVARCHAR(10)","notNull":false},{"name":"Total","declaredType":"NUMERIC(10,2)","notNull":true}],"indexes":[{"name":"IFK_InvoiceCustomerId","unique":false,"origin":"c","createSql":"CREATE INDEX [IFK_InvoiceCustomerId] ON [Invoice] ([CustomerId])","columns":[{"position":0,"name":"CustomerId","key":true,"collation":"BINARY"},{"position":1,"key":false,"collation":"BINARY"}]}]}'
+    constraint_validation: provider-preflight-passed
+    relationship_comparison: provider-native
+    storage_class_files:
+        - source-storage-0001.jsonl
+    fields:
+        - name: InvoiceId
+          type: int
+          nullable: false
+        - name: CustomerId
+          type: int
+          nullable: false
+        - name: InvoiceDate
+          type: time
+          nullable: false
+        - name: BillingAddress
+          type: string
+          nullable: true
+        - name: BillingCity
+          type: string
+          nullable: true
+        - name: BillingState
+          type: string
+          nullable: true
+        - name: BillingCountry
+          type: string
+          nullable: true
+        - name: BillingPostalCode
+          type: string
+          nullable: true
+        - name: Total
+          type: decimal
+          nullable: false
+          precision: 10
+          scale: 2
+          encoding: decimal-string
+    indexes:
+        - name: IFK_InvoiceCustomerId
+          fields:
+            - CustomerId
+    foreign_keys:
+        - name: Invoice_fk_0
+          fields:
+            - CustomerId
+          referenced_collection: Customer
+          referenced_fields:
+            - CustomerId
+          source_enforcement: disabled
+          on_update: NO ACTION
+          on_delete: NO ACTION

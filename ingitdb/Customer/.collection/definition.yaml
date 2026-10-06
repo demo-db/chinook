@@ -1,0 +1,110 @@
+record_file:
+    name: records.json
+    format: json
+    type: map[$record_id]map[$field_name]any
+columns:
+    CustomerId:
+        type: int
+        required: true
+    FirstName:
+        type: string
+        required: true
+    LastName:
+        type: string
+        required: true
+    Company:
+        type: string
+    Address:
+        type: string
+    City:
+        type: string
+    State:
+        type: string
+    Country:
+        type: string
+    PostalCode:
+        type: string
+    Phone:
+        type: string
+    Fax:
+        type: string
+    Email:
+        type: string
+        required: true
+    SupportRepId:
+        type: int
+columns_order:
+    - CustomerId
+    - FirstName
+    - LastName
+    - Company
+    - Address
+    - City
+    - State
+    - Country
+    - PostalCode
+    - Phone
+    - Fax
+    - Email
+    - SupportRepId
+primary_key:
+    - CustomerId
+source_schema:
+    key_mode: source-primary-key
+    source_definition_json: '{"dialect":"sqlite","createSql":"CREATE TABLE [Customer]\n(\n    [CustomerId] INTEGER  NOT NULL,\n    [FirstName] NVARCHAR(40)  NOT NULL,\n    [LastName] NVARCHAR(20)  NOT NULL,\n    [Company] NVARCHAR(80),\n    [Address] NVARCHAR(70),\n    [City] NVARCHAR(40),\n    [State] NVARCHAR(40),\n    [Country] NVARCHAR(40),\n    [PostalCode] NVARCHAR(10),\n    [Phone] NVARCHAR(24),\n    [Fax] NVARCHAR(24),\n    [Email] NVARCHAR(60)  NOT NULL,\n    [SupportRepId] INTEGER,\n    CONSTRAINT [PK_Customer] PRIMARY KEY  ([CustomerId]),\n    FOREIGN KEY ([SupportRepId]) REFERENCES [Employee] ([EmployeeId]) \n\t\tON DELETE NO ACTION ON UPDATE NO ACTION\n)","columns":[{"name":"CustomerId","declaredType":"INTEGER","notNull":true,"primaryKeyPosition":1},{"name":"FirstName","declaredType":"NVARCHAR(40)","notNull":true},{"name":"LastName","declaredType":"NVARCHAR(20)","notNull":true},{"name":"Company","declaredType":"NVARCHAR(80)","notNull":false},{"name":"Address","declaredType":"NVARCHAR(70)","notNull":false},{"name":"City","declaredType":"NVARCHAR(40)","notNull":false},{"name":"State","declaredType":"NVARCHAR(40)","notNull":false},{"name":"Country","declaredType":"NVARCHAR(40)","notNull":false},{"name":"PostalCode","declaredType":"NVARCHAR(10)","notNull":false},{"name":"Phone","declaredType":"NVARCHAR(24)","notNull":false},{"name":"Fax","declaredType":"NVARCHAR(24)","notNull":false},{"name":"Email","declaredType":"NVARCHAR(60)","notNull":true},{"name":"SupportRepId","declaredType":"INTEGER","notNull":false}],"indexes":[{"name":"IFK_CustomerSupportRepId","unique":false,"origin":"c","createSql":"CREATE INDEX [IFK_CustomerSupportRepId] ON [Customer] ([SupportRepId])","columns":[{"position":0,"name":"SupportRepId","key":true,"collation":"BINARY"},{"position":1,"key":false,"collation":"BINARY"}]}]}'
+    constraint_validation: provider-preflight-passed
+    relationship_comparison: provider-native
+    fields:
+        - name: CustomerId
+          type: int
+          nullable: false
+        - name: FirstName
+          type: string
+          nullable: false
+        - name: LastName
+          type: string
+          nullable: false
+        - name: Company
+          type: string
+          nullable: true
+        - name: Address
+          type: string
+          nullable: true
+        - name: City
+          type: string
+          nullable: true
+        - name: State
+          type: string
+          nullable: true
+        - name: Country
+          type: string
+          nullable: true
+        - name: PostalCode
+          type: string
+          nullable: true
+        - name: Phone
+          type: string
+          nullable: true
+        - name: Fax
+          type: string
+          nullable: true
+        - name: Email
+          type: string
+          nullable: false
+        - name: SupportRepId
+          type: int
+          nullable: true
+    indexes:
+        - name: IFK_CustomerSupportRepId
+          fields:
+            - SupportRepId
+    foreign_keys:
+        - name: Customer_fk_0
+          fields:
+            - SupportRepId
+          referenced_collection: Employee
+          referenced_fields:
+            - EmployeeId
+          source_enforcement: disabled
+          on_update: NO ACTION
+          on_delete: NO ACTION
