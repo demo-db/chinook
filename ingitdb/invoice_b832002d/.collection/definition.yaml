@@ -2,22 +2,27 @@ record_file:
   name: records.json
   format: json
   type: "map[$record_id]map[$field_name]any"
+primary_key: ["InvoiceId"]
 columns:
   "InvoiceId":
-    type: any
+    type: int
+    required: true
   "CustomerId":
-    type: any
+    type: int
+    required: true
   "InvoiceDate":
-    type: any
+    type: string
+    required: true
   "BillingAddress":
-    type: any
+    type: string
   "BillingCity":
-    type: any
+    type: string
   "BillingState":
-    type: any
+    type: string
   "BillingCountry":
-    type: any
+    type: string
   "BillingPostalCode":
-    type: any
+    type: string
   "Total":
-    type: any
+    type: string
+    required: true

@@ -2,8 +2,10 @@ record_file:
   name: records.json
   format: json
   type: "map[$record_id]map[$field_name]any"
+primary_key: ["PlaylistId"]
 columns:
   "PlaylistId":
-    type: any
+    type: int
+    required: true
   "Name":
-    type: any
+    type: string
