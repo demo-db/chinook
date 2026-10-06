@@ -1,0 +1,23 @@
+record_file:
+  name: records.json
+  format: json
+  type: "map[$record_id]map[$field_name]any"
+columns:
+  "InvoiceId":
+    type: any
+  "CustomerId":
+    type: any
+  "InvoiceDate":
+    type: any
+  "BillingAddress":
+    type: any
+  "BillingCity":
+    type: any
+  "BillingState":
+    type: any
+  "BillingCountry":
+    type: any
+  "BillingPostalCode":
+    type: any
+  "Total":
+    type: any

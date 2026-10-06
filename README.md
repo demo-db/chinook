@@ -31,3 +31,14 @@ The website registry pins an immutable provider commit and the SHA-256 values fr
 The offline publisher pre-check (`pnpm check:ovdb`, exercised by `pnpm test:directory-rules`) accepts `licences.data` as one of the 18 SPDX IDs in `scripts/lib/ovdb-manifest.mjs`, or 2–4 distinct IDs from that same list joined with exactly ` AND `, up to 64 ASCII bytes in total. Examples are `CC0-1.0 AND CC-BY-4.0` and `MIT AND Apache-2.0`; either operand order is accepted and the authored scalar string is preserved in the generated descriptor. The conjunction profile requires exact case and spacing, with no normalization; it refuses unknown IDs, repeats, extra terms, other operators, parentheses, references and control or Unicode whitespace. `licences.model` and `licences.meaning` retain their single-ID rules.
 
 This bounded syntax check does not establish legal compatibility or supply attribution. Preserve scoped source rights, licence files, notices and modification statements with served/downloaded material. The checker remains an offline pre-check; the Directory is authoritative and cross-validator/runtime acceptance must be verified before admitting a provider.
+
+## Native inGitDB snapshot
+
+The `ingitdb/` directory contains 15,607 source table rows across 11 collections. It is a Git-backed, queryable snapshot prepared from the pinned SQLite fixture. Verify and query it with the installed inGitDB CLI:
+
+```sh
+ingitdb validate --path ingitdb
+ingitdb select --path ingitdb --from album_f05e840e --limit 1 --format json
+```
+
+[`ingitdb/export-manifest.json`](ingitdb/export-manifest.json) maps each native table to its collection, row count, original primary and foreign keys, column types, transport encodings, and SHA-256 of its record file. The source fixture SHA-256 is `7651ba378ac2fcd0dfc3c66fb101f7a7eed3ba39a612ec642b96e20702061f15`. These bytes were exported against provider commit `26e852cca00101f53a84ef8ee1f1ae389067f5cf`; the source fixture hash also matches this repository's pinned fixture. Record keys encode native primary keys where present; keyless tables use stable ordinal IDs, which are not native keys. Native key relationships are descriptive metadata, not enforced in this snapshot. Exact decimal values travel as strings and binary values as base64 where marked in column metadata. Source view definitions are retained as metadata only; they are not materialized in inGitDB. Source rights and original notices remain in [`data-source/`](data-source/) and [`LICENSE`](LICENSE).

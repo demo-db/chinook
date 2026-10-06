@@ -1,0 +1,23 @@
+record_file:
+  name: records.json
+  format: json
+  type: "map[$record_id]map[$field_name]any"
+columns:
+  "TrackId":
+    type: any
+  "Name":
+    type: any
+  "AlbumId":
+    type: any
+  "MediaTypeId":
+    type: any
+  "GenreId":
+    type: any
+  "Composer":
+    type: any
+  "Milliseconds":
+    type: any
+  "Bytes":
+    type: any
+  "UnitPrice":
+    type: any
