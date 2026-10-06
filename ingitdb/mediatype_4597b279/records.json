@@ -1,0 +1,7 @@
+{
+  "pk-W1siaW50IiwxXV0": {"MediaTypeId":1,"Name":"MPEG audio file"},
+  "pk-W1siaW50IiwyXV0": {"MediaTypeId":2,"Name":"Protected AAC audio file"},
+  "pk-W1siaW50IiwzXV0": {"MediaTypeId":3,"Name":"Protected MPEG-4 video file"},
+  "pk-W1siaW50Iiw0XV0": {"MediaTypeId":4,"Name":"Purchased AAC audio file"},
+  "pk-W1siaW50Iiw1XV0": {"MediaTypeId":5,"Name":"AAC audio file"}
+}

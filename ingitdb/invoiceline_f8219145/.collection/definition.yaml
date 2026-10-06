@@ -1,0 +1,15 @@
+record_file:
+  name: records.json
+  format: json
+  type: "map[$record_id]map[$field_name]any"
+columns:
+  "InvoiceLineId":
+    type: any
+  "InvoiceId":
+    type: any
+  "TrackId":
+    type: any
+  "UnitPrice":
+    type: any
+  "Quantity":
+    type: any

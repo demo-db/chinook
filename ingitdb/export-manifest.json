@@ -1,0 +1,599 @@
+{
+  "format": "demodb-ingitdb-export/v1",
+  "datasetId": "chinook",
+  "source": {
+    "repository": "https://github.com/lerocha/chinook-database",
+    "revision": "7f67772503d71ba90f19283c38e93923addb43fa",
+    "providerRepository": "https://github.com/demo-db/chinook",
+    "providerCommit": "26e852cca00101f53a84ef8ee1f1ae389067f5cf",
+    "providerContractSha256": "576b4ecb21bd3b263b7a3523b6a3c952c8388298eb0fa56a7950b42f63958272",
+    "fixtureSha256": "7651ba378ac2fcd0dfc3c66fb101f7a7eed3ba39a612ec642b96e20702061f15",
+    "fixtureBytes": 1007616
+  },
+  "rowCount": 15607,
+  "tables": [
+    {
+      "nativeName": "Album",
+      "collection": "album_f05e840e",
+      "rows": 347,
+      "primaryKey": [
+        "AlbumId"
+      ],
+      "transportId": "encoded-native-primary-key",
+      "foreignKeys": [
+        {
+          "id": 0,
+          "sequence": 0,
+          "table": "Artist",
+          "from": "ArtistId",
+          "to": "ArtistId"
+        }
+      ],
+      "columns": [
+        {
+          "nativeName": "AlbumId",
+          "declaredType": "INTEGER",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "Title",
+          "declaredType": "NVARCHAR(160)",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "ArtistId",
+          "declaredType": "INTEGER",
+          "encoding": "native-json"
+        }
+      ],
+      "records": {
+        "path": "album_f05e840e/records.json",
+        "sha256": "ea3931ce0f5500231c93443ba0e2b801e82b656db1aa394c6a814ac6c4aeb5cf"
+      }
+    },
+    {
+      "nativeName": "Artist",
+      "collection": "artist_1d3981ba",
+      "rows": 275,
+      "primaryKey": [
+        "ArtistId"
+      ],
+      "transportId": "encoded-native-primary-key",
+      "foreignKeys": [],
+      "columns": [
+        {
+          "nativeName": "ArtistId",
+          "declaredType": "INTEGER",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "Name",
+          "declaredType": "NVARCHAR(120)",
+          "encoding": "native-json"
+        }
+      ],
+      "records": {
+        "path": "artist_1d3981ba/records.json",
+        "sha256": "1bfe6bc3d1b832a504e8e589ecaa888a97d2830c42cd10581938bdef812f668d"
+      }
+    },
+    {
+      "nativeName": "Customer",
+      "collection": "customer_bf376338",
+      "rows": 59,
+      "primaryKey": [
+        "CustomerId"
+      ],
+      "transportId": "encoded-native-primary-key",
+      "foreignKeys": [
+        {
+          "id": 0,
+          "sequence": 0,
+          "table": "Employee",
+          "from": "SupportRepId",
+          "to": "EmployeeId"
+        }
+      ],
+      "columns": [
+        {
+          "nativeName": "CustomerId",
+          "declaredType": "INTEGER",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "FirstName",
+          "declaredType": "NVARCHAR(40)",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "LastName",
+          "declaredType": "NVARCHAR(20)",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "Company",
+          "declaredType": "NVARCHAR(80)",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "Address",
+          "declaredType": "NVARCHAR(70)",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "City",
+          "declaredType": "NVARCHAR(40)",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "State",
+          "declaredType": "NVARCHAR(40)",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "Country",
+          "declaredType": "NVARCHAR(40)",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "PostalCode",
+          "declaredType": "NVARCHAR(10)",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "Phone",
+          "declaredType": "NVARCHAR(24)",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "Fax",
+          "declaredType": "NVARCHAR(24)",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "Email",
+          "declaredType": "NVARCHAR(60)",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "SupportRepId",
+          "declaredType": "INTEGER",
+          "encoding": "native-json"
+        }
+      ],
+      "records": {
+        "path": "customer_bf376338/records.json",
+        "sha256": "6960427c7d0b858b0158943c303045ee773665076664c343b46928ad1aa9ac64"
+      }
+    },
+    {
+      "nativeName": "Employee",
+      "collection": "employee_14014e6a",
+      "rows": 8,
+      "primaryKey": [
+        "EmployeeId"
+      ],
+      "transportId": "encoded-native-primary-key",
+      "foreignKeys": [
+        {
+          "id": 0,
+          "sequence": 0,
+          "table": "Employee",
+          "from": "ReportsTo",
+          "to": "EmployeeId"
+        }
+      ],
+      "columns": [
+        {
+          "nativeName": "EmployeeId",
+          "declaredType": "INTEGER",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "LastName",
+          "declaredType": "NVARCHAR(20)",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "FirstName",
+          "declaredType": "NVARCHAR(20)",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "Title",
+          "declaredType": "NVARCHAR(30)",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "ReportsTo",
+          "declaredType": "INTEGER",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "BirthDate",
+          "declaredType": "DATETIME",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "HireDate",
+          "declaredType": "DATETIME",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "Address",
+          "declaredType": "NVARCHAR(70)",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "City",
+          "declaredType": "NVARCHAR(40)",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "State",
+          "declaredType": "NVARCHAR(40)",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "Country",
+          "declaredType": "NVARCHAR(40)",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "PostalCode",
+          "declaredType": "NVARCHAR(10)",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "Phone",
+          "declaredType": "NVARCHAR(24)",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "Fax",
+          "declaredType": "NVARCHAR(24)",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "Email",
+          "declaredType": "NVARCHAR(60)",
+          "encoding": "native-json"
+        }
+      ],
+      "records": {
+        "path": "employee_14014e6a/records.json",
+        "sha256": "bf95c56bace5e2081dfc9a1366198670242c9da85b4718aa68c3f195c68ee258"
+      }
+    },
+    {
+      "nativeName": "Genre",
+      "collection": "genre_6da795a8",
+      "rows": 25,
+      "primaryKey": [
+        "GenreId"
+      ],
+      "transportId": "encoded-native-primary-key",
+      "foreignKeys": [],
+      "columns": [
+        {
+          "nativeName": "GenreId",
+          "declaredType": "INTEGER",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "Name",
+          "declaredType": "NVARCHAR(120)",
+          "encoding": "native-json"
+        }
+      ],
+      "records": {
+        "path": "genre_6da795a8/records.json",
+        "sha256": "463664e5179e68fa23da2aa4a6ef7063d4e475cf28450ed65dc15ed21d03b815"
+      }
+    },
+    {
+      "nativeName": "Invoice",
+      "collection": "invoice_b832002d",
+      "rows": 412,
+      "primaryKey": [
+        "InvoiceId"
+      ],
+      "transportId": "encoded-native-primary-key",
+      "foreignKeys": [
+        {
+          "id": 0,
+          "sequence": 0,
+          "table": "Customer",
+          "from": "CustomerId",
+          "to": "CustomerId"
+        }
+      ],
+      "columns": [
+        {
+          "nativeName": "InvoiceId",
+          "declaredType": "INTEGER",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "CustomerId",
+          "declaredType": "INTEGER",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "InvoiceDate",
+          "declaredType": "DATETIME",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "BillingAddress",
+          "declaredType": "NVARCHAR(70)",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "BillingCity",
+          "declaredType": "NVARCHAR(40)",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "BillingState",
+          "declaredType": "NVARCHAR(40)",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "BillingCountry",
+          "declaredType": "NVARCHAR(40)",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "BillingPostalCode",
+          "declaredType": "NVARCHAR(10)",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "Total",
+          "declaredType": "NUMERIC(10,2)",
+          "encoding": "decimal-string-from-source"
+        }
+      ],
+      "records": {
+        "path": "invoice_b832002d/records.json",
+        "sha256": "75ab7c86291c39d304678a8f2cc3260490f213a423bd79de72ecebe764ae5cfa"
+      }
+    },
+    {
+      "nativeName": "InvoiceLine",
+      "collection": "invoiceline_f8219145",
+      "rows": 2240,
+      "primaryKey": [
+        "InvoiceLineId"
+      ],
+      "transportId": "encoded-native-primary-key",
+      "foreignKeys": [
+        {
+          "id": 0,
+          "sequence": 0,
+          "table": "Track",
+          "from": "TrackId",
+          "to": "TrackId"
+        },
+        {
+          "id": 1,
+          "sequence": 0,
+          "table": "Invoice",
+          "from": "InvoiceId",
+          "to": "InvoiceId"
+        }
+      ],
+      "columns": [
+        {
+          "nativeName": "InvoiceLineId",
+          "declaredType": "INTEGER",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "InvoiceId",
+          "declaredType": "INTEGER",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "TrackId",
+          "declaredType": "INTEGER",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "UnitPrice",
+          "declaredType": "NUMERIC(10,2)",
+          "encoding": "decimal-string-from-source"
+        },
+        {
+          "nativeName": "Quantity",
+          "declaredType": "INTEGER",
+          "encoding": "native-json"
+        }
+      ],
+      "records": {
+        "path": "invoiceline_f8219145/records.json",
+        "sha256": "0212dfa1a6a6f55fb3c44922fbf927cb37f1ed878e14eda5c0909599c1900fe9"
+      }
+    },
+    {
+      "nativeName": "MediaType",
+      "collection": "mediatype_4597b279",
+      "rows": 5,
+      "primaryKey": [
+        "MediaTypeId"
+      ],
+      "transportId": "encoded-native-primary-key",
+      "foreignKeys": [],
+      "columns": [
+        {
+          "nativeName": "MediaTypeId",
+          "declaredType": "INTEGER",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "Name",
+          "declaredType": "NVARCHAR(120)",
+          "encoding": "native-json"
+        }
+      ],
+      "records": {
+        "path": "mediatype_4597b279/records.json",
+        "sha256": "39960917f0222d4dfe7629668424cdebdf010ea47de466ace3e148d32d08d18c"
+      }
+    },
+    {
+      "nativeName": "Playlist",
+      "collection": "playlist_7af36c50",
+      "rows": 18,
+      "primaryKey": [
+        "PlaylistId"
+      ],
+      "transportId": "encoded-native-primary-key",
+      "foreignKeys": [],
+      "columns": [
+        {
+          "nativeName": "PlaylistId",
+          "declaredType": "INTEGER",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "Name",
+          "declaredType": "NVARCHAR(120)",
+          "encoding": "native-json"
+        }
+      ],
+      "records": {
+        "path": "playlist_7af36c50/records.json",
+        "sha256": "fef64809fb6ad57b24a071ccb8d2a7679afad26be0d31ed0e20dd390827a8408"
+      }
+    },
+    {
+      "nativeName": "PlaylistTrack",
+      "collection": "playlisttrack_d0483a81",
+      "rows": 8715,
+      "primaryKey": [
+        "PlaylistId",
+        "TrackId"
+      ],
+      "transportId": "encoded-native-primary-key",
+      "foreignKeys": [
+        {
+          "id": 0,
+          "sequence": 0,
+          "table": "Track",
+          "from": "TrackId",
+          "to": "TrackId"
+        },
+        {
+          "id": 1,
+          "sequence": 0,
+          "table": "Playlist",
+          "from": "PlaylistId",
+          "to": "PlaylistId"
+        }
+      ],
+      "columns": [
+        {
+          "nativeName": "PlaylistId",
+          "declaredType": "INTEGER",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "TrackId",
+          "declaredType": "INTEGER",
+          "encoding": "native-json"
+        }
+      ],
+      "records": {
+        "path": "playlisttrack_d0483a81/records.json",
+        "sha256": "5a0b84b741a38e6ef973dd23b30b8df40128bfe93c28d0e50610e274f7c6f73f"
+      }
+    },
+    {
+      "nativeName": "Track",
+      "collection": "track_051f01f0",
+      "rows": 3503,
+      "primaryKey": [
+        "TrackId"
+      ],
+      "transportId": "encoded-native-primary-key",
+      "foreignKeys": [
+        {
+          "id": 0,
+          "sequence": 0,
+          "table": "MediaType",
+          "from": "MediaTypeId",
+          "to": "MediaTypeId"
+        },
+        {
+          "id": 1,
+          "sequence": 0,
+          "table": "Genre",
+          "from": "GenreId",
+          "to": "GenreId"
+        },
+        {
+          "id": 2,
+          "sequence": 0,
+          "table": "Album",
+          "from": "AlbumId",
+          "to": "AlbumId"
+        }
+      ],
+      "columns": [
+        {
+          "nativeName": "TrackId",
+          "declaredType": "INTEGER",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "Name",
+          "declaredType": "NVARCHAR(200)",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "AlbumId",
+          "declaredType": "INTEGER",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "MediaTypeId",
+          "declaredType": "INTEGER",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "GenreId",
+          "declaredType": "INTEGER",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "Composer",
+          "declaredType": "NVARCHAR(220)",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "Milliseconds",
+          "declaredType": "INTEGER",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "Bytes",
+          "declaredType": "INTEGER",
+          "encoding": "native-json"
+        },
+        {
+          "nativeName": "UnitPrice",
+          "declaredType": "NUMERIC(10,2)",
+          "encoding": "decimal-string-from-source"
+        }
+      ],
+      "records": {
+        "path": "track_051f01f0/records.json",
+        "sha256": "cf6592b76448e539ff0ac969f1b61be2cec303e6fcd8d29d620bb576f6f72c37"
+      }
+    }
+  ],
+  "views": [],
+  "status": "prepared-not-hosted"
+}
