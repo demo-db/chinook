@@ -20,29 +20,82 @@
         "AlbumId"
       ],
       "transportId": "encoded-native-primary-key",
+      "sourceSql": "CREATE TABLE [Album]\n(\n    [AlbumId] INTEGER  NOT NULL,\n    [Title] NVARCHAR(160)  NOT NULL,\n    [ArtistId] INTEGER  NOT NULL,\n    CONSTRAINT [PK_Album] PRIMARY KEY  ([AlbumId]),\n    FOREIGN KEY ([ArtistId]) REFERENCES [Artist] ([ArtistId]) \n\t\tON DELETE NO ACTION ON UPDATE NO ACTION\n)",
+      "indexes": [
+        {
+          "name": "IFK_AlbumArtistId",
+          "unique": false,
+          "origin": "c",
+          "partial": false,
+          "sql": "CREATE INDEX [IFK_AlbumArtistId] ON [Album] ([ArtistId])",
+          "columns": [
+            "ArtistId"
+          ],
+          "key_columns": [
+            "ArtistId"
+          ]
+        }
+      ],
       "foreignKeys": [
         {
           "id": 0,
           "sequence": 0,
           "table": "Artist",
           "from": "ArtistId",
-          "to": "ArtistId"
+          "to": "ArtistId",
+          "onUpdate": "NO ACTION",
+          "onDelete": "NO ACTION",
+          "match": "NONE"
+        }
+      ],
+      "foreignKeyConstraints": [
+        {
+          "id": 0,
+          "localColumns": [
+            "ArtistId"
+          ],
+          "referencedTable": "Artist",
+          "referencedColumns": [
+            "ArtistId"
+          ],
+          "onUpdate": "NO ACTION",
+          "onDelete": "NO ACTION",
+          "match": "NONE",
+          "enforced": false
         }
       ],
       "columns": [
         {
           "nativeName": "AlbumId",
           "declaredType": "INTEGER",
+          "sourceNotNull": true,
+          "primaryKeyPosition": 1,
+          "sourceDeclaredNullable": false,
+          "defaultValue": null,
+          "ingitdbType": "int",
+          "exportRequired": true,
           "encoding": "native-json"
         },
         {
           "nativeName": "Title",
           "declaredType": "NVARCHAR(160)",
+          "sourceNotNull": true,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": false,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": true,
           "encoding": "native-json"
         },
         {
           "nativeName": "ArtistId",
           "declaredType": "INTEGER",
+          "sourceNotNull": true,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": false,
+          "defaultValue": null,
+          "ingitdbType": "int",
+          "exportRequired": true,
           "encoding": "native-json"
         }
       ],
@@ -59,16 +112,31 @@
         "ArtistId"
       ],
       "transportId": "encoded-native-primary-key",
+      "sourceSql": "CREATE TABLE [Artist]\n(\n    [ArtistId] INTEGER  NOT NULL,\n    [Name] NVARCHAR(120),\n    CONSTRAINT [PK_Artist] PRIMARY KEY  ([ArtistId])\n)",
+      "indexes": [],
       "foreignKeys": [],
+      "foreignKeyConstraints": [],
       "columns": [
         {
           "nativeName": "ArtistId",
           "declaredType": "INTEGER",
+          "sourceNotNull": true,
+          "primaryKeyPosition": 1,
+          "sourceDeclaredNullable": false,
+          "defaultValue": null,
+          "ingitdbType": "int",
+          "exportRequired": true,
           "encoding": "native-json"
         },
         {
           "nativeName": "Name",
           "declaredType": "NVARCHAR(120)",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": false,
           "encoding": "native-json"
         }
       ],
@@ -85,79 +153,192 @@
         "CustomerId"
       ],
       "transportId": "encoded-native-primary-key",
+      "sourceSql": "CREATE TABLE [Customer]\n(\n    [CustomerId] INTEGER  NOT NULL,\n    [FirstName] NVARCHAR(40)  NOT NULL,\n    [LastName] NVARCHAR(20)  NOT NULL,\n    [Company] NVARCHAR(80),\n    [Address] NVARCHAR(70),\n    [City] NVARCHAR(40),\n    [State] NVARCHAR(40),\n    [Country] NVARCHAR(40),\n    [PostalCode] NVARCHAR(10),\n    [Phone] NVARCHAR(24),\n    [Fax] NVARCHAR(24),\n    [Email] NVARCHAR(60)  NOT NULL,\n    [SupportRepId] INTEGER,\n    CONSTRAINT [PK_Customer] PRIMARY KEY  ([CustomerId]),\n    FOREIGN KEY ([SupportRepId]) REFERENCES [Employee] ([EmployeeId]) \n\t\tON DELETE NO ACTION ON UPDATE NO ACTION\n)",
+      "indexes": [
+        {
+          "name": "IFK_CustomerSupportRepId",
+          "unique": false,
+          "origin": "c",
+          "partial": false,
+          "sql": "CREATE INDEX [IFK_CustomerSupportRepId] ON [Customer] ([SupportRepId])",
+          "columns": [
+            "SupportRepId"
+          ],
+          "key_columns": [
+            "SupportRepId"
+          ]
+        }
+      ],
       "foreignKeys": [
         {
           "id": 0,
           "sequence": 0,
           "table": "Employee",
           "from": "SupportRepId",
-          "to": "EmployeeId"
+          "to": "EmployeeId",
+          "onUpdate": "NO ACTION",
+          "onDelete": "NO ACTION",
+          "match": "NONE"
+        }
+      ],
+      "foreignKeyConstraints": [
+        {
+          "id": 0,
+          "localColumns": [
+            "SupportRepId"
+          ],
+          "referencedTable": "Employee",
+          "referencedColumns": [
+            "EmployeeId"
+          ],
+          "onUpdate": "NO ACTION",
+          "onDelete": "NO ACTION",
+          "match": "NONE",
+          "enforced": false
         }
       ],
       "columns": [
         {
           "nativeName": "CustomerId",
           "declaredType": "INTEGER",
+          "sourceNotNull": true,
+          "primaryKeyPosition": 1,
+          "sourceDeclaredNullable": false,
+          "defaultValue": null,
+          "ingitdbType": "int",
+          "exportRequired": true,
           "encoding": "native-json"
         },
         {
           "nativeName": "FirstName",
           "declaredType": "NVARCHAR(40)",
+          "sourceNotNull": true,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": false,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": true,
           "encoding": "native-json"
         },
         {
           "nativeName": "LastName",
           "declaredType": "NVARCHAR(20)",
+          "sourceNotNull": true,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": false,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": true,
           "encoding": "native-json"
         },
         {
           "nativeName": "Company",
           "declaredType": "NVARCHAR(80)",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": false,
           "encoding": "native-json"
         },
         {
           "nativeName": "Address",
           "declaredType": "NVARCHAR(70)",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": false,
           "encoding": "native-json"
         },
         {
           "nativeName": "City",
           "declaredType": "NVARCHAR(40)",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": false,
           "encoding": "native-json"
         },
         {
           "nativeName": "State",
           "declaredType": "NVARCHAR(40)",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": false,
           "encoding": "native-json"
         },
         {
           "nativeName": "Country",
           "declaredType": "NVARCHAR(40)",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": false,
           "encoding": "native-json"
         },
         {
           "nativeName": "PostalCode",
           "declaredType": "NVARCHAR(10)",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": false,
           "encoding": "native-json"
         },
         {
           "nativeName": "Phone",
           "declaredType": "NVARCHAR(24)",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": false,
           "encoding": "native-json"
         },
         {
           "nativeName": "Fax",
           "declaredType": "NVARCHAR(24)",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": false,
           "encoding": "native-json"
         },
         {
           "nativeName": "Email",
           "declaredType": "NVARCHAR(60)",
+          "sourceNotNull": true,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": false,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": true,
           "encoding": "native-json"
         },
         {
           "nativeName": "SupportRepId",
           "declaredType": "INTEGER",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "int",
+          "exportRequired": false,
           "encoding": "native-json"
         }
       ],
@@ -174,89 +355,214 @@
         "EmployeeId"
       ],
       "transportId": "encoded-native-primary-key",
+      "sourceSql": "CREATE TABLE [Employee]\n(\n    [EmployeeId] INTEGER  NOT NULL,\n    [LastName] NVARCHAR(20)  NOT NULL,\n    [FirstName] NVARCHAR(20)  NOT NULL,\n    [Title] NVARCHAR(30),\n    [ReportsTo] INTEGER,\n    [BirthDate] DATETIME,\n    [HireDate] DATETIME,\n    [Address] NVARCHAR(70),\n    [City] NVARCHAR(40),\n    [State] NVARCHAR(40),\n    [Country] NVARCHAR(40),\n    [PostalCode] NVARCHAR(10),\n    [Phone] NVARCHAR(24),\n    [Fax] NVARCHAR(24),\n    [Email] NVARCHAR(60),\n    CONSTRAINT [PK_Employee] PRIMARY KEY  ([EmployeeId]),\n    FOREIGN KEY ([ReportsTo]) REFERENCES [Employee] ([EmployeeId]) \n\t\tON DELETE NO ACTION ON UPDATE NO ACTION\n)",
+      "indexes": [
+        {
+          "name": "IFK_EmployeeReportsTo",
+          "unique": false,
+          "origin": "c",
+          "partial": false,
+          "sql": "CREATE INDEX [IFK_EmployeeReportsTo] ON [Employee] ([ReportsTo])",
+          "columns": [
+            "ReportsTo"
+          ],
+          "key_columns": [
+            "ReportsTo"
+          ]
+        }
+      ],
       "foreignKeys": [
         {
           "id": 0,
           "sequence": 0,
           "table": "Employee",
           "from": "ReportsTo",
-          "to": "EmployeeId"
+          "to": "EmployeeId",
+          "onUpdate": "NO ACTION",
+          "onDelete": "NO ACTION",
+          "match": "NONE"
+        }
+      ],
+      "foreignKeyConstraints": [
+        {
+          "id": 0,
+          "localColumns": [
+            "ReportsTo"
+          ],
+          "referencedTable": "Employee",
+          "referencedColumns": [
+            "EmployeeId"
+          ],
+          "onUpdate": "NO ACTION",
+          "onDelete": "NO ACTION",
+          "match": "NONE",
+          "enforced": false
         }
       ],
       "columns": [
         {
           "nativeName": "EmployeeId",
           "declaredType": "INTEGER",
+          "sourceNotNull": true,
+          "primaryKeyPosition": 1,
+          "sourceDeclaredNullable": false,
+          "defaultValue": null,
+          "ingitdbType": "int",
+          "exportRequired": true,
           "encoding": "native-json"
         },
         {
           "nativeName": "LastName",
           "declaredType": "NVARCHAR(20)",
+          "sourceNotNull": true,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": false,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": true,
           "encoding": "native-json"
         },
         {
           "nativeName": "FirstName",
           "declaredType": "NVARCHAR(20)",
+          "sourceNotNull": true,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": false,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": true,
           "encoding": "native-json"
         },
         {
           "nativeName": "Title",
           "declaredType": "NVARCHAR(30)",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": false,
           "encoding": "native-json"
         },
         {
           "nativeName": "ReportsTo",
           "declaredType": "INTEGER",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "int",
+          "exportRequired": false,
           "encoding": "native-json"
         },
         {
           "nativeName": "BirthDate",
           "declaredType": "DATETIME",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": false,
           "encoding": "native-json"
         },
         {
           "nativeName": "HireDate",
           "declaredType": "DATETIME",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": false,
           "encoding": "native-json"
         },
         {
           "nativeName": "Address",
           "declaredType": "NVARCHAR(70)",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": false,
           "encoding": "native-json"
         },
         {
           "nativeName": "City",
           "declaredType": "NVARCHAR(40)",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": false,
           "encoding": "native-json"
         },
         {
           "nativeName": "State",
           "declaredType": "NVARCHAR(40)",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": false,
           "encoding": "native-json"
         },
         {
           "nativeName": "Country",
           "declaredType": "NVARCHAR(40)",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": false,
           "encoding": "native-json"
         },
         {
           "nativeName": "PostalCode",
           "declaredType": "NVARCHAR(10)",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": false,
           "encoding": "native-json"
         },
         {
           "nativeName": "Phone",
           "declaredType": "NVARCHAR(24)",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": false,
           "encoding": "native-json"
         },
         {
           "nativeName": "Fax",
           "declaredType": "NVARCHAR(24)",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": false,
           "encoding": "native-json"
         },
         {
           "nativeName": "Email",
           "declaredType": "NVARCHAR(60)",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": false,
           "encoding": "native-json"
         }
       ],
@@ -273,16 +579,31 @@
         "GenreId"
       ],
       "transportId": "encoded-native-primary-key",
+      "sourceSql": "CREATE TABLE [Genre]\n(\n    [GenreId] INTEGER  NOT NULL,\n    [Name] NVARCHAR(120),\n    CONSTRAINT [PK_Genre] PRIMARY KEY  ([GenreId])\n)",
+      "indexes": [],
       "foreignKeys": [],
+      "foreignKeyConstraints": [],
       "columns": [
         {
           "nativeName": "GenreId",
           "declaredType": "INTEGER",
+          "sourceNotNull": true,
+          "primaryKeyPosition": 1,
+          "sourceDeclaredNullable": false,
+          "defaultValue": null,
+          "ingitdbType": "int",
+          "exportRequired": true,
           "encoding": "native-json"
         },
         {
           "nativeName": "Name",
           "declaredType": "NVARCHAR(120)",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": false,
           "encoding": "native-json"
         }
       ],
@@ -299,59 +620,148 @@
         "InvoiceId"
       ],
       "transportId": "encoded-native-primary-key",
+      "sourceSql": "CREATE TABLE [Invoice]\n(\n    [InvoiceId] INTEGER  NOT NULL,\n    [CustomerId] INTEGER  NOT NULL,\n    [InvoiceDate] DATETIME  NOT NULL,\n    [BillingAddress] NVARCHAR(70),\n    [BillingCity] NVARCHAR(40),\n    [BillingState] NVARCHAR(40),\n    [BillingCountry] NVARCHAR(40),\n    [BillingPostalCode] NVARCHAR(10),\n    [Total] NUMERIC(10,2)  NOT NULL,\n    CONSTRAINT [PK_Invoice] PRIMARY KEY  ([InvoiceId]),\n    FOREIGN KEY ([CustomerId]) REFERENCES [Customer] ([CustomerId]) \n\t\tON DELETE NO ACTION ON UPDATE NO ACTION\n)",
+      "indexes": [
+        {
+          "name": "IFK_InvoiceCustomerId",
+          "unique": false,
+          "origin": "c",
+          "partial": false,
+          "sql": "CREATE INDEX [IFK_InvoiceCustomerId] ON [Invoice] ([CustomerId])",
+          "columns": [
+            "CustomerId"
+          ],
+          "key_columns": [
+            "CustomerId"
+          ]
+        }
+      ],
       "foreignKeys": [
         {
           "id": 0,
           "sequence": 0,
           "table": "Customer",
           "from": "CustomerId",
-          "to": "CustomerId"
+          "to": "CustomerId",
+          "onUpdate": "NO ACTION",
+          "onDelete": "NO ACTION",
+          "match": "NONE"
+        }
+      ],
+      "foreignKeyConstraints": [
+        {
+          "id": 0,
+          "localColumns": [
+            "CustomerId"
+          ],
+          "referencedTable": "Customer",
+          "referencedColumns": [
+            "CustomerId"
+          ],
+          "onUpdate": "NO ACTION",
+          "onDelete": "NO ACTION",
+          "match": "NONE",
+          "enforced": false
         }
       ],
       "columns": [
         {
           "nativeName": "InvoiceId",
           "declaredType": "INTEGER",
+          "sourceNotNull": true,
+          "primaryKeyPosition": 1,
+          "sourceDeclaredNullable": false,
+          "defaultValue": null,
+          "ingitdbType": "int",
+          "exportRequired": true,
           "encoding": "native-json"
         },
         {
           "nativeName": "CustomerId",
           "declaredType": "INTEGER",
+          "sourceNotNull": true,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": false,
+          "defaultValue": null,
+          "ingitdbType": "int",
+          "exportRequired": true,
           "encoding": "native-json"
         },
         {
           "nativeName": "InvoiceDate",
           "declaredType": "DATETIME",
+          "sourceNotNull": true,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": false,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": true,
           "encoding": "native-json"
         },
         {
           "nativeName": "BillingAddress",
           "declaredType": "NVARCHAR(70)",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": false,
           "encoding": "native-json"
         },
         {
           "nativeName": "BillingCity",
           "declaredType": "NVARCHAR(40)",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": false,
           "encoding": "native-json"
         },
         {
           "nativeName": "BillingState",
           "declaredType": "NVARCHAR(40)",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": false,
           "encoding": "native-json"
         },
         {
           "nativeName": "BillingCountry",
           "declaredType": "NVARCHAR(40)",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": false,
           "encoding": "native-json"
         },
         {
           "nativeName": "BillingPostalCode",
           "declaredType": "NVARCHAR(10)",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": false,
           "encoding": "native-json"
         },
         {
           "nativeName": "Total",
           "declaredType": "NUMERIC(10,2)",
+          "sourceNotNull": true,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": false,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": true,
           "encoding": "decimal-string-from-source"
         }
       ],
@@ -368,46 +778,141 @@
         "InvoiceLineId"
       ],
       "transportId": "encoded-native-primary-key",
+      "sourceSql": "CREATE TABLE [InvoiceLine]\n(\n    [InvoiceLineId] INTEGER  NOT NULL,\n    [InvoiceId] INTEGER  NOT NULL,\n    [TrackId] INTEGER  NOT NULL,\n    [UnitPrice] NUMERIC(10,2)  NOT NULL,\n    [Quantity] INTEGER  NOT NULL,\n    CONSTRAINT [PK_InvoiceLine] PRIMARY KEY  ([InvoiceLineId]),\n    FOREIGN KEY ([InvoiceId]) REFERENCES [Invoice] ([InvoiceId]) \n\t\tON DELETE NO ACTION ON UPDATE NO ACTION,\n    FOREIGN KEY ([TrackId]) REFERENCES [Track] ([TrackId]) \n\t\tON DELETE NO ACTION ON UPDATE NO ACTION\n)",
+      "indexes": [
+        {
+          "name": "IFK_InvoiceLineTrackId",
+          "unique": false,
+          "origin": "c",
+          "partial": false,
+          "sql": "CREATE INDEX [IFK_InvoiceLineTrackId] ON [InvoiceLine] ([TrackId])",
+          "columns": [
+            "TrackId"
+          ],
+          "key_columns": [
+            "TrackId"
+          ]
+        },
+        {
+          "name": "IFK_InvoiceLineInvoiceId",
+          "unique": false,
+          "origin": "c",
+          "partial": false,
+          "sql": "CREATE INDEX [IFK_InvoiceLineInvoiceId] ON [InvoiceLine] ([InvoiceId])",
+          "columns": [
+            "InvoiceId"
+          ],
+          "key_columns": [
+            "InvoiceId"
+          ]
+        }
+      ],
       "foreignKeys": [
         {
           "id": 0,
           "sequence": 0,
           "table": "Track",
           "from": "TrackId",
-          "to": "TrackId"
+          "to": "TrackId",
+          "onUpdate": "NO ACTION",
+          "onDelete": "NO ACTION",
+          "match": "NONE"
         },
         {
           "id": 1,
           "sequence": 0,
           "table": "Invoice",
           "from": "InvoiceId",
-          "to": "InvoiceId"
+          "to": "InvoiceId",
+          "onUpdate": "NO ACTION",
+          "onDelete": "NO ACTION",
+          "match": "NONE"
+        }
+      ],
+      "foreignKeyConstraints": [
+        {
+          "id": 0,
+          "localColumns": [
+            "TrackId"
+          ],
+          "referencedTable": "Track",
+          "referencedColumns": [
+            "TrackId"
+          ],
+          "onUpdate": "NO ACTION",
+          "onDelete": "NO ACTION",
+          "match": "NONE",
+          "enforced": false
+        },
+        {
+          "id": 1,
+          "localColumns": [
+            "InvoiceId"
+          ],
+          "referencedTable": "Invoice",
+          "referencedColumns": [
+            "InvoiceId"
+          ],
+          "onUpdate": "NO ACTION",
+          "onDelete": "NO ACTION",
+          "match": "NONE",
+          "enforced": false
         }
       ],
       "columns": [
         {
           "nativeName": "InvoiceLineId",
           "declaredType": "INTEGER",
+          "sourceNotNull": true,
+          "primaryKeyPosition": 1,
+          "sourceDeclaredNullable": false,
+          "defaultValue": null,
+          "ingitdbType": "int",
+          "exportRequired": true,
           "encoding": "native-json"
         },
         {
           "nativeName": "InvoiceId",
           "declaredType": "INTEGER",
+          "sourceNotNull": true,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": false,
+          "defaultValue": null,
+          "ingitdbType": "int",
+          "exportRequired": true,
           "encoding": "native-json"
         },
         {
           "nativeName": "TrackId",
           "declaredType": "INTEGER",
+          "sourceNotNull": true,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": false,
+          "defaultValue": null,
+          "ingitdbType": "int",
+          "exportRequired": true,
           "encoding": "native-json"
         },
         {
           "nativeName": "UnitPrice",
           "declaredType": "NUMERIC(10,2)",
+          "sourceNotNull": true,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": false,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": true,
           "encoding": "decimal-string-from-source"
         },
         {
           "nativeName": "Quantity",
           "declaredType": "INTEGER",
+          "sourceNotNull": true,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": false,
+          "defaultValue": null,
+          "ingitdbType": "int",
+          "exportRequired": true,
           "encoding": "native-json"
         }
       ],
@@ -424,16 +929,31 @@
         "MediaTypeId"
       ],
       "transportId": "encoded-native-primary-key",
+      "sourceSql": "CREATE TABLE [MediaType]\n(\n    [MediaTypeId] INTEGER  NOT NULL,\n    [Name] NVARCHAR(120),\n    CONSTRAINT [PK_MediaType] PRIMARY KEY  ([MediaTypeId])\n)",
+      "indexes": [],
       "foreignKeys": [],
+      "foreignKeyConstraints": [],
       "columns": [
         {
           "nativeName": "MediaTypeId",
           "declaredType": "INTEGER",
+          "sourceNotNull": true,
+          "primaryKeyPosition": 1,
+          "sourceDeclaredNullable": false,
+          "defaultValue": null,
+          "ingitdbType": "int",
+          "exportRequired": true,
           "encoding": "native-json"
         },
         {
           "nativeName": "Name",
           "declaredType": "NVARCHAR(120)",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": false,
           "encoding": "native-json"
         }
       ],
@@ -450,16 +970,31 @@
         "PlaylistId"
       ],
       "transportId": "encoded-native-primary-key",
+      "sourceSql": "CREATE TABLE [Playlist]\n(\n    [PlaylistId] INTEGER  NOT NULL,\n    [Name] NVARCHAR(120),\n    CONSTRAINT [PK_Playlist] PRIMARY KEY  ([PlaylistId])\n)",
+      "indexes": [],
       "foreignKeys": [],
+      "foreignKeyConstraints": [],
       "columns": [
         {
           "nativeName": "PlaylistId",
           "declaredType": "INTEGER",
+          "sourceNotNull": true,
+          "primaryKeyPosition": 1,
+          "sourceDeclaredNullable": false,
+          "defaultValue": null,
+          "ingitdbType": "int",
+          "exportRequired": true,
           "encoding": "native-json"
         },
         {
           "nativeName": "Name",
           "declaredType": "NVARCHAR(120)",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": false,
           "encoding": "native-json"
         }
       ],
@@ -477,31 +1012,123 @@
         "TrackId"
       ],
       "transportId": "encoded-native-primary-key",
+      "sourceSql": "CREATE TABLE [PlaylistTrack]\n(\n    [PlaylistId] INTEGER  NOT NULL,\n    [TrackId] INTEGER  NOT NULL,\n    CONSTRAINT [PK_PlaylistTrack] PRIMARY KEY  ([PlaylistId], [TrackId]),\n    FOREIGN KEY ([PlaylistId]) REFERENCES [Playlist] ([PlaylistId]) \n\t\tON DELETE NO ACTION ON UPDATE NO ACTION,\n    FOREIGN KEY ([TrackId]) REFERENCES [Track] ([TrackId]) \n\t\tON DELETE NO ACTION ON UPDATE NO ACTION\n)",
+      "indexes": [
+        {
+          "name": "IFK_PlaylistTrackTrackId",
+          "unique": false,
+          "origin": "c",
+          "partial": false,
+          "sql": "CREATE INDEX [IFK_PlaylistTrackTrackId] ON [PlaylistTrack] ([TrackId])",
+          "columns": [
+            "TrackId"
+          ],
+          "key_columns": [
+            "TrackId"
+          ]
+        },
+        {
+          "name": "IFK_PlaylistTrackPlaylistId",
+          "unique": false,
+          "origin": "c",
+          "partial": false,
+          "sql": "CREATE INDEX [IFK_PlaylistTrackPlaylistId] ON [PlaylistTrack] ([PlaylistId])",
+          "columns": [
+            "PlaylistId"
+          ],
+          "key_columns": [
+            "PlaylistId"
+          ]
+        },
+        {
+          "name": "sqlite_autoindex_PlaylistTrack_1",
+          "unique": true,
+          "origin": "pk",
+          "partial": false,
+          "sql": null,
+          "columns": [
+            "PlaylistId",
+            "TrackId"
+          ],
+          "key_columns": [
+            "PlaylistId",
+            "TrackId"
+          ]
+        }
+      ],
       "foreignKeys": [
         {
           "id": 0,
           "sequence": 0,
           "table": "Track",
           "from": "TrackId",
-          "to": "TrackId"
+          "to": "TrackId",
+          "onUpdate": "NO ACTION",
+          "onDelete": "NO ACTION",
+          "match": "NONE"
         },
         {
           "id": 1,
           "sequence": 0,
           "table": "Playlist",
           "from": "PlaylistId",
-          "to": "PlaylistId"
+          "to": "PlaylistId",
+          "onUpdate": "NO ACTION",
+          "onDelete": "NO ACTION",
+          "match": "NONE"
+        }
+      ],
+      "foreignKeyConstraints": [
+        {
+          "id": 0,
+          "localColumns": [
+            "TrackId"
+          ],
+          "referencedTable": "Track",
+          "referencedColumns": [
+            "TrackId"
+          ],
+          "onUpdate": "NO ACTION",
+          "onDelete": "NO ACTION",
+          "match": "NONE",
+          "enforced": false
+        },
+        {
+          "id": 1,
+          "localColumns": [
+            "PlaylistId"
+          ],
+          "referencedTable": "Playlist",
+          "referencedColumns": [
+            "PlaylistId"
+          ],
+          "onUpdate": "NO ACTION",
+          "onDelete": "NO ACTION",
+          "match": "NONE",
+          "enforced": false
         }
       ],
       "columns": [
         {
           "nativeName": "PlaylistId",
           "declaredType": "INTEGER",
+          "sourceNotNull": true,
+          "primaryKeyPosition": 1,
+          "sourceDeclaredNullable": false,
+          "defaultValue": null,
+          "ingitdbType": "int",
+          "exportRequired": true,
           "encoding": "native-json"
         },
         {
           "nativeName": "TrackId",
           "declaredType": "INTEGER",
+          "sourceNotNull": true,
+          "primaryKeyPosition": 2,
+          "sourceDeclaredNullable": false,
+          "defaultValue": null,
+          "ingitdbType": "int",
+          "exportRequired": true,
           "encoding": "native-json"
         }
       ],
@@ -518,73 +1145,222 @@
         "TrackId"
       ],
       "transportId": "encoded-native-primary-key",
+      "sourceSql": "CREATE TABLE [Track]\n(\n    [TrackId] INTEGER  NOT NULL,\n    [Name] NVARCHAR(200)  NOT NULL,\n    [AlbumId] INTEGER,\n    [MediaTypeId] INTEGER  NOT NULL,\n    [GenreId] INTEGER,\n    [Composer] NVARCHAR(220),\n    [Milliseconds] INTEGER  NOT NULL,\n    [Bytes] INTEGER,\n    [UnitPrice] NUMERIC(10,2)  NOT NULL,\n    CONSTRAINT [PK_Track] PRIMARY KEY  ([TrackId]),\n    FOREIGN KEY ([AlbumId]) REFERENCES [Album] ([AlbumId]) \n\t\tON DELETE NO ACTION ON UPDATE NO ACTION,\n    FOREIGN KEY ([GenreId]) REFERENCES [Genre] ([GenreId]) \n\t\tON DELETE NO ACTION ON UPDATE NO ACTION,\n    FOREIGN KEY ([MediaTypeId]) REFERENCES [MediaType] ([MediaTypeId]) \n\t\tON DELETE NO ACTION ON UPDATE NO ACTION\n)",
+      "indexes": [
+        {
+          "name": "IFK_TrackMediaTypeId",
+          "unique": false,
+          "origin": "c",
+          "partial": false,
+          "sql": "CREATE INDEX [IFK_TrackMediaTypeId] ON [Track] ([MediaTypeId])",
+          "columns": [
+            "MediaTypeId"
+          ],
+          "key_columns": [
+            "MediaTypeId"
+          ]
+        },
+        {
+          "name": "IFK_TrackGenreId",
+          "unique": false,
+          "origin": "c",
+          "partial": false,
+          "sql": "CREATE INDEX [IFK_TrackGenreId] ON [Track] ([GenreId])",
+          "columns": [
+            "GenreId"
+          ],
+          "key_columns": [
+            "GenreId"
+          ]
+        },
+        {
+          "name": "IFK_TrackAlbumId",
+          "unique": false,
+          "origin": "c",
+          "partial": false,
+          "sql": "CREATE INDEX [IFK_TrackAlbumId] ON [Track] ([AlbumId])",
+          "columns": [
+            "AlbumId"
+          ],
+          "key_columns": [
+            "AlbumId"
+          ]
+        }
+      ],
       "foreignKeys": [
         {
           "id": 0,
           "sequence": 0,
           "table": "MediaType",
           "from": "MediaTypeId",
-          "to": "MediaTypeId"
+          "to": "MediaTypeId",
+          "onUpdate": "NO ACTION",
+          "onDelete": "NO ACTION",
+          "match": "NONE"
         },
         {
           "id": 1,
           "sequence": 0,
           "table": "Genre",
           "from": "GenreId",
-          "to": "GenreId"
+          "to": "GenreId",
+          "onUpdate": "NO ACTION",
+          "onDelete": "NO ACTION",
+          "match": "NONE"
         },
         {
           "id": 2,
           "sequence": 0,
           "table": "Album",
           "from": "AlbumId",
-          "to": "AlbumId"
+          "to": "AlbumId",
+          "onUpdate": "NO ACTION",
+          "onDelete": "NO ACTION",
+          "match": "NONE"
+        }
+      ],
+      "foreignKeyConstraints": [
+        {
+          "id": 0,
+          "localColumns": [
+            "MediaTypeId"
+          ],
+          "referencedTable": "MediaType",
+          "referencedColumns": [
+            "MediaTypeId"
+          ],
+          "onUpdate": "NO ACTION",
+          "onDelete": "NO ACTION",
+          "match": "NONE",
+          "enforced": false
+        },
+        {
+          "id": 1,
+          "localColumns": [
+            "GenreId"
+          ],
+          "referencedTable": "Genre",
+          "referencedColumns": [
+            "GenreId"
+          ],
+          "onUpdate": "NO ACTION",
+          "onDelete": "NO ACTION",
+          "match": "NONE",
+          "enforced": false
+        },
+        {
+          "id": 2,
+          "localColumns": [
+            "AlbumId"
+          ],
+          "referencedTable": "Album",
+          "referencedColumns": [
+            "AlbumId"
+          ],
+          "onUpdate": "NO ACTION",
+          "onDelete": "NO ACTION",
+          "match": "NONE",
+          "enforced": false
         }
       ],
       "columns": [
         {
           "nativeName": "TrackId",
           "declaredType": "INTEGER",
+          "sourceNotNull": true,
+          "primaryKeyPosition": 1,
+          "sourceDeclaredNullable": false,
+          "defaultValue": null,
+          "ingitdbType": "int",
+          "exportRequired": true,
           "encoding": "native-json"
         },
         {
           "nativeName": "Name",
           "declaredType": "NVARCHAR(200)",
+          "sourceNotNull": true,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": false,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": true,
           "encoding": "native-json"
         },
         {
           "nativeName": "AlbumId",
           "declaredType": "INTEGER",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "int",
+          "exportRequired": false,
           "encoding": "native-json"
         },
         {
           "nativeName": "MediaTypeId",
           "declaredType": "INTEGER",
+          "sourceNotNull": true,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": false,
+          "defaultValue": null,
+          "ingitdbType": "int",
+          "exportRequired": true,
           "encoding": "native-json"
         },
         {
           "nativeName": "GenreId",
           "declaredType": "INTEGER",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "int",
+          "exportRequired": false,
           "encoding": "native-json"
         },
         {
           "nativeName": "Composer",
           "declaredType": "NVARCHAR(220)",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": false,
           "encoding": "native-json"
         },
         {
           "nativeName": "Milliseconds",
           "declaredType": "INTEGER",
+          "sourceNotNull": true,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": false,
+          "defaultValue": null,
+          "ingitdbType": "int",
+          "exportRequired": true,
           "encoding": "native-json"
         },
         {
           "nativeName": "Bytes",
           "declaredType": "INTEGER",
+          "sourceNotNull": false,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": true,
+          "defaultValue": null,
+          "ingitdbType": "int",
+          "exportRequired": false,
           "encoding": "native-json"
         },
         {
           "nativeName": "UnitPrice",
           "declaredType": "NUMERIC(10,2)",
+          "sourceNotNull": true,
+          "primaryKeyPosition": 0,
+          "sourceDeclaredNullable": false,
+          "defaultValue": null,
+          "ingitdbType": "string",
+          "exportRequired": true,
           "encoding": "decimal-string-from-source"
         }
       ],

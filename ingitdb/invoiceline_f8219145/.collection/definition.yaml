@@ -2,14 +2,20 @@ record_file:
   name: records.json
   format: json
   type: "map[$record_id]map[$field_name]any"
+primary_key: ["InvoiceLineId"]
 columns:
   "InvoiceLineId":
-    type: any
+    type: int
+    required: true
   "InvoiceId":
-    type: any
+    type: int
+    required: true
   "TrackId":
-    type: any
+    type: int
+    required: true
   "UnitPrice":
-    type: any
+    type: string
+    required: true
   "Quantity":
-    type: any
+    type: int
+    required: true
