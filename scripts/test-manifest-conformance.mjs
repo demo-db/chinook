@@ -5,7 +5,7 @@
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 import { chinookVerdict, conformance, manifestFor } from './conformance-files.mjs';
-import { formatOf, normalisedMapping } from './lib/manifest-mapping.mjs';
+import { columnModelProblems, formatOf, normalisedMapping } from './lib/manifest-mapping.mjs';
 
 const noticed = (notes) => notes.some((note) => note.includes('recordset_entities is the earlier form of the mapping'));
 const mentions = (lines, texts) => {
@@ -51,4 +51,25 @@ test('the identifier decides the form', () => {
   assert.equal(formatOf({ format: 'ovdb-manifest/draft-1' }), 'old');
   assert.equal(formatOf({ format: 'ovdb-manifest/draft-2' }), 'new');
   for (const format of [undefined, null, 1, 2, 'ovdb-manifest/draft-3', 'ovdb-manifest/draft-2 ']) assert.equal(formatOf({ format }), null, String(format));
+});
+
+test('a column that holds a path into a component says that no reader reads components yet, and nothing about what the field holds', () => {
+  const problems = columnModelProblems({ name: 'payments', recordType: 'Payment', columns: new Map([['amount_minor', 'Amount.Minor']]) }, new Set(['Amount']));
+  assert.deepEqual(problems, ['recordsets "payments": column "amount_minor" holds "Amount.Minor": no reader of the model reads a component yet, so "Minor" cannot be read in Amount']);
+});
+
+test('a value that refers to itself is reported as a problem and does not throw', () => {
+  const list = ['Customer', 'OrderLine'];
+  list.push(list);
+  const item = { name: 'Customer' };
+  item.record_type = item;
+  const columns = { name: 'Customer', columns: {} };
+  columns.columns.self = columns.columns;
+  for (const format of ['ovdb-manifest/draft-1', 'ovdb-manifest/draft-2']) {
+    for (const recordsets of [list, ['OrderLine', item], ['OrderLine', columns]]) {
+      let result;
+      assert.doesNotThrow(() => { result = chinookVerdict({ format, recordsets }); }, `${format}`);
+      assert.ok(result.problems.length > 0, `${format}: the manifest is refused`);
+    }
+  }
 });
