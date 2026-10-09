@@ -13,13 +13,13 @@
       }
     },
     "meaninggraph": {
-      "version": "0.2.0",
+      "version": "0.3.0",
       "repository": "meaninggraph/cli",
       "sha256": {
-        "darwin_amd64": "15cbdcc04df5316eb9df12ad9b512db828bac5ae9bb62e8c75ab43b185db8ae7",
-        "darwin_arm64": "635b1560c62be0fc68ab581513ac9a6963af2857f3eaad3d7c0ea5de04998ecf",
-        "linux_amd64": "582c109132d26db1b940e6af757185c821e318ba7aa0ad073e30daa788e15767",
-        "linux_arm64": "ad64e471b9de23523b6fe896f9d3dc6abccc06b2d73009c76818aa542e75872b"
+        "darwin_amd64": "5d2fb02a66df0a8c856e971a30dfe6fd4ad010458f1bd24f202d5b9351255039",
+        "darwin_arm64": "d84ced6daed43607452cddf375eeba104be88966cba0071b24b4c7a0412be6de",
+        "linux_amd64": "f8073b9ab5547551e00d021fcd83c4ff52c4a49034f9ee5719512dfade9afdf8",
+        "linux_arm64": "8d20af9d39855eb7bed78af9fd5a62623fd3cab7241d6f371313a82bc37c4221"
       }
     }
   }
