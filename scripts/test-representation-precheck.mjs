@@ -373,3 +373,21 @@ test('the recordsets of an own model are the names of its record types, whicheve
   swapModel(f, inCurrentSpelling(f.files.get(f.contract.target.model.path).toString()).replaceAll('"records":', '"entities":'));
   assert.match(report(f).problems.join('\n'), /target\.modelspec\.json has no records \(an object of ModelSpec records\)|has no records/);
 });
+
+test('a contract names a recordset by its own name in either form of the manifest, and a recordset that lists columns is refused', () => {
+  for (const format of [1, 3]) {
+    const f = manifestFixture(format);
+    assert.deepEqual(report(f).problems, [], `format ${format}`);
+    f.manifest.format = 'ovdb-manifest/draft-2';
+    f.manifest.recordsets = [{ name: 'Entities', record_type: 'Entities' }, 'Bridge'];
+    assert.deepEqual(report(f).problems, [], `format ${format}, the new form`);
+    f.manifest.recordsets = [{ name: 'Entities', columns: { identifier: { field: 'id' } } }, 'Bridge'];
+    assert.match(report(f).problems.join('\n'), /recordset Entities lists columns, but a representation contract reads its columns by the model's names/, `format ${format}`);
+    f.manifest.recordsets = [{ name: 'Entities', columns: {} }, 'Bridge'];
+    assert.deepEqual(report(f).problems, [], 'an empty columns says nothing');
+  }
+  const f = manifestFixture(1);
+  f.manifest.format = 'ovdb-manifest/draft-2';
+  f.manifest.recordsets = ['Entities', { name: 'Bridge', columns: { label: { field: 'raw_label' } } }];
+  assert.match(report(f).problems.join('\n'), /recordset Bridge lists columns/);
+});
