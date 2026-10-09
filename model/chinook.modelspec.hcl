@@ -9,8 +9,8 @@
 # Source of the structure: the pinned upstream SQLite fixture
 # (data-source/source.sqlite). Record type and field names are the
 # upstream table and column names, so each field matches one published
-# column one to one. scripts/test-model.mjs fails when this file and the
-# published data disagree.
+# column one to one. scripts/test-data.mjs fails when a record type's key,
+# or the set of record types, disagrees with metadata/schema.json.
 #
 # Reading notes:
 # - A field with `record = "X"` is a reference to an X record. It holds
