@@ -11,6 +11,7 @@ pnpm install --frozen-lockfile
 pnpm generate
 pnpm validate
 pnpm test:data
+pnpm test:modelspec
 pnpm lint:model
 pnpm check:model-twin
 pnpm check:meaning
