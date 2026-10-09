@@ -318,3 +318,58 @@ test('committed HEAD fixture exercises the same regular-file reader as the publi
   const bad = precheckRepresentation(ref('scripts/testdata/representation/duplicate-contract.json', duplicateBytes), files, f.manifest, providerRepo);
   assert.match(bad.problems.join('\n'), /duplicate JSON key/);
 });
+
+// ModelSpec JSON in either vocabulary: 1.0-draft (entities, properties, entity) or 1.0-draft-2 (records, fields, record).
+const inCurrentSpelling = (text) => text
+  .replace('"modelspec":"1.0-draft"', '"modelspec":"1.0-draft-2"')
+  .replaceAll('"entities":', '"records":').replaceAll('"properties":', '"fields":').replaceAll('"entity":', '"record":');
+
+// Puts `text` in place of the fixture's target model, keeping the provenance that names it consistent.
+function swapModel(f, text) {
+  replaceMetadata(f, f.contract.target.model, text);
+  if (f.contract.native) {
+    const provenance = JSON.parse(f.files.get(f.contract.native.provenance.path));
+    provenance.native_key.model = f.contract.target.model;
+    replaceMetadata(f, f.contract.native.provenance, provenance);
+  }
+}
+
+test('the target model is read in the current spelling as in the earlier one, for every contract format', () => {
+  for (const format of [1, 2, 3]) {
+    const earlier = manifestFixture(format);
+    const text = earlier.files.get(earlier.contract.target.model.path).toString();
+    assert.match(text, /"modelspec":"1\.0-draft","module"/);
+    const current = manifestFixture(format);
+    swapModel(current, inCurrentSpelling(text));
+    assert.match(current.files.get(current.contract.target.model.path).toString(), /"modelspec":"1\.0-draft-2".*"records":.*"fields":/);
+    assert.deepEqual(report(current).problems, report(earlier).problems, `format ${format}`);
+    assert.deepEqual(report(current).problems, [], `format ${format}`);
+  }
+});
+
+test('a target model whose identifier and keys are of different vocabularies, or whose identifier is unknown, is refused', () => {
+  for (const [name, change, pattern] of [
+    ['1.0-draft-2 with entities', (text) => text.replace('"1.0-draft"', '"1.0-draft-2"'), /target ModelSpec module\/entity\/property\/datatype mismatch/],
+    ['1.0-draft with records and fields', (text) => inCurrentSpelling(text).replace('"1.0-draft-2"', '"1.0-draft"'), /target ModelSpec module\/entity\/property\/datatype mismatch/],
+    ['an identifier of neither', (text) => text.replace('"1.0-draft"', '"1.0-draft-3"'), /target ModelSpec module\/entity\/property\/datatype mismatch/],
+    ['1.0-draft-2 with entities only for the manifest', (text) => inCurrentSpelling(text).replaceAll('"records":', '"entities":'), /has no records|has no entities|mismatch/],
+  ]) {
+    const f = manifestFixture(3);
+    swapModel(f, change(f.files.get(f.contract.target.model.path).toString()));
+    assert.match(report(f).problems.join('\n'), pattern, name);
+  }
+});
+
+test('the recordsets of an own model are the names of its record types, whichever vocabulary names them', () => {
+  for (const [identifier, spelling] of [['1.0-draft', (text) => text], ['1.0-draft-2', inCurrentSpelling]]) {
+    const f = manifestFixture(3);
+    swapModel(f, spelling(f.files.get(f.contract.target.model.path).toString()));
+    f.manifest.recordsets = ['Entities'];
+    assert.match(report(f).problems.join('\n'), /recordsets lacks ModelSpec entities: Bridge/, identifier);
+    f.manifest.recordsets = ['Entities', 'Bridge', 'Extra'];
+    assert.match(report(f).problems.join('\n'), /recordsets names things that are not ModelSpec entities: Extra/, identifier);
+  }
+  const f = manifestFixture(3);
+  swapModel(f, inCurrentSpelling(f.files.get(f.contract.target.model.path).toString()).replaceAll('"records":', '"entities":'));
+  assert.match(report(f).problems.join('\n'), /target\.modelspec\.json has no records \(an object of ModelSpec records\)|has no records/);
+});
