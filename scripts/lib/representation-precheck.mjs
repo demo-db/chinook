@@ -6,7 +6,7 @@ import { parse as parseYaml } from 'yaml';
 import { isDeepStrictEqual } from 'node:util';
 import { parseStrictJson } from './strict-json.mjs';
 import { vocabularyOf } from './modelspec.mjs';
-import { hasColumns, recordsetNames } from './manifest-mapping.mjs';
+import { hasColumns, recordsetNames, recordsetsOfType } from './manifest-mapping.mjs';
 
 const MiB = 1024 * 1024;
 const schemaPins = {
@@ -110,9 +110,12 @@ export function precheckRepresentation(envelope, files, manifest, outerRepositor
     else if (!manifest.model?.modelspec) notes.push(`${label}: shared model target association is unresolved offline`);
     if (manifest.model?.modelspec && c.target.binding.document.path !== manifest.meaning?.file) bad(`${label}: target binding path differs from manifest.meaning.file`);
     else if (!manifest.model?.modelspec) notes.push(`${label}: shared meaning target association is unresolved offline`);
-    // A contract names a recordset by its own name, in either form of the manifest; it reads the columns by the model's names.
-    if (!recordsetNames(manifest).includes(c.target.entity)) bad(`${label}: target entity is absent from manifest recordsets`);
-    else if (hasColumns(manifest, c.target.entity)) bad(`${label}: recordset ${c.target.entity} lists columns, but a representation contract reads its columns by the model's names`);
+    // A contract's target names a ModelSpec record type, as the Go check reads it: it is found among the record types of the
+    // manifest's recordsets (the record_type: of an item, the pair in recordset_entities, else the recordset's own name), in
+    // either form. A contract reads the columns of that recordset by the model's names, so the recordset lists none.
+    const targetRecordsets = recordsetsOfType(manifest, c.target.entity);
+    if (targetRecordsets.length === 0) bad(`${label}: target entity is absent from manifest recordsets`);
+    else for (const name of targetRecordsets) if (hasColumns(manifest, name)) bad(`${label}: recordset ${name} lists columns, but a representation contract reads its columns by the model's names`);
     // The model is read in the vocabulary its identifier names: 1.0-draft (entities, properties) or 1.0-draft-2 (records, fields).
     const words = vocabularyOf(model);
     const records = words && model[words.records];
@@ -187,6 +190,7 @@ export function precheckRepresentation(envelope, files, manifest, outerRepositor
       }
       notes.push(`${label}: native.dataset corpus is not read by metadata precheck`);
     } else {
+      // The bridge table keeps its native name: it is found by the recordset's own name, and the model is read by that name.
       if (!recordsetNames(manifest).includes(c.bridge.table)) bad(`${label}: bridge table is absent from manifest recordsets`);
       else if (hasColumns(manifest, c.bridge.table)) bad(`${label}: recordset ${c.bridge.table} lists columns, but a representation contract reads its columns by the model's names`);
       if (model) {

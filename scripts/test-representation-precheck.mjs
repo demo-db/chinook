@@ -374,20 +374,47 @@ test('the recordsets of an own model are the names of its record types, whicheve
   assert.match(report(f).problems.join('\n'), /target\.modelspec\.json has no records \(an object of ModelSpec records\)|has no records/);
 });
 
-test('a contract names a recordset by its own name in either form of the manifest, and a recordset that lists columns is refused', () => {
+test('a contract finds its target among the record types of the recordsets, in either form of the manifest, and a recordset of that record type that lists columns is refused', () => {
   for (const format of [1, 3]) {
     const f = manifestFixture(format);
     assert.deepEqual(report(f).problems, [], `format ${format}`);
+    // the new form, own name and record type the same
     f.manifest.format = 'ovdb-manifest/draft-2';
     f.manifest.recordsets = [{ name: 'Entities', record_type: 'Entities' }, 'Bridge'];
     assert.deepEqual(report(f).problems, [], `format ${format}, the new form`);
-    f.manifest.recordsets = [{ name: 'Entities', columns: { identifier: { field: 'id' } } }, 'Bridge'];
-    assert.match(report(f).problems.join('\n'), /recordset Entities lists columns, but a representation contract reads its columns by the model's names/, `format ${format}`);
-    f.manifest.recordsets = [{ name: 'Entities', columns: {} }, 'Bridge'];
+    // the target is a record type: a recordset of another name whose record type it is, in the new form ...
+    f.manifest.recordsets = [{ name: 'orgs', record_type: 'Entities' }, 'Bridge'];
+    assert.deepEqual(report(f).problems, [], `format ${format}, new form, a recordset named orgs`);
+    f.manifest.recordsets = [{ name: 'Other', record_type: 'Entities' }, 'Bridge'];
+    assert.deepEqual(report(f).problems, [], `format ${format}, new form, a recordset named Other`);
+    // ... and in the old form, through recordset_entities
+    const old = manifestFixture(format);
+    old.manifest.recordsets = ['orgs', 'Bridge'];
+    old.manifest.recordset_entities = { orgs: 'Entities' };
+    assert.deepEqual(report(old).problems, [], `format ${format}, old form`);
+    // no recordset has the record type: absent
+    f.manifest.recordsets = [{ name: 'Entities', record_type: 'Other' }, 'Bridge'];
+    assert.match(report(f).problems.join('\n'), /target entity is absent from manifest recordsets/, `format ${format}`);
+    // names swapped: the recordset called Bridge has the record type Entities, so it is the target ...
+    f.manifest.recordsets = [{ name: 'Entities', record_type: 'Bridge' }, { name: 'Bridge', record_type: 'Entities' }];
+    assert.deepEqual(report(f).problems, [], `format ${format}, swapped names`);
+    // ... and a contract reads its columns by the model's names, so that recordset lists none
+    f.manifest.recordsets = [{ name: 'Entities', record_type: 'Bridge' }, { name: 'Bridge', record_type: 'Entities', columns: { identifier: { field: 'id' } } }];
+    assert.match(report(f).problems.join('\n'), /recordset Bridge lists columns, but a representation contract reads its columns by the model's names/, `format ${format}, swapped names with a column`);
+    // a recordset of another record type may list columns, even when it is called like the target
+    f.manifest.recordsets = [{ name: 'Entities', record_type: 'Bridge', columns: { identifier: { field: 'id' } } }, { name: 'orgs', record_type: 'Entities' }];
+    assert.doesNotMatch(report(f).problems.join('\n'), /lists columns, but a representation contract/, `format ${format}, a recordset called Entities of another record type`);
+    // an empty columns says nothing
+    f.manifest.recordsets = [{ name: 'orgs', record_type: 'Entities', columns: {} }, 'Bridge'];
     assert.deepEqual(report(f).problems, [], 'an empty columns says nothing');
+    f.manifest.recordsets = [{ name: 'orgs', record_type: 'Entities', columns: { identifier: { field: 'id' } } }, 'Bridge'];
+    assert.match(report(f).problems.join('\n'), /recordset orgs lists columns/, `format ${format}`);
   }
+  // the bridge table keeps its native name, in either form
   const f = manifestFixture(1);
   f.manifest.format = 'ovdb-manifest/draft-2';
   f.manifest.recordsets = ['Entities', { name: 'Bridge', columns: { label: { field: 'raw_label' } } }];
   assert.match(report(f).problems.join('\n'), /recordset Bridge lists columns/);
+  f.manifest.recordsets = ['Entities', { name: 'Other', record_type: 'Bridge' }];
+  assert.match(report(f).problems.join('\n'), /bridge table is absent from manifest recordsets/);
 });
