@@ -8,6 +8,7 @@ import { cleanGitEnv } from './git-env.mjs';
 import { canonicalUrlProblem, enginePattern, homepageFieldProblem, idPattern, isRepositoryPath, manifestUrlProblem, maxIdLength } from './directory-rules.mjs';
 import { precheckRepresentation } from './representation-precheck.mjs';
 import { vocabularies, vocabularyOf } from './modelspec.mjs';
+import { columnModelProblems, earlierKeyNotice, formatOf, formatProblem, mapItemUnderOldFormat, nameProblem, newFormProblems, normalisedMapping } from './manifest-mapping.mjs';
 
 // Checks the OpenVaultDB publisher manifest: the root OVDB.md that opts the repository in and the
 // manifest files it lists.
@@ -23,6 +24,11 @@ import { vocabularies, vocabularyOf } from './modelspec.mjs';
 // problem(), when present, says why the repository cannot be read at all (not a git repository, no
 // commit yet). read() throws an Error whose message says why a file cannot be read (for example, too large).
 // checkOvdbManifest returns a list of problems; empty means the manifest is good.
+//
+// The manifest's `format` is ovdb-manifest/draft-1 or ovdb-manifest/draft-2 (manifest-mapping.mjs, the same file as in
+// openvaultdb/directory): the identifier decides how `recordsets` is read. In draft-1 it is a list of names and the optional
+// `recordset_entities` pairs a name with a ModelSpec record type; in draft-2 an item is a name or a map with `name`,
+// `record_type` and `columns`. Either way the mapping the rest of this file reads is the normalised one.
 //
 // The publisher YAML has one of two forms: this repository's own model files or a pinned shared model.
 // The public JSON database descriptor is a separate typed format validated against its pinned schema.
@@ -59,7 +65,6 @@ import { vocabularies, vocabularyOf } from './modelspec.mjs';
 // module name, a letter and then letters, digits and `_`, case-sensitive, never with a dot
 // (`<address>.<Entity>` is an entity reference).
 
-const manifestFormat = 'ovdb-manifest/draft-1';
 const databaseFormat = 'ovdb-database/draft-1';
 const databaseSchemaPath = 'schemas/ovdb-database-draft-1.schema.json';
 const databaseSchemaSha256 = '2424ef00acd462ab5a8abc546fe2d1fffbbb5397e312332aedc77b3e73109488';
@@ -104,7 +109,7 @@ const discoveryPath = '/.well-known/openvaultdb';
 
 // The keys a manifest may have. Anything else is refused, so a stray secret cannot ride along.
 const allowedKeys = {
-  '': ['format', 'id', 'title', 'description', 'url', 'deployment', 'model', 'meaning', 'publisher', 'licences', 'recordsets', 'recordsets_partial', 'homepage', 'representation_contract'],
+  '': ['format', 'id', 'title', 'description', 'url', 'deployment', 'model', 'meaning', 'publisher', 'licences', 'recordsets', 'recordset_entities', 'recordsets_partial', 'homepage', 'representation_contract'],
   deployment: ['url', 'engine', 'discovery', 'recordset_page'],
   model: ['modelspec', 'hcl', 'address', 'name'],
   meaning: ['file', 'graph', 'address'],
@@ -282,7 +287,8 @@ function analyseManifest(path, files, { repository } = {}) {
     if (unknown.length) bad(`unknown ${where ? `${where}.` : ''}keys: ${unknown.join(', ')}`);
   }
 
-  if (manifest.format !== manifestFormat) bad(`format must be ${manifestFormat}, got ${JSON.stringify(manifest.format)}`);
+  const formatError = formatProblem(manifest);
+  if (formatError) bad(formatError);
   for (const field of ['id', 'title', 'description']) if (!isText(manifest[field])) bad(`${field} is required`);
   if (isText(manifest.id) && (!idPattern.test(manifest.id) || manifest.id.length > maxIdLength)) bad(`id must be lower-case letters, digits and single hyphens, at most ${maxIdLength} characters`);
 
@@ -393,6 +399,7 @@ function analyseManifest(path, files, { repository } = {}) {
   // What the model declares: set only when the model is known (a parsed own model file).
   let moduleName;
   let entityNames;
+  let entityFields; // record type name -> Set of its field names
 
   if (local) {
     // ---- own model: the model and the meaning file are tracked files of this repository ----
@@ -446,7 +453,11 @@ function analyseManifest(path, files, { repository } = {}) {
           // identifier is read as it always was, in the earlier vocabulary.
           const recordsKey = (vocabularyOf(json) ?? vocabularies.earlier).records;
           if (!isObject(json[recordsKey])) bad(`${modelFile} has no ${recordsKey} (an object of ModelSpec ${recordsKey})`);
-          else entityNames = Object.keys(json[recordsKey]);
+          else {
+            entityNames = Object.keys(json[recordsKey]);
+            const fieldsKey = (vocabularyOf(json) ?? vocabularies.earlier).fields;
+            entityFields = new Map(entityNames.map((name) => [name, new Set(isObject(json[recordsKey][name]?.[fieldsKey]) ? Object.keys(json[recordsKey][name][fieldsKey]) : [])]));
+          }
         }
       }
     }
@@ -548,29 +559,74 @@ function analyseManifest(path, files, { repository } = {}) {
     notes.push(`${path}: shared model: this check is offline and validated only the shape of model.address, meaning.address, meaning.file, meaning.graph, the licences and recordsets. The OVDB Directory checks both addresses against the ModelSpec registry and the MeaningGraph registry, reads both repositories at the pinned commits, and compares recordsets with the model's entities (a subset needs recordsets_partial: true).`);
   }
 
-  // Recordsets are the ModelSpec entities (an own model's, exactly), each a valid, unique name.
+  // Recordsets: each has a name and the ModelSpec record type its rows have. An own model's record types are the recordsets', exactly.
   const recordsets = manifest.recordsets;
-  if (!Array.isArray(recordsets) || recordsets.length === 0 || !recordsets.every(isText)) {
-    bad('recordsets must be a non-empty list of names');
-  } else {
-    const listed = new Set(recordsets);
-    if (listed.size !== recordsets.length) bad('recordsets lists a name twice');
-    const misshapen = recordsets.filter((name) => !entityName.test(name));
+  const earlierShape = formatOf(manifest) !== 'new';
+  const mapItem = mapItemUnderOldFormat(manifest);
+  const shape = []; // what is wrong with the shape of recordsets and recordset_entities
+  if (!earlierShape) shape.push(...newFormProblems(manifest));
+  else if (mapItem) shape.push(mapItem);
+  else if (!Array.isArray(recordsets) || recordsets.length === 0 || !recordsets.every(isText)) shape.push('recordsets must be a non-empty list of names');
+  const listShapeOk = earlierShape ? !mapItem && shape.length === 0 : shape.length === 0;
+  // The earlier key, as the Directory reads it.
+  const keyProblems = [];
+  if (earlierShape && !mapItem && manifest.recordset_entities !== undefined) {
+    const mapped = manifest.recordset_entities;
+    if (!isObject(mapped)) keyProblems.push('recordset_entities must map native recordset names to ModelSpec entity names');
+    else {
+      const usedEntities = new Map();
+      for (const [recordset, entity] of Object.entries(mapped)) {
+        if (!Array.isArray(recordsets) || !recordsets.includes(recordset)) keyProblems.push(`recordset_entities names ${JSON.stringify(recordset)}, which is not in recordsets`);
+        const problem = nameProblem(recordset);
+        if (problem) keyProblems.push(`recordset_entities key ${JSON.stringify(recordset)} ${problem}`);
+        if (typeof entity !== 'string' || !entityName.test(entity)) keyProblems.push(`recordset_entities value for ${JSON.stringify(recordset)} must be a ModelSpec entity identifier`);
+        else if (usedEntities.has(entity)) keyProblems.push(`recordset_entities maps both ${JSON.stringify(usedEntities.get(entity))} and ${JSON.stringify(recordset)} to ModelSpec entity ${entity}; mappings must be one-to-one`);
+        else usedEntities.set(entity, recordset);
+      }
+    }
+  }
+  for (const problem of [...shape, ...keyProblems]) bad(problem);
+  if (listShapeOk) {
+    const mapping = normalisedMapping(manifest);
+    const names = mapping.map((entry) => entry.name);
+    if (earlierShape && new Set(names).size !== names.length) bad('recordsets lists a name twice');
+    // A recordset that has the record type of its own name must be named like one; one that is mapped to another record
+    // type has the native name of its table, which the Directory's name rule (not this one) decides.
+    const misshapen = mapping.filter((entry) => entry.recordType === entry.name && !entityName.test(entry.name)).map((entry) => entry.name);
     if (misshapen.length) bad(`recordsets names must look like ModelSpec entity names (letters, digits, underscore): ${misshapen.map((name) => JSON.stringify(name)).join(', ')}`);
-    // Every recordset page the template makes is a URL the Directory checks again with the real name.
+    if (earlierShape) for (const entry of mapping) {
+      const problem = entry.recordType !== entry.name && nameProblem(entry.name);
+      if (problem) bad(`recordsets name ${JSON.stringify(entry.name)} ${problem}`);
+    }
+    // Every recordset page the template makes is a URL the Directory checks again with the real name. The name of a table that
+    // is not an identifier is encoded into the path, which this pre-check's plain spelling does not allow: the Directory judges it.
     if (isText(page) && !misshapen.length && !manifestUrlProblem(page, { template: true })) {
-      for (const name of recordsets) {
+      for (const { name } of mapping) {
+        if (!entityName.test(name)) { notes.push(`${path}: the recordset page of ${JSON.stringify(name)} is not checked here: the name is encoded into the path, and the Directory judges the URL`); continue; }
         const problem = manifestUrlProblem(page.replace('{name}', name));
         if (problem) bad(`the recordset page of ${name}, ${page.replace('{name}', name)}, ${problem}`);
       }
     }
-    // A shared model is in another repository, so its entities cannot be read here: the Directory compares.
-    if (local && entityNames !== undefined) {
-      const missing = entityNames.filter((name) => !listed.has(name));
-      const extra = recordsets.filter((name) => !entityNames.includes(name));
-      if (missing.length) bad(`recordsets lacks ModelSpec entities: ${missing.join(', ')}`);
-      if (extra.length) bad(`recordsets names things that are not ModelSpec entities: ${extra.join(', ')}`);
+    // A shared model is in another repository, so its record types cannot be read here: the Directory compares.
+    if (local && entityNames !== undefined && keyProblems.length === 0) {
+      const recordTypes = mapping.map((entry) => entry.recordType);
+      const missing = entityNames.filter((name) => !recordTypes.includes(name));
+      const extra = mapping.filter((entry) => !entityNames.includes(entry.recordType));
+      if (missing.length) bad(`recordsets lacks ${earlierShape ? 'ModelSpec entities' : 'the record types of the model'}: ${missing.join(', ')}`);
+      if (extra.length) {
+        bad(earlierShape
+          ? `recordsets names things that are not ModelSpec entities: ${extra.map((entry) => entry.name).join(', ')}`
+          : `recordsets names record types that are not in the model file: ${extra.map((entry) => `${entry.name} (record type ${entry.recordType})`).join(', ')}`);
+      }
+      if (earlierShape && new Set(names).size === names.length && new Set(recordTypes).size !== recordTypes.length) bad('recordset_entities maps more than one native recordset to the same ModelSpec entity; mappings must be one-to-one');
+      // The columns a recordset lists hold fields of its record type.
+      for (const entry of mapping) {
+        if (entry.columns.size > 0 && entityFields.has(entry.recordType)) for (const problem of columnModelProblems(entry, entityFields.get(entry.recordType))) bad(problem);
+      }
     }
+    // A manifest in the earlier form that still writes recordset_entities is read as it always was, with a notice.
+    const notice = keyProblems.length === 0 ? earlierKeyNotice(manifest) : null;
+    if (notice) notes.push(`${path}: ${notice}`);
   }
   if (manifest.representation_contract !== undefined) {
     const checked = precheckRepresentation(manifest.representation_contract, files, manifest, repo);
