@@ -3,13 +3,13 @@
   "note": "The released command-line tools that validate the model and the meaning graph, pinned by version and by the SHA-256 of each release archive (the line of the archive in the release's <tool>_<version>_checksums.txt). scripts/install-tools.mjs is the only reader that downloads them; it refuses an archive whose hash differs. To move to a newer release, change the version and every hash together, then run pnpm test:tools.",
   "tools": {
     "modelspec": {
-      "version": "0.1.1",
+      "version": "0.2.0",
       "repository": "modelspec-org/cli",
       "sha256": {
-        "darwin_amd64": "0278f91d6e8599a31369e72e8bfae697e1d56ba018df47e26709039ddde434e6",
-        "darwin_arm64": "1bd17601bc4655072db62e4137960fdd0380b95192db9201ba7a231c95d8eb29",
-        "linux_amd64": "a8af1cd0784759f284a5799e6de3261b1e81677ac47a6b5a895d2734d1e2613d",
-        "linux_arm64": "a92db84e23902044390fcf9036c56b153ee893cd60c3d05b1222edd6ce1f7b3c"
+        "darwin_amd64": "92bec574afe086a36732fd2125168c53714310dfe19e2c6b94b90a341815c9c9",
+        "darwin_arm64": "356f09f106510f5d63e55591c1380ce075d5b86c24910c4482308af157c18e5d",
+        "linux_amd64": "95b999570c633a4eba07014dccaf31dc71cfc9e9e7711c3cc254cb377bc2ddbc",
+        "linux_arm64": "6b36775eca795d7538ab946d1b116978e5fdff6bc0b0bad86082df44999c9220"
       }
     },
     "meaninggraph": {
