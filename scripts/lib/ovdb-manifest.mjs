@@ -7,6 +7,7 @@ import { parse as parseYaml } from 'yaml';
 import { cleanGitEnv } from './git-env.mjs';
 import { canonicalUrlProblem, enginePattern, homepageFieldProblem, idPattern, isRepositoryPath, manifestUrlProblem, maxIdLength } from './directory-rules.mjs';
 import { precheckRepresentation } from './representation-precheck.mjs';
+import { vocabularies, vocabularyOf } from './modelspec.mjs';
 
 // Checks the OpenVaultDB publisher manifest: the root OVDB.md that opts the repository in and the
 // manifest files it lists.
@@ -441,8 +442,11 @@ function analyseManifest(path, files, { repository } = {}) {
           const name = json.module?.name;
           if (typeof name !== 'string' || !modulePattern.test(name)) bad(`${modelFile} has no module.name that is a ModelSpec module name (a letter, then letters, digits and "_"), got ${JSON.stringify(name)}`);
           else moduleName = name;
-          if (!isObject(json.entities)) bad(`${modelFile} has no entities (an object of ModelSpec entities)`);
-          else entityNames = Object.keys(json.entities);
+          // The record types are `entities` in a 1.0-draft document and `records` in a 1.0-draft-2 one; a file with no
+          // identifier is read as it always was, in the earlier vocabulary.
+          const recordsKey = (vocabularyOf(json) ?? vocabularies.earlier).records;
+          if (!isObject(json[recordsKey])) bad(`${modelFile} has no ${recordsKey} (an object of ModelSpec ${recordsKey})`);
+          else entityNames = Object.keys(json[recordsKey]);
         }
       }
     }

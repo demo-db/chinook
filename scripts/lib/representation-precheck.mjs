@@ -5,6 +5,7 @@ import Ajv2020 from 'ajv/dist/2020.js';
 import { parse as parseYaml } from 'yaml';
 import { isDeepStrictEqual } from 'node:util';
 import { parseStrictJson } from './strict-json.mjs';
+import { vocabularyOf } from './modelspec.mjs';
 
 const MiB = 1024 * 1024;
 const schemaPins = {
@@ -109,8 +110,11 @@ export function precheckRepresentation(envelope, files, manifest, outerRepositor
     if (manifest.model?.modelspec && c.target.binding.document.path !== manifest.meaning?.file) bad(`${label}: target binding path differs from manifest.meaning.file`);
     else if (!manifest.model?.modelspec) notes.push(`${label}: shared meaning target association is unresolved offline`);
     if (!manifest.recordsets?.includes(c.target.entity)) bad(`${label}: target entity is absent from manifest recordsets`);
-    const property = model?.entities?.[c.target.entity]?.properties?.[c.target.property];
-    if (model && (model.modelspec !== '1.0-draft' || model.module?.name !== c.target.module || !property || property.type !== c.target.datatype)) bad(`${label}: target ModelSpec module/entity/property/datatype mismatch`);
+    // The model is read in the vocabulary its identifier names: 1.0-draft (entities, properties) or 1.0-draft-2 (records, fields).
+    const words = vocabularyOf(model);
+    const records = words && model[words.records];
+    const property = records?.[c.target.entity]?.[words.fields]?.[c.target.property];
+    if (model && (!words || model.module?.name !== c.target.module || !property || property.type !== c.target.datatype)) bad(`${label}: target ModelSpec module/entity/property/datatype mismatch`);
     if (binding) {
       const address = `meaning://${c.target.binding.meaning.document.repository.slice(8)}/${c.target.binding.meaning.concept}?ref=${c.target.binding.meaning.document.revision}`;
       const concepts = binding.concepts;
@@ -138,9 +142,9 @@ export function precheckRepresentation(envelope, files, manifest, outerRepositor
       }
       associated(c.target.model, 'target.model'); associated(c.target.binding.document, 'target.binding.document');
       if (model) {
-        const entity = model.entities?.[c.target.entity];
+        const entity = records?.[c.target.entity];
         if (!Array.isArray(entity?.key) || entity.key.length !== 1 || entity.key[0] !== c.target.property || property?.required !== true) bad(`${label}: native target key must be one required selected property`);
-        if (c.native.serving_identity_column && (c.native.serving_identity_column === c.target.property || !entity?.properties?.[c.native.serving_identity_column])) bad(`${label}: invalid serving identity column`);
+        if (c.native.serving_identity_column && (c.native.serving_identity_column === c.target.property || !entity?.[words.fields]?.[c.native.serving_identity_column])) bad(`${label}: invalid serving identity column`);
       }
       const provenance = localObject(c.native.provenance, `${label}.native.provenance`, 'json', 2 * MiB);
       if (provenance) {
@@ -182,7 +186,7 @@ export function precheckRepresentation(envelope, files, manifest, outerRepositor
     } else {
       if (!manifest.recordsets?.includes(c.bridge.table)) bad(`${label}: bridge table is absent from manifest recordsets`);
       if (model) {
-        const columns = model.entities?.[c.bridge.table]?.properties;
+        const columns = records?.[c.bridge.table]?.[words.fields];
         if (!columns || c.bridge.raw_label_column === c.bridge.target_key_column || columns[c.bridge.raw_label_column]?.type !== 'string' || columns[c.bridge.target_key_column]?.type !== 'string' || c.bridge.serving_identity_column && (c.bridge.serving_identity_column === c.bridge.raw_label_column || c.bridge.serving_identity_column === c.bridge.target_key_column || !columns[c.bridge.serving_identity_column])) bad(`${label}: bridge columns missing or overlapping in local model`);
       }
       const bridge = localObject(c.bridge.artifact, `${label}.bridge.artifact`);
