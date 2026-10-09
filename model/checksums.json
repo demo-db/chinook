@@ -7,16 +7,16 @@
   },
   "files": {
     "chinook.meaning.yaml": {
-      "sha256": "06dccf350525baa18ddfb6a86af11dc726ed33469c8a3a5ba65e16d24a88bd7c",
-      "bytes": 15815
+      "sha256": "08070167da1626c3fd51f6555e846cd8aa1aa068a533db45c53394127bb0fcad",
+      "bytes": 15817
     },
     "chinook.modelspec.hcl": {
-      "sha256": "f6ad6d7a43fb111ab38bb36352fc71d680c7325759ab8af92876d87c62f9cf55",
-      "bytes": 7583
+      "sha256": "8e507ec6f212e300ddaa7bc12494b97c98301b316e9f545112f5dea85b14f16d",
+      "bytes": 7436
     },
     "chinook.modelspec.json": {
-      "sha256": "5e81f79ae02760bbdc372985022ab94209b97aaa76bf456fb59e040a99476870",
-      "bytes": 6854
+      "sha256": "19be3e0f575e14aa999769da79ba3ecb7fe3cb7e6a7dee151399dcbebfc56a7b",
+      "bytes": 6811
     }
   }
 }

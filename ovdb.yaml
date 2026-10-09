@@ -53,7 +53,7 @@ licences:
   model: MIT
   meaning: CC0-1.0
 
-# Recordset names are the ModelSpec entity names, which are also the collection
+# Recordset names are the ModelSpec record type names, which are also the collection
 # names the deployment serves.
 recordsets:
   - Album

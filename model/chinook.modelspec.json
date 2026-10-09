@@ -1,16 +1,16 @@
 {
-  "modelspec": "1.0-draft",
+  "modelspec": "1.0-draft-2",
   "module": {
     "id": "github.com/demo-db/chinook/model/chinook",
     "name": "chinook",
     "version": "0.1.0"
   },
-  "entities": {
+  "records": {
     "Artist": {
       "key": [
         "ArtistId"
       ],
-      "properties": {
+      "fields": {
         "ArtistId": {
           "type": "int",
           "required": true
@@ -25,7 +25,7 @@
       "key": [
         "AlbumId"
       ],
-      "properties": {
+      "fields": {
         "AlbumId": {
           "type": "int",
           "required": true
@@ -36,7 +36,7 @@
           "max_len": 160
         },
         "ArtistId": {
-          "entity": "Artist",
+          "record": "Artist",
           "required": true
         }
       }
@@ -45,7 +45,7 @@
       "key": [
         "TrackId"
       ],
-      "properties": {
+      "fields": {
         "TrackId": {
           "type": "int",
           "required": true
@@ -56,14 +56,14 @@
           "max_len": 200
         },
         "AlbumId": {
-          "entity": "Album"
+          "record": "Album"
         },
         "MediaTypeId": {
-          "entity": "MediaType",
+          "record": "MediaType",
           "required": true
         },
         "GenreId": {
-          "entity": "Genre"
+          "record": "Genre"
         },
         "Composer": {
           "type": "string",
@@ -86,7 +86,7 @@
       "key": [
         "GenreId"
       ],
-      "properties": {
+      "fields": {
         "GenreId": {
           "type": "int",
           "required": true
@@ -101,7 +101,7 @@
       "key": [
         "MediaTypeId"
       ],
-      "properties": {
+      "fields": {
         "MediaTypeId": {
           "type": "int",
           "required": true
@@ -116,7 +116,7 @@
       "key": [
         "PlaylistId"
       ],
-      "properties": {
+      "fields": {
         "PlaylistId": {
           "type": "int",
           "required": true
@@ -132,13 +132,13 @@
         "PlaylistId",
         "TrackId"
       ],
-      "properties": {
+      "fields": {
         "PlaylistId": {
-          "entity": "Playlist",
+          "record": "Playlist",
           "required": true
         },
         "TrackId": {
-          "entity": "Track",
+          "record": "Track",
           "required": true
         }
       }
@@ -147,7 +147,7 @@
       "key": [
         "CustomerId"
       ],
-      "properties": {
+      "fields": {
         "CustomerId": {
           "type": "int",
           "required": true
@@ -201,7 +201,7 @@
           "format": "email"
         },
         "SupportRepId": {
-          "entity": "Employee"
+          "record": "Employee"
         }
       }
     },
@@ -209,7 +209,7 @@
       "key": [
         "EmployeeId"
       ],
-      "properties": {
+      "fields": {
         "EmployeeId": {
           "type": "int",
           "required": true
@@ -229,7 +229,7 @@
           "max_len": 30
         },
         "ReportsTo": {
-          "entity": "Employee"
+          "record": "Employee"
         },
         "BirthDate": {
           "type": "datetime"
@@ -276,13 +276,13 @@
       "key": [
         "InvoiceId"
       ],
-      "properties": {
+      "fields": {
         "InvoiceId": {
           "type": "int",
           "required": true
         },
         "CustomerId": {
-          "entity": "Customer",
+          "record": "Customer",
           "required": true
         },
         "InvoiceDate": {
@@ -319,17 +319,17 @@
       "key": [
         "InvoiceLineId"
       ],
-      "properties": {
+      "fields": {
         "InvoiceLineId": {
           "type": "int",
           "required": true
         },
         "InvoiceId": {
-          "entity": "Invoice",
+          "record": "Invoice",
           "required": true
         },
         "TrackId": {
-          "entity": "Track",
+          "record": "Track",
           "required": true
         },
         "UnitPrice": {

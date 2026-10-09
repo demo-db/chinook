@@ -4,7 +4,7 @@ name: Chinook music store
 description: >-
   What the Chinook sample database means: a digital music store that sells
   tracks to customers in 24 countries. Each concept says what it is, the words
-  people use for it, and which ModelSpec entity or property holds it, in which
+  people use for it, and which ModelSpec record type or field holds it, in which
   role. Concepts that are not specific to Chinook (country, currency,
   customer, invoice, price, revenue, date, population, per capita) are reused
   from the universal concepts at meaning://github.com/meaninggraph/core, each

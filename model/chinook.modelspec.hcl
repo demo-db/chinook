@@ -3,17 +3,17 @@
 # Luis Rocha, MIT (https://github.com/lerocha/chinook-database/blob/master/LICENSE.md),
 # so that notice applies to it too. The meaning file chinook.meaning.yaml is CC0-1.0.
 #
-# Chinook sample database: storage-neutral data model (ModelSpec 1.0-draft).
+# Chinook sample database: storage-neutral data model (ModelSpec 1.0-draft-2).
 #
-# Module short name: chinook (references use modelspec:///chinook.<Entity>).
+# Module short name: chinook (references use modelspec:///chinook.<Record>).
 # Source of the structure: the pinned upstream SQLite fixture
-# (data-source/source.sqlite). Entity and property names are the
-# upstream table and column names, so each property matches one published
-# column one to one. scripts/test-model.mjs fails when this file and the
-# published data disagree.
+# (data-source/source.sqlite). Record type and field names are the
+# upstream table and column names, so each field matches one published
+# column one to one. scripts/test-data.mjs fails when a record type's key,
+# or the set of record types, disagrees with metadata/schema.json.
 #
 # Reading notes:
-# - A property with `entity = "X"` is a reference to an X record. It holds
+# - A field with `record = "X"` is a reference to an X record. It holds
 #   X's key value (for example Album.ArtistId holds an Artist.ArtistId).
 # - NVARCHAR(n) columns are `string` with `max_len = n`.
 # - NUMERIC(10,2) columns are `decimal`; ModelSpec has no precision or scale
@@ -24,217 +24,217 @@
 #   lives in chinook.meaning.yaml, not here.
 
 # A recording artist or band.
-entity "Artist" {
+record "Artist" {
   key = ["ArtistId"]
 
-  property "ArtistId" {
+  field "ArtistId" {
     type     = "int"
     required = true
   }
 
-  property "Name" {
+  field "Name" {
     type    = "string"
     max_len = 120
   }
 }
 
 # An album released by one artist.
-entity "Album" {
+record "Album" {
   key = ["AlbumId"]
 
-  property "AlbumId" {
+  field "AlbumId" {
     type     = "int"
     required = true
   }
 
-  property "Title" {
+  field "Title" {
     type     = "string"
     required = true
     max_len  = 160
   }
 
-  property "ArtistId" {
-    entity   = "Artist"
+  field "ArtistId" {
+    record   = "Artist"
     required = true
   }
 }
 
 # One audio or video track sold by the store.
-entity "Track" {
+record "Track" {
   key = ["TrackId"]
 
-  property "TrackId" {
+  field "TrackId" {
     type     = "int"
     required = true
   }
 
-  property "Name" {
+  field "Name" {
     type     = "string"
     required = true
     max_len  = 200
   }
 
-  property "AlbumId" {
-    entity = "Album"
+  field "AlbumId" {
+    record = "Album"
   }
 
-  property "MediaTypeId" {
-    entity   = "MediaType"
+  field "MediaTypeId" {
+    record   = "MediaType"
     required = true
   }
 
-  property "GenreId" {
-    entity = "Genre"
+  field "GenreId" {
+    record = "Genre"
   }
 
-  property "Composer" {
+  field "Composer" {
     type    = "string"
     max_len = 220
   }
 
   # Duration in milliseconds.
-  property "Milliseconds" {
+  field "Milliseconds" {
     type     = "int"
     required = true
   }
 
   # File size in bytes.
-  property "Bytes" {
+  field "Bytes" {
     type = "int"
   }
 
   # List price of one copy. NUMERIC(10,2).
-  property "UnitPrice" {
+  field "UnitPrice" {
     type     = "decimal"
     required = true
   }
 }
 
 # A music genre.
-entity "Genre" {
+record "Genre" {
   key = ["GenreId"]
 
-  property "GenreId" {
+  field "GenreId" {
     type     = "int"
     required = true
   }
 
-  property "Name" {
+  field "Name" {
     type    = "string"
     max_len = 120
   }
 }
 
 # A file format and encoding, such as "MPEG audio file".
-entity "MediaType" {
+record "MediaType" {
   key = ["MediaTypeId"]
 
-  property "MediaTypeId" {
+  field "MediaTypeId" {
     type     = "int"
     required = true
   }
 
-  property "Name" {
+  field "Name" {
     type    = "string"
     max_len = 120
   }
 }
 
 # A named list of tracks.
-entity "Playlist" {
+record "Playlist" {
   key = ["PlaylistId"]
 
-  property "PlaylistId" {
+  field "PlaylistId" {
     type     = "int"
     required = true
   }
 
-  property "Name" {
+  field "Name" {
     type    = "string"
     max_len = 120
   }
 }
 
 # Membership of a track in a playlist: the many-to-many link between Playlist
-# and Track. ModelSpec has no many-to-many construct; an association entity
+# and Track. ModelSpec has no many-to-many construct; an association record type
 # whose key is its two references is how the model says it.
-entity "PlaylistTrack" {
+record "PlaylistTrack" {
   key = ["PlaylistId", "TrackId"]
 
-  property "PlaylistId" {
-    entity   = "Playlist"
+  field "PlaylistId" {
+    record   = "Playlist"
     required = true
   }
 
-  property "TrackId" {
-    entity   = "Track"
+  field "TrackId" {
+    record   = "Track"
     required = true
   }
 }
 
 # A person who buys from the store.
-entity "Customer" {
+record "Customer" {
   key = ["CustomerId"]
 
-  property "CustomerId" {
+  field "CustomerId" {
     type     = "int"
     required = true
   }
 
-  property "FirstName" {
+  field "FirstName" {
     type     = "string"
     required = true
     max_len  = 40
   }
 
-  property "LastName" {
+  field "LastName" {
     type     = "string"
     required = true
     max_len  = 20
   }
 
-  property "Company" {
+  field "Company" {
     type    = "string"
     max_len = 80
   }
 
-  property "Address" {
+  field "Address" {
     type    = "string"
     max_len = 70
   }
 
-  property "City" {
+  field "City" {
     type    = "string"
     max_len = 40
   }
 
-  property "State" {
+  field "State" {
     type    = "string"
     max_len = 40
   }
 
   # Country name as Chinook spells it ("USA", "Czech Republic").
-  property "Country" {
+  field "Country" {
     type    = "string"
     max_len = 40
   }
 
-  property "PostalCode" {
+  field "PostalCode" {
     type    = "string"
     max_len = 10
   }
 
-  property "Phone" {
+  field "Phone" {
     type    = "string"
     max_len = 24
   }
 
-  property "Fax" {
+  field "Fax" {
     type    = "string"
     max_len = 24
   }
 
-  property "Email" {
+  field "Email" {
     type     = "string"
     required = true
     max_len  = 60
@@ -242,86 +242,86 @@ entity "Customer" {
   }
 
   # The employee who supports this customer.
-  property "SupportRepId" {
-    entity = "Employee"
+  field "SupportRepId" {
+    record = "Employee"
   }
 }
 
 # A store employee.
-entity "Employee" {
+record "Employee" {
   key = ["EmployeeId"]
 
-  property "EmployeeId" {
+  field "EmployeeId" {
     type     = "int"
     required = true
   }
 
-  property "LastName" {
+  field "LastName" {
     type     = "string"
     required = true
     max_len  = 20
   }
 
-  property "FirstName" {
+  field "FirstName" {
     type     = "string"
     required = true
     max_len  = 20
   }
 
-  property "Title" {
+  field "Title" {
     type    = "string"
     max_len = 30
   }
 
   # The employee's manager: a reference to another Employee (self-reference).
-  property "ReportsTo" {
-    entity = "Employee"
+  field "ReportsTo" {
+    record = "Employee"
   }
 
-  property "BirthDate" {
+  field "BirthDate" {
     type = "datetime"
   }
 
-  property "HireDate" {
+  field "HireDate" {
     type = "datetime"
   }
 
-  property "Address" {
+  field "Address" {
     type    = "string"
     max_len = 70
   }
 
-  property "City" {
+  field "City" {
     type    = "string"
     max_len = 40
   }
 
-  property "State" {
+  field "State" {
     type    = "string"
     max_len = 40
   }
 
-  property "Country" {
+  field "Country" {
     type    = "string"
     max_len = 40
   }
 
-  property "PostalCode" {
+  field "PostalCode" {
     type    = "string"
     max_len = 10
   }
 
-  property "Phone" {
+  field "Phone" {
     type    = "string"
     max_len = 24
   }
 
-  property "Fax" {
+  field "Fax" {
     type    = "string"
     max_len = 24
   }
 
-  property "Email" {
+  field "Email" {
     type    = "string"
     max_len = 60
     format  = "email"
@@ -329,84 +329,84 @@ entity "Employee" {
 }
 
 # One sale: an invoice raised for a customer.
-entity "Invoice" {
+record "Invoice" {
   key = ["InvoiceId"]
 
-  property "InvoiceId" {
+  field "InvoiceId" {
     type     = "int"
     required = true
   }
 
-  property "CustomerId" {
-    entity   = "Customer"
+  field "CustomerId" {
+    record   = "Customer"
     required = true
   }
 
-  property "InvoiceDate" {
+  field "InvoiceDate" {
     type     = "datetime"
     required = true
   }
 
-  property "BillingAddress" {
+  field "BillingAddress" {
     type    = "string"
     max_len = 70
   }
 
-  property "BillingCity" {
+  field "BillingCity" {
     type    = "string"
     max_len = 40
   }
 
-  property "BillingState" {
+  field "BillingState" {
     type    = "string"
     max_len = 40
   }
 
   # Country name as Chinook spells it ("USA", "Czech Republic").
-  property "BillingCountry" {
+  field "BillingCountry" {
     type    = "string"
     max_len = 40
   }
 
-  property "BillingPostalCode" {
+  field "BillingPostalCode" {
     type    = "string"
     max_len = 10
   }
 
   # Amount charged. Equals the sum of UnitPrice x Quantity over the invoice's
   # lines. NUMERIC(10,2). The data names no currency.
-  property "Total" {
+  field "Total" {
     type     = "decimal"
     required = true
   }
 }
 
 # One track on an invoice.
-entity "InvoiceLine" {
+record "InvoiceLine" {
   key = ["InvoiceLineId"]
 
-  property "InvoiceLineId" {
+  field "InvoiceLineId" {
     type     = "int"
     required = true
   }
 
-  property "InvoiceId" {
-    entity   = "Invoice"
+  field "InvoiceId" {
+    record   = "Invoice"
     required = true
   }
 
-  property "TrackId" {
-    entity   = "Track"
+  field "TrackId" {
+    record   = "Track"
     required = true
   }
 
   # Price charged for one copy on this invoice. NUMERIC(10,2).
-  property "UnitPrice" {
+  field "UnitPrice" {
     type     = "decimal"
     required = true
   }
 
-  property "Quantity" {
+  field "Quantity" {
     type     = "int"
     required = true
   }
