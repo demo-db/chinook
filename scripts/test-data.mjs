@@ -7,6 +7,7 @@ import { test } from 'node:test';
 import { parse as parseYaml } from 'yaml';
 import { buildChecksums, checksumsPath, listDataFiles, serializeChecksums, sha256Hex, verifyChecksums } from './lib/checksums.mjs';
 import { evaluateDrift } from './lib/drift.mjs';
+import { vocabularyOf } from './lib/modelspec.mjs';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const published = join(root, 'artifacts', 'data');
@@ -97,4 +98,55 @@ test('the drift guard fails when data changes without checksums and a data-sourc
 test('the drift guard names at most five changed files', () => {
   const many = Array.from({ length: 8 }, (_, i) => `artifacts/data/csv/f${i}.csv`);
   assert.match(evaluateDrift(many).at(-1), /and 3 more/);
+});
+
+// Every table of this database has a primary key, so the record type that describes it must
+// declare that key. ModelSpec itself allows a record type without a key, so only this check
+// notices when one loses it. `model` is the ModelSpec JSON in either vocabulary; `schema` is
+// metadata/schema.json. Returns problems.
+function keyProblems(model, schema) {
+  const words = vocabularyOf(model);
+  if (!words) return [`modelspec "${model?.modelspec}" is neither of the known identifiers`];
+  const problems = [];
+  const recordTypes = model[words.records] ?? {};
+  for (const table of schema.tables) {
+    const primaryKey = table.columns.filter((column) => column.primaryKey).sort((a, b) => a.primaryKeyPosition - b.primaryKeyPosition).map((column) => column.name);
+    if (primaryKey.length === 0) problems.push(`${table.name}: the table has no primary key`);
+    const recordType = recordTypes[table.name];
+    if (!recordType) { problems.push(`${table.name}: the table has no ${words.record} type in the model`); continue; }
+    if (!Array.isArray(recordType.key) || recordType.key.length === 0) problems.push(`${table.name}: the ${words.record} type declares no key`);
+    else if (JSON.stringify(recordType.key) !== JSON.stringify(primaryKey)) problems.push(`${table.name}: key [${recordType.key.join(', ')}] differs from the primary key [${primaryKey.join(', ')}]`);
+  }
+  for (const name of Object.keys(recordTypes)) if (!schema.tables.some((table) => table.name === name)) problems.push(`${name}: the model has a ${words.record} type that describes no table`);
+  return problems;
+}
+
+test('every record type of the model declares the primary key of its table', async () => {
+  const model = JSON.parse(await readFile(join(root, 'model', 'chinook.modelspec.json'), 'utf8'));
+  const schema = JSON.parse(await readFile(join(root, 'metadata', 'schema.json'), 'utf8'));
+  assert.equal(schema.tables.length, 11);
+  assert.deepEqual(keyProblems(model, schema), []);
+  assert.deepEqual(model.records.PlaylistTrack.key, ['PlaylistId', 'TrackId']);
+
+  // The check is not vacuous: each way a key can be lost, changed or forgotten is named.
+  const without = structuredClone(model);
+  delete without.records.Genre.key;
+  assert.deepEqual(keyProblems(without, schema), ['Genre: the record type declares no key']);
+  const empty = structuredClone(model);
+  empty.records.Genre.key = [];
+  assert.deepEqual(keyProblems(empty, schema), ['Genre: the record type declares no key']);
+  const wrong = structuredClone(model);
+  wrong.records.PlaylistTrack.key = ['TrackId', 'PlaylistId'];
+  assert.deepEqual(keyProblems(wrong, schema), ['PlaylistTrack: key [TrackId, PlaylistId] differs from the primary key [PlaylistId, TrackId]']);
+  const missing = structuredClone(model);
+  delete missing.records.Genre;
+  assert.deepEqual(keyProblems(missing, schema), ['Genre: the table has no record type in the model']);
+  const extra = structuredClone(model);
+  extra.records.Shipment = { fields: {} };
+  assert.deepEqual(keyProblems(extra, schema), ['Shipment: the model has a record type that describes no table']);
+  // The earlier spelling is read as well, in its own words.
+  const earlier = { modelspec: '1.0-draft', module: model.module, entities: structuredClone(model.records) };
+  delete earlier.entities.Genre.key;
+  assert.deepEqual(keyProblems(earlier, schema), ['Genre: the entity type declares no key']);
+  assert.deepEqual(keyProblems({ modelspec: '1.0-draft-3' }, schema), ['modelspec "1.0-draft-3" is neither of the known identifiers']);
 });
