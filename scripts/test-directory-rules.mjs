@@ -185,3 +185,41 @@ test('the public descriptor generator preserves the full authored data expressio
     execFileSync(process.execPath, [join(fixtureRoot, 'scripts/generate-public-manifest.mjs'), '--check'], { stdio: 'pipe' });
   }
 });
+
+test('the public descriptor generator reads a manifest in the form with record_type and columns, and writes the same descriptor as the earlier form', (t) => {
+  // The generator is run on copies of the inputs. The same recordsets are written in the earlier form (a list of
+  // names and the map recordset_entities) and in ovdb-manifest/draft-2 (an item with name, record_type and
+  // columns); the descriptor must be the same bytes, and modelEntity must hold the record type of Album and
+  // appear for no other recordset.
+  const fixtureRoot = mkdtempSync(join(tmpdir(), 'chinook-record-type-'));
+  t.after(() => rmSync(fixtureRoot, { recursive: true, force: true }));
+  for (const path of ['scripts/generate-public-manifest.mjs', 'manifest.json', 'metadata/schema.json', 'metadata/checksums.json', 'schemas/ovdb-database-draft-1.schema.json']) {
+    mkdirSync(dirname(join(fixtureRoot, path)), { recursive: true });
+    copyFileSync(join(root, path), join(fixtureRoot, path));
+  }
+  // The generator may read the shared mapping module beside it.
+  mkdirSync(join(fixtureRoot, 'scripts/lib'), { recursive: true });
+  copyFileSync(join(root, 'scripts/lib/manifest-mapping.mjs'), join(fixtureRoot, 'scripts/lib/manifest-mapping.mjs'));
+  symlinkSync(join(root, 'node_modules'), join(fixtureRoot, 'node_modules'), 'dir');
+  const provider = parseYaml(readFileSync(join(root, 'ovdb.yaml'), 'utf8'));
+  const generate = (manifest, ...args) => {
+    writeFileSync(join(fixtureRoot, 'ovdb.yaml'), stringifyYaml(manifest));
+    execFileSync(process.execPath, [join(fixtureRoot, 'scripts/generate-public-manifest.mjs'), ...args], { stdio: 'pipe' });
+    return readFileSync(join(fixtureRoot, 'ovdb-database.json'), 'utf8');
+  };
+  assert.ok(provider.recordsets.includes('Album'));
+
+  const earlier = generate({ ...provider, recordset_entities: { Album: 'Disc' } });
+  const current = generate({
+    ...provider,
+    format: 'ovdb-manifest/draft-2',
+    recordsets: provider.recordsets.map((name) => (name === 'Album' ? { name, record_type: 'Disc', columns: { Title: { field: 'Title' } } } : name)),
+  });
+  assert.equal(current, earlier);
+  const descriptor = JSON.parse(current);
+  assert.deepEqual(descriptor.recordsets.map((recordset) => recordset.name), provider.recordsets);
+  assert.deepEqual(descriptor.recordsets.filter((recordset) => recordset.modelEntity !== undefined).map((recordset) => [recordset.name, recordset.modelEntity]), [['Album', 'Disc']]);
+  // The descriptor and the checksums that the run wrote agree with the manifest in the current form.
+  execFileSync(process.execPath, [join(fixtureRoot, 'scripts/generate-public-manifest.mjs'), '--check'], { stdio: 'pipe' });
+  assert.equal(generate({ ...provider, format: 'ovdb-manifest/draft-2', recordsets: provider.recordsets.map((name) => (name === 'Album' ? { name, record_type: 'Disc' } : { name })) }), earlier);
+});
