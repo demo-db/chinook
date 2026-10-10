@@ -121,6 +121,6 @@ test('a name listed twice is reported as that, and not also as two recordsets wi
 // one is changed, change the other the same way and record the new SHA-256 values in the test of each repository.
 const sha256 = (path) => createHash('sha256').update(readFileSync(fileURLToPath(new URL(path, import.meta.url)))).digest('hex');
 test('the mapping and the conformance cases are the files that openvaultdb/directory holds a copy of', () => {
-  assert.equal(sha256('./lib/manifest-mapping.mjs'), 'f25fbe8aacce3cd7dd2e1418721a4e6de095f68ba1ee9f88249e6a7d5f50c303');
+  assert.equal(sha256('./lib/manifest-mapping.mjs'), 'aa27f9fc0d893502c6054594c60fa6c85b1457877cde0bdce1659874daac4bf7');
   assert.equal(sha256('./testdata/manifest-conformance.json'), '5a7b576cf5682c19e0d09f7f59843d78b59f0ae4d3beefc899db5570bb2602af');
 });
