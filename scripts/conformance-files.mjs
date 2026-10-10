@@ -12,24 +12,28 @@ const own = (path) => readFileSync(join(root, path), 'utf8');
 export const conformance = JSON.parse(own('scripts/testdata/manifest-conformance.json'));
 
 // The manifest of a case: this repository's own manifest with the case's format, recordsets and recordset_entities in place of its own.
-export const manifestFor = (part) => {
+// `recordsetPage` replaces the manifest's deployment.recordset_page.
+export const manifestFor = (part, { recordsetPage } = {}) => {
   const { format: _format, recordsets: _recordsets, recordset_entities: _entities, ...rest } = parseYaml(own('ovdb.yaml'));
+  if (recordsetPage !== undefined) rest.deployment = { ...rest.deployment, recordset_page: recordsetPage };
   // The case's model is the module shop: the manifest's own address for it is this repository plus that module.
   if (rest.model?.address !== undefined) rest.model = { ...rest.model, address: 'modelspec://github.com/demo-db/chinook/shop' };
   return { ...(Object.hasOwn(part, 'format') ? { format: part.format } : {}), ...rest, ...(Object.hasOwn(part, 'recordsets') ? { recordsets: part.recordsets } : {}), ...(Object.hasOwn(part, 'recordset_entities') ? { recordset_entities: part.recordset_entities } : {}) };
 };
 
 // The repository of a case, as the pre-check reads it: OVDB.md, the manifest, the case's model (module shop) and a meaning file that names
-// it. `withModel: false` leaves the model file out, to show that a verdict is reached from the manifest's text alone.
-export const filesFor = (part, vocabulary, { withModel = true } = {}) => {
+// it. `withModel: false` leaves the model file out, to show that a verdict is reached from the manifest's text alone;
+// `model` is the model file's content in place of the case file's model of that vocabulary, and `recordsetPage` replaces
+// the manifest's deployment.recordset_page.
+export const filesFor = (part, vocabulary, { withModel = true, model = conformance.models[vocabulary], recordsetPage } = {}) => {
   const meaning = parseYaml(own('model/chinook.meaning.yaml'));
   meaning.models = { shop: meaning.models.chinook };
   const files = new Map([
     ['OVDB.md', '---\novdb: 1\npublish: [./ovdb.yaml]\n---\n'],
-    ['ovdb.yaml', stringifyYaml(manifestFor(part))],
+    ['ovdb.yaml', stringifyYaml(manifestFor(part, { recordsetPage }))],
     ['model/chinook.modelspec.hcl', '# the source of the model\n'],
     ['model/chinook.meaning.yaml', stringifyYaml(meaning)],
-    ...(withModel ? [['model/chinook.modelspec.json', JSON.stringify(conformance.models[vocabulary])]] : []),
+    ...(withModel ? [['model/chinook.modelspec.json', JSON.stringify(model)]] : []),
   ]);
   return {
     problem: () => '',

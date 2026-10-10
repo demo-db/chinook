@@ -3,11 +3,18 @@
 // which runs the same cases through the Directory checker; the two checkers must agree on every case. Each case is run twice, against
 // the model in ModelSpec's current vocabulary and against the same model in the earlier one.
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { describe, test } from 'node:test';
+import { fileURLToPath } from 'node:url';
 import { chinookVerdict, conformance, manifestFor } from './conformance-files.mjs';
 import { columnModelProblems, formatOf, normalisedMapping } from './lib/manifest-mapping.mjs';
 
 const noticed = (notes) => notes.some((note) => note.includes('recordset_entities is the earlier form of the mapping'));
+// Cases that the case file puts at the file stage because the Directory reaches the refusal there, and that this pre-check
+// refuses from the manifest's text alone: an old-form recordset that is not named like a record type is refused by the
+// identifier rule before any model is read. The two checkers word that refusal differently, and both refuse it.
+const refusedWithoutModelHere = new Set(['A4']);
 const mentions = (lines, texts) => {
   const joined = lines.join('\n');
   for (const text of texts) assert.ok(joined.includes(text), `expected the problems to contain ${JSON.stringify(text)}, got:\n${joined || '(none)'}`);
@@ -25,6 +32,11 @@ for (const vocabulary of ['current', 'earlier']) {
             // Refused from the manifest's text alone: the verdict is the same with no model file in the repository.
             const without = chinookVerdict(c.manifest, vocabulary, { withModel: false });
             mentions(without.problems, c.messageHas);
+          } else if (c.stage === 'file') {
+            // Refused only with the model file read: with no model file in the repository its texts are not among the problems.
+            const without = chinookVerdict(c.manifest, vocabulary, { withModel: false }).problems;
+            const present = c.messageHas.filter((text) => without.join('\n').includes(text));
+            assert.deepEqual(present, refusedWithoutModelHere.has(c.id) ? c.messageHas : [], `texts of a file-stage case found with no model file: ${without.join('\n') || '(no problem)'}`);
           }
         } else {
           assert.deepEqual(result.problems, []);
@@ -72,4 +84,43 @@ test('a value that refers to itself is reported as a problem and does not throw'
       assert.ok(result.problems.length > 0, `${format}: the manifest is refused`);
     }
   }
+});
+
+test('a map that refers to itself under its own key toString is reported as a problem and does not throw', () => {
+  const recordType = {};
+  recordType.toString = recordType;
+  const format = {};
+  format.toString = format;
+  const cases = [
+    ['record_type', { format: 'ovdb-manifest/draft-2', recordsets: ['Customer', { name: 'OrderLine', record_type: recordType }] }],
+    ['format, draft-1 spelling', { format, recordsets: ['Customer', 'OrderLine'] }],
+  ];
+  for (const [label, part] of cases) {
+    let result;
+    assert.doesNotThrow(() => { result = chinookVerdict(part); }, label);
+    assert.ok(result.problems.length > 0, `${label}: the manifest is refused`);
+    assert.ok(result.problems.some((problem) => problem.includes('a value that refers to itself')), `${label}: ${result.problems.join('\n')}`);
+  }
+});
+
+test('a recordset item that has a record type and no name is reported by its position', () => {
+  const { problems } = chinookVerdict({ format: 'ovdb-manifest/draft-2', recordsets: [{ record_type: '9x' }] });
+  assert.ok(problems.some((problem) => problem.includes('recordsets item 1 needs name:')), problems.join('\n'));
+  assert.ok(problems.some((problem) => problem.includes('recordsets item 1: record_type must be a ModelSpec record type name')), problems.join('\n'));
+  assert.equal(problems.some((problem) => problem.includes('recordsets undefined')), false, problems.join('\n'));
+});
+
+test('a name listed twice is reported as that, and not also as two recordsets with one record type', () => {
+  const { problems } = chinookVerdict({ format: 'ovdb-manifest/draft-2', recordsets: ['Customer', { name: 'Customer' }, 'OrderLine'] });
+  assert.ok(problems.some((problem) => problem.includes('recordsets lists a name twice: "Customer"')), problems.join('\n'));
+  assert.equal(problems.some((problem) => problem.includes('both have the record type')), false, problems.join('\n'));
+});
+
+// The mapping and the case file are held byte for byte by openvaultdb/directory as well (scripts/lib/manifest-mapping.mjs and
+// scripts/fixtures/manifest-conformance.json there), and nothing but these two values shows when the copies drift apart: when
+// one is changed, change the other the same way and record the new SHA-256 values in the test of each repository.
+const sha256 = (path) => createHash('sha256').update(readFileSync(fileURLToPath(new URL(path, import.meta.url)))).digest('hex');
+test('the mapping and the conformance cases are the files that openvaultdb/directory holds a copy of', () => {
+  assert.equal(sha256('./lib/manifest-mapping.mjs'), 'aa27f9fc0d893502c6054594c60fa6c85b1457877cde0bdce1659874daac4bf7');
+  assert.equal(sha256('./testdata/manifest-conformance.json'), '5a7b576cf5682c19e0d09f7f59843d78b59f0ae4d3beefc899db5570bb2602af');
 });

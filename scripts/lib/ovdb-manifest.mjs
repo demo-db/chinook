@@ -5,7 +5,7 @@ import { createHash } from 'node:crypto';
 import Ajv2020 from 'ajv/dist/2020.js';
 import { parse as parseYaml } from 'yaml';
 import { cleanGitEnv } from './git-env.mjs';
-import { canonicalUrlProblem, enginePattern, homepageFieldProblem, idPattern, isRepositoryPath, manifestUrlProblem, maxIdLength } from './directory-rules.mjs';
+import { canonicalUrlProblem, enginePattern, encodePathSegment, homepageFieldProblem, idPattern, isRepositoryPath, manifestUrlProblem, maxIdLength, publicHttpsProblem } from './directory-rules.mjs';
 import { precheckRepresentation } from './representation-precheck.mjs';
 import { vocabularies, vocabularyOf } from './modelspec.mjs';
 import { columnModelProblems, earlierKeyNotice, formatOf, formatProblem, mapItemUnderOldFormat, nameProblem, newFormProblems, normalisedMapping } from './manifest-mapping.mjs';
@@ -591,20 +591,24 @@ function analyseManifest(path, files, { repository } = {}) {
     const names = mapping.map((entry) => entry.name);
     if (earlierShape && new Set(names).size !== names.length) bad('recordsets lists a name twice');
     // A recordset that has the record type of its own name must be named like one; one that is mapped to another record
-    // type has the native name of its table, which the Directory's name rule (not this one) decides.
+    // type has the native name of its table, which the Directory's name rule decides (nameProblem, below).
     const misshapen = mapping.filter((entry) => entry.recordType === entry.name && !entityName.test(entry.name)).map((entry) => entry.name);
     if (misshapen.length) bad(`recordsets names must look like ModelSpec entity names (letters, digits, underscore): ${misshapen.map((name) => JSON.stringify(name)).join(', ')}`);
+    // The draft-2 form applies the name rule to every name in newFormProblems; the draft-1 form applies it here, to every name
+    // the rule above has not already refused.
     if (earlierShape) for (const entry of mapping) {
-      const problem = entry.recordType !== entry.name && nameProblem(entry.name);
+      const problem = !misshapen.includes(entry.name) && nameProblem(entry.name);
       if (problem) bad(`recordsets name ${JSON.stringify(entry.name)} ${problem}`);
     }
-    // Every recordset page the template makes is a URL the Directory checks again with the real name. The name of a table that
-    // is not an identifier is encoded into the path, which this pre-check's plain spelling does not allow: the Directory judges it.
+    // Every recordset page the template makes is a URL the Directory checks again with the real name. A name that is not an
+    // identifier is written into the path percent-encoded, as the Directory writes it (encodePathSegment), and judged by
+    // the Directory's rule for that one encoded segment (publicHttpsProblem with encodedPathSegment).
     if (isText(page) && !misshapen.length && !manifestUrlProblem(page, { template: true })) {
       for (const { name } of mapping) {
-        if (!entityName.test(name)) { notes.push(`${path}: the recordset page of ${JSON.stringify(name)} is not checked here: the name is encoded into the path, and the Directory judges the URL`); continue; }
-        const problem = manifestUrlProblem(page.replace('{name}', name));
-        if (problem) bad(`the recordset page of ${name}, ${page.replace('{name}', name)}, ${problem}`);
+        const encoded = encodePathSegment(name);
+        const url = page.replace('{name}', encoded);
+        const problem = entityName.test(name) ? manifestUrlProblem(url) : publicHttpsProblem(url, { encodedPathSegment: encoded.includes('%') ? encoded : undefined });
+        if (problem) bad(`the recordset page of ${name}, ${url}, ${problem}`);
       }
     }
     // A shared model is in another repository, so its record types cannot be read here: the Directory compares.
