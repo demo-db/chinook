@@ -117,10 +117,10 @@ test('a name listed twice is reported as that, and not also as two recordsets wi
 });
 
 // The mapping and the case file are held byte for byte by openvaultdb/directory as well (scripts/lib/manifest-mapping.mjs and
-// scripts/fixtures/manifest-conformance.json there), and nothing else makes the two copies drift visibly: when one is
-// changed, change the other the same way and record the new SHA-256 values in both repositories' tests.
+// scripts/fixtures/manifest-conformance.json there), and nothing but these two values shows when the copies drift apart: when
+// one is changed, change the other the same way and record the new SHA-256 values in the test of each repository.
 const sha256 = (path) => createHash('sha256').update(readFileSync(fileURLToPath(new URL(path, import.meta.url)))).digest('hex');
 test('the mapping and the conformance cases are the files that openvaultdb/directory holds a copy of', () => {
-  assert.equal(sha256('./lib/manifest-mapping.mjs'), 'eadd6b8869b72caea8df8ad416e8696781a857dc60b180510aa4c75b3f8b9a8e');
+  assert.equal(sha256('./lib/manifest-mapping.mjs'), 'f25fbe8aacce3cd7dd2e1418721a4e6de095f68ba1ee9f88249e6a7d5f50c303');
   assert.equal(sha256('./testdata/manifest-conformance.json'), '5a7b576cf5682c19e0d09f7f59843d78b59f0ae4d3beefc899db5570bb2602af');
 });

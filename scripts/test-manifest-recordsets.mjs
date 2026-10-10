@@ -102,6 +102,7 @@ describe('the length of a recordset name', () => {
         ['draft-2 unmapped', { format: draft2, recordsets: ['Customer', longName] }],
         ['draft-1 unmapped', { format: draft1, recordsets: ['Customer', longName] }],
         ['draft-2 mapped', { format: draft2, recordsets: ['Customer', { name: longName, record_type: longName }] }],
+        ['draft-1 mapped', { format: draft1, recordsets: ['Customer', longName], recordset_entities: { [longName]: longName } }],
       ];
       for (const [label, part] of forms) {
         const { problems } = chinookVerdict(part, vocabulary, { model: model(vocabulary) });

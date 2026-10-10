@@ -2,10 +2,11 @@
 // (CC0-1.0, like the Directory's files).
 //
 // MIRRORS `scripts/lib/urls.mjs` and `scripts/lib/directory.mjs` of openvaultdb/directory: publicHttpsProblem,
-// hostProblem and homepageProblem are copied from urls.mjs (the file's opening comment is not repeated; it
-// includes the refusal of any port, even :443, and of any percent escape in a path except the one encoded native
-// name of a generated recordset page: encodePathSegment and the encodedPathSegment option of publicHttpsProblem),
-// and from directory.mjs
+// hostProblem, homepageProblem and encodePathSegment are copied from urls.mjs (the file's opening comment is not
+// repeated). Any port is refused, even :443, and any percent escape in a path except the one encoded native name of
+// a generated recordset page (the encodedPathSegment option of publicHttpsProblem). The Directory also allows
+// canonical percent-encoded segments in a database's identity path (its option encodedPathSegments); that is not
+// copied, so this pre-check refuses them. From directory.mjs come
 // the generic canonical-identity URL rule, id pattern, deployment.engine pattern and `homepage` field check,
 // and from git.mjs isRepositoryPath. When the Directory changes one of them, change it here. Tests pin the
 // accepted canonical identity forms and unsafe URL refusals.
@@ -41,8 +42,9 @@ export function hostProblem(url) {
   return null;
 }
 
-// The one spelling of a native recordset name as a path segment: encodeURIComponent, with the five characters it leaves
-// alone (! ' ( ) *) encoded too. The Directory writes a recordset page this way (urls.mjs encodePathSegment).
+// The one spelling of a native recordset name as a path segment: encodeURIComponent, with five of the characters it
+// leaves alone (! ' ( ) *) encoded too, so only letters, digits and - _ . ~ are written as they are. The Directory
+// writes a recordset page this way (urls.mjs encodePathSegment).
 export const encodePathSegment = (value) => encodeURIComponent(value).replace(/[!'()*]/g, (character) => `%${character.codePointAt(0).toString(16).toUpperCase()}`);
 
 // A problem with `value` as a public https URL (the canonical url, the
