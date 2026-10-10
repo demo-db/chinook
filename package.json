@@ -8,7 +8,7 @@
     "validate": "python3 scripts/validate.py && node scripts/generate-public-manifest.mjs --check && node scripts/check-directory-opt-in.mjs",
     "test:data": "node --test scripts/test-data.mjs",
     "test:modelspec": "node --test scripts/test-modelspec.mjs",
-    "test:directory-rules": "node --test scripts/test-directory-rules.mjs scripts/test-representation-precheck.mjs scripts/test-manifest-conformance.mjs scripts/test-receipt-compatibility.mjs",
+    "test:directory-rules": "node --test scripts/test-directory-rules.mjs scripts/test-representation-precheck.mjs scripts/test-manifest-conformance.mjs scripts/test-manifest-recordsets.mjs scripts/test-receipt-compatibility.mjs",
     "test:tools": "node --test scripts/test-tools.mjs",
     "tools:install": "node scripts/install-tools.mjs --dir .tools/bin",
     "lint:model": "node scripts/run-tool.mjs modelspec lint --profile publish model",

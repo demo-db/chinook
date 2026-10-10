@@ -3,7 +3,9 @@
 //
 // MIRRORS `scripts/lib/urls.mjs` and `scripts/lib/directory.mjs` of openvaultdb/directory: publicHttpsProblem,
 // hostProblem and homepageProblem are copied from urls.mjs (the file's opening comment is not repeated; it
-// includes the refusal of any port, even :443, and of any percent escape in a path), and from directory.mjs
+// includes the refusal of any port, even :443, and of any percent escape in a path except the one encoded native
+// name of a generated recordset page: encodePathSegment and the encodedPathSegment option of publicHttpsProblem),
+// and from directory.mjs
 // the generic canonical-identity URL rule, id pattern, deployment.engine pattern and `homepage` field check,
 // and from git.mjs isRepositoryPath. When the Directory changes one of them, change it here. Tests pin the
 // accepted canonical identity forms and unsafe URL refusals.
@@ -39,13 +41,19 @@ export function hostProblem(url) {
   return null;
 }
 
+// The one spelling of a native recordset name as a path segment: encodeURIComponent, with the five characters it leaves
+// alone (! ' ( ) *) encoded too. The Directory writes a recordset page this way (urls.mjs encodePathSegment).
+export const encodePathSegment = (value) => encodeURIComponent(value).replace(/[!'()*]/g, (character) => `%${character.codePointAt(0).toString(16).toUpperCase()}`);
+
 // A problem with `value` as a public https URL (the canonical url, the
 // deployment's url, discovery document or recordset page, the publisher's
 // url), or null. `template` allows `{name}` exactly once, and only in the path
 // (never in the host, userinfo or port), as in recordset_page.
 // Refused: anything but https, userinfo, a query, a fragment, a host that is
 // not public (see hostProblem), a malformed or non-canonical spelling.
-export function publicHttpsProblem(value, { template = false } = {}) {
+// `encodedPathSegment` is the one percent-encoded native recordset name that a generated recordset URL may carry (what
+// encodePathSegment gives a name that has a character to encode); any other percent escape in the path is refused.
+export function publicHttpsProblem(value, { template = false, encodedPathSegment } = {}) {
   if (typeof value !== 'string' || value.trim() === '') return 'is not a URL';
   if (value !== value.trim() || /[\u0000- \u007f\\]/.test(value)) return 'contains whitespace, control characters or a backslash';
   let probe = value;
@@ -66,7 +74,34 @@ export function publicHttpsProblem(value, { template = false } = {}) {
   // The parser drops the default port, so look at the text: any ":" in the authority is a port.
   if (probe.slice('https://'.length).split('/')[0].includes(':')) return 'must not name a port (not even :443): a deployment is reached on the default https port';
   if (url.pathname.includes('//')) return 'has an empty path segment (//)';
-  if (url.pathname.includes('%')) return 'must not contain a percent escape in the path (write the character itself, or leave it out)';
+  const authorityEnd = probe.indexOf('/', probe.indexOf('//') + 2);
+  const writtenPath = authorityEnd === -1 ? '' : probe.slice(authorityEnd);
+  if (writtenPath.includes('%')) {
+    const escaped = writtenPath.split('/').filter((segment) => segment.includes('%'));
+    const allowedEscapes = typeof encodedPathSegment === 'string' ? [encodedPathSegment] : [];
+    if (escaped.length !== allowedEscapes.length || escaped.some((segment, index) => segment !== allowedEscapes[index])) {
+      return 'must not contain a percent escape in the path (write the character itself, or leave it out)';
+    }
+    for (const encoded of escaped) {
+      let decoded;
+      try { decoded = decodeURIComponent(encoded); } catch { return 'has an invalid percent escape in the path'; }
+      if (encodePathSegment(decoded) !== encoded || decoded === '.' || decoded === '..' || /[/\\\u0000-\u001f\u007f]/.test(decoded)) {
+        return 'has a non-canonical or unsafe encoded path segment';
+      }
+      // A downstream router or proxy must not be able to turn a still-encoded separator or dot segment into path syntax
+      // by decoding this segment a second (or later) time. Check each nested layer without changing the spelling.
+      let nested = decoded;
+      while (/%[0-9a-f]{2}/i.test(nested)) {
+        let next;
+        try { next = decodeURIComponent(nested); } catch { break; }
+        if (next === nested) break;
+        if (next === '.' || next === '..' || /[/\\\u0000-\u001f\u007f]/.test(next)) {
+          return 'has a nested percent escape that can become a path separator, control character or dot segment';
+        }
+        nested = next;
+      }
+    }
+  }
   // The literal text must be the URL's own spelling, so that what is checked is
   // what is published (no %2e dot segments, no mixed-case host, no decoded host).
   if (url.href !== probe) return `is not written canonically (it would be ${url.href})`;
