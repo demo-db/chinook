@@ -1,8 +1,8 @@
 // What the offline pre-check does with the names of recordsets, apart from the conformance cases shared with
-// openvaultdb/directory: the recordset page of a name that is not an identifier.
+// openvaultdb/directory: the recordset page of a name that is not an identifier, and the length of a name in either form.
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
-import { chinookVerdict } from './conformance-files.mjs';
+import { chinookVerdict, conformance } from './conformance-files.mjs';
 import { encodePathSegment, publicHttpsProblem } from './lib/directory-rules.mjs';
 
 const draft1 = 'ovdb-manifest/draft-1';
@@ -51,4 +51,36 @@ describe('the recordset page of a name that is not an identifier', () => {
     assert.match(publicHttpsProblem(`${page}%2E%2E`, { encodedPathSegment: '%2E%2E' }), /non-canonical or unsafe/, 'a segment that decodes to a dot segment is refused');
     assert.match(publicHttpsProblem(`${page}%252E%252E`, { encodedPathSegment: '%252E%252E' }), /nested percent escape/, 'an escape that decodes to a dot segment in a second round is refused');
   });
+});
+
+describe('the length of a recordset name', () => {
+  const longName = 'L'.repeat(257);
+  const model = (vocabulary) => {
+    const current = conformance.models[vocabulary];
+    const key = vocabulary === 'current' ? 'records' : 'entities';
+    return { ...current, [key]: { Customer: current[key].Customer, [longName]: current[key].OrderLine } };
+  };
+  for (const vocabulary of ['current', 'earlier']) {
+    test(`a name of 257 letters is refused in either form, mapped or not, model in the ${vocabulary} vocabulary`, () => {
+      const forms = [
+        ['draft-2 unmapped', { format: draft2, recordsets: ['Customer', longName] }],
+        ['draft-1 unmapped', { format: draft1, recordsets: ['Customer', longName] }],
+        ['draft-2 mapped', { format: draft2, recordsets: ['Customer', { name: longName, record_type: longName }] }],
+      ];
+      for (const [label, part] of forms) {
+        const { problems } = chinookVerdict(part, vocabulary, { model: model(vocabulary) });
+        assert.ok(problems.some((problem) => problem.includes('must be at most 256 characters')), `${label}: ${problems.join('\n') || '(accepted)'}`);
+      }
+    });
+
+    test(`a name of 256 letters is accepted in either form, model in the ${vocabulary} vocabulary`, () => {
+      const name = 'L'.repeat(256);
+      const key = vocabulary === 'current' ? 'records' : 'entities';
+      const current = conformance.models[vocabulary];
+      const accepted = { ...current, [key]: { Customer: current[key].Customer, [name]: current[key].OrderLine } };
+      for (const format of [draft1, draft2]) {
+        assert.deepEqual(chinookVerdict({ format, recordsets: ['Customer', name] }, vocabulary, { model: accepted }).problems, [], format);
+      }
+    });
+  }
 });

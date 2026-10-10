@@ -591,11 +591,13 @@ function analyseManifest(path, files, { repository } = {}) {
     const names = mapping.map((entry) => entry.name);
     if (earlierShape && new Set(names).size !== names.length) bad('recordsets lists a name twice');
     // A recordset that has the record type of its own name must be named like one; one that is mapped to another record
-    // type has the native name of its table, which the Directory's name rule (not this one) decides.
+    // type has the native name of its table, which the Directory's name rule decides (nameProblem, below).
     const misshapen = mapping.filter((entry) => entry.recordType === entry.name && !entityName.test(entry.name)).map((entry) => entry.name);
     if (misshapen.length) bad(`recordsets names must look like ModelSpec entity names (letters, digits, underscore): ${misshapen.map((name) => JSON.stringify(name)).join(', ')}`);
+    // The draft-2 form applies the name rule to every name in newFormProblems; the draft-1 form applies it here, to every name
+    // the rule above has not already refused.
     if (earlierShape) for (const entry of mapping) {
-      const problem = entry.recordType !== entry.name && nameProblem(entry.name);
+      const problem = !misshapen.includes(entry.name) && nameProblem(entry.name);
       if (problem) bad(`recordsets name ${JSON.stringify(entry.name)} ${problem}`);
     }
     // Every recordset page the template makes is a URL the Directory checks again with the real name. A name that is not an
