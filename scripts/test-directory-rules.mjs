@@ -186,11 +186,12 @@ test('the public descriptor generator preserves the full authored data expressio
   }
 });
 
-test('the public descriptor generator reads a manifest in the form with record_type and columns, and writes the same descriptor as the earlier form', (t) => {
+test('the public descriptor generator reads a manifest in the form with record_type and columns, and writes the descriptor of the earlier form with modelEntity added for every recordset', (t) => {
   // The generator is run on copies of the inputs. The same recordsets are written in the earlier form (a list of
   // names and the map recordset_entities) and in ovdb-manifest/draft-2 (an item with name, record_type and
-  // columns); the descriptor must be the same bytes, and modelEntity must hold the record type of Album and
-  // appear for no other recordset.
+  // columns). The two descriptors are the same apart from modelEntity: the earlier form writes it for Album alone
+  // (the pair of recordset_entities), the draft-2 form for every recordset (the record type of Album, and for each
+  // other recordset its own name).
   const fixtureRoot = mkdtempSync(join(tmpdir(), 'chinook-record-type-'));
   t.after(() => rmSync(fixtureRoot, { recursive: true, force: true }));
   for (const path of ['scripts/generate-public-manifest.mjs', 'manifest.json', 'metadata/schema.json', 'metadata/checksums.json', 'schemas/ovdb-database-draft-1.schema.json']) {
