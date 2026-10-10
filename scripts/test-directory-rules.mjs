@@ -167,7 +167,7 @@ test('the public descriptor generator preserves the full authored data expressio
   // Run the actual generator against copied inputs, so the provider's real licences stay unchanged.
   const fixtureRoot = mkdtempSync(join(tmpdir(), 'chinook-licences-'));
   t.after(() => rmSync(fixtureRoot, { recursive: true, force: true }));
-  for (const path of ['scripts/generate-public-manifest.mjs', 'manifest.json',
+  for (const path of ['scripts/generate-public-manifest.mjs', 'scripts/lib/manifest-mapping.mjs', 'manifest.json',
     'metadata/schema.json', 'metadata/checksums.json', 'schemas/ovdb-database-draft-1.schema.json']) {
     mkdirSync(dirname(join(fixtureRoot, path)), { recursive: true });
     copyFileSync(join(root, path), join(fixtureRoot, path));
@@ -215,11 +215,43 @@ test('the public descriptor generator reads a manifest in the form with record_t
     format: 'ovdb-manifest/draft-2',
     recordsets: provider.recordsets.map((name) => (name === 'Album' ? { name, record_type: 'Disc', columns: { Title: { field: 'Title' } } } : name)),
   });
-  assert.equal(current, earlier);
+  // In the current form every recordset states its record type (the item's record_type, else its own name), so
+  // modelEntity is written for each; apart from that the descriptors are the same.
+  const withoutModelEntity = (text) => {
+    const descriptor = JSON.parse(text);
+    for (const recordset of descriptor.recordsets) delete recordset.modelEntity;
+    return descriptor;
+  };
+  assert.deepEqual(withoutModelEntity(current), withoutModelEntity(earlier));
   const descriptor = JSON.parse(current);
   assert.deepEqual(descriptor.recordsets.map((recordset) => recordset.name), provider.recordsets);
-  assert.deepEqual(descriptor.recordsets.filter((recordset) => recordset.modelEntity !== undefined).map((recordset) => [recordset.name, recordset.modelEntity]), [['Album', 'Disc']]);
+  assert.deepEqual(descriptor.recordsets.map((recordset) => recordset.modelEntity), provider.recordsets.map((name) => (name === 'Album' ? 'Disc' : name)));
+  // The earlier form still writes modelEntity for the pair alone.
+  assert.deepEqual(JSON.parse(earlier).recordsets.filter((recordset) => recordset.modelEntity !== undefined).map((recordset) => [recordset.name, recordset.modelEntity]), [['Album', 'Disc']]);
   // The descriptor and the checksums that the run wrote agree with the manifest in the current form.
   execFileSync(process.execPath, [join(fixtureRoot, 'scripts/generate-public-manifest.mjs'), '--check'], { stdio: 'pipe' });
-  assert.equal(generate({ ...provider, format: 'ovdb-manifest/draft-2', recordsets: provider.recordsets.map((name) => (name === 'Album' ? { name, record_type: 'Disc' } : { name })) }), earlier);
+  // The columns of a recordset are not part of the descriptor.
+  assert.equal(generate({ ...provider, format: 'ovdb-manifest/draft-2', recordsets: provider.recordsets.map((name) => (name === 'Album' ? { name, record_type: 'Disc' } : { name })) }), current);
+});
+
+test('the public descriptor generator refuses a manifest it cannot read in one form, instead of half reading it', (t) => {
+  const fixtureRoot = mkdtempSync(join(tmpdir(), 'chinook-refused-'));
+  t.after(() => rmSync(fixtureRoot, { recursive: true, force: true }));
+  for (const path of ['scripts/generate-public-manifest.mjs', 'scripts/lib/manifest-mapping.mjs', 'manifest.json', 'metadata/schema.json', 'metadata/checksums.json', 'schemas/ovdb-database-draft-1.schema.json']) {
+    mkdirSync(dirname(join(fixtureRoot, path)), { recursive: true });
+    copyFileSync(join(root, path), join(fixtureRoot, path));
+  }
+  symlinkSync(join(root, 'node_modules'), join(fixtureRoot, 'node_modules'), 'dir');
+  const provider = parseYaml(readFileSync(join(root, 'ovdb.yaml'), 'utf8'));
+  const refusal = (manifest) => {
+    writeFileSync(join(fixtureRoot, 'ovdb.yaml'), stringifyYaml(manifest));
+    try {
+      execFileSync(process.execPath, [join(fixtureRoot, 'scripts/generate-public-manifest.mjs')], { stdio: 'pipe' });
+    } catch (error) { return String(error.stderr); }
+    assert.fail('the generator must refuse this manifest');
+  };
+  const item = { name: 'Album', record_type: 'Disc' };
+  assert.match(refusal({ ...provider, format: 'ovdb-manifest/draft-3' }), /format must be ovdb-manifest\/draft-1 or ovdb-manifest\/draft-2/);
+  assert.match(refusal({ ...provider, recordsets: [item, ...provider.recordsets.slice(1)] }), /is a map, but ovdb-manifest\/draft-1 lists recordsets by name only/);
+  assert.match(refusal({ ...provider, format: 'ovdb-manifest/draft-2', recordsets: [item, ...provider.recordsets.slice(1)], recordset_entities: { Album: 'Disc' } }), /recordset_entities and record_type both state the mapping/);
 });
