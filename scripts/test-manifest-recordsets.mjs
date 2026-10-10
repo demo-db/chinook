@@ -1,9 +1,18 @@
 // What the offline pre-check does with the names of recordsets, apart from the conformance cases shared with
-// openvaultdb/directory: the recordset page of a name that is not an identifier, and the length of a name in either form.
+// openvaultdb/directory: the recordset page of a name that is not an identifier, the rule that an unmapped name must look
+// like an identifier where the model is in another repository, and the length of a name in either form.
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { describe, test } from 'node:test';
+import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
+import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
 import { chinookVerdict, conformance } from './conformance-files.mjs';
 import { encodePathSegment, publicHttpsProblem } from './lib/directory-rules.mjs';
+import { reportOvdbManifest } from './lib/ovdb-manifest.mjs';
+
+const root = fileURLToPath(new URL('../', import.meta.url));
+const repository = 'https://github.com/demo-db/chinook';
 
 const draft1 = 'ovdb-manifest/draft-1';
 const draft2 = 'ovdb-manifest/draft-2';
@@ -50,6 +59,33 @@ describe('the recordset page of a name that is not an identifier', () => {
     assert.match(publicHttpsProblem(`${page}%2e%2e`, { encodedPathSegment: '%2e%2e' }), /non-canonical or unsafe/, 'a lower-case escape is not the canonical spelling');
     assert.match(publicHttpsProblem(`${page}%2E%2E`, { encodedPathSegment: '%2E%2E' }), /non-canonical or unsafe/, 'a segment that decodes to a dot segment is refused');
     assert.match(publicHttpsProblem(`${page}%252E%252E`, { encodedPathSegment: '%252E%252E' }), /nested percent escape/, 'an escape that decodes to a dot segment in a second round is refused');
+  });
+});
+
+// A manifest whose model is in another repository (a shared model), so that its record types cannot be read here.
+function sharedModelProblems(recordsets, format = draft2) {
+  const manifest = parseYaml(readFileSync(join(root, 'ovdb.yaml'), 'utf8'));
+  manifest.format = format;
+  manifest.model = { address: `modelspec://github.com/example/model/chinook?ref=${'a'.repeat(40)}` };
+  manifest.meaning = { address: `meaning://github.com/example/graph?ref=${'b'.repeat(40)}`, file: 'model/chinook.meaning.yaml', graph: { id: 'chinook' } };
+  manifest.recordsets = recordsets;
+  const files = {
+    kind: () => 'file',
+    read: (path) => (path === 'ovdb.yaml' ? stringifyYaml(manifest) : path === 'OVDB.md' ? '---\novdb: 1\npublish: [./ovdb.yaml]\n---\n' : readFileSync(join(root, path), 'utf8')),
+  };
+  return reportOvdbManifest(files, { repository }).problems;
+}
+
+describe('where the model is in another repository', () => {
+  test('a recordset that is not mapped to a record type must be named like one', () => {
+    for (const format of [draft1, draft2]) {
+      assert.deepEqual(sharedModelProblems(['Customer', 'OrderLine'], format), [], format);
+      assert.deepEqual(sharedModelProblems(['Customer', 'Order Lines'], format), ['ovdb.yaml: recordsets names must look like ModelSpec entity names (letters, digits, underscore): "Order Lines"'], format);
+    }
+  });
+
+  test('a recordset that is mapped to a record type may have the name of its table', () => {
+    assert.deepEqual(sharedModelProblems(['Customer', { name: 'Order Lines', record_type: 'OrderLine' }]), []);
   });
 });
 
