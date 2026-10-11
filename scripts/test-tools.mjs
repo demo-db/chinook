@@ -673,6 +673,17 @@ test('CI installs pinned tools and runs generation, data, OVDB, and model checks
   assert.ok(commands.includes(scripts['check:drift']));
 });
 
+test('comparison-fixture CI uses the exact pinned Node runtime and runs its checks', () => {
+  const job = workflow.jobs['compare-fixture'];
+  assert.ok(job, 'comparison fixture has an independent CI job');
+  const setupNode = job.steps.find((step) => step.uses === 'actions/setup-node@820762786026740c76f36085b0efc47a31fe5020');
+  assert.ok(setupNode, 'comparison fixture uses the repository-pinned setup-node action');
+  assert.equal(setupNode.with?.['node-version'], '24.20.0');
+  assert.equal(setupNode.with?.['check-latest'], false);
+  assert.ok(job.steps.some((step) => step.run === 'node scripts/generate-compare-fixture.mjs --check --base-ref "$COMPARE_FIXTURE_BASE"'));
+  assert.ok(job.steps.some((step) => step.run === 'node --test scripts/test-compare-fixture.mjs'));
+});
+
 test('provider CI is validation-only, fully pinned and bounded', () => {
   for (const step of steps.filter((candidate) => candidate.uses)) assert.match(step.uses, /^[\w.-]+\/[\w.-]+@[0-9a-f]{40}$/, step.uses);
   for (const step of steps.filter((candidate) => candidate.run)) {

@@ -19,14 +19,10 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - name: Install SHA-pinned official Node 24.20.0 runtime
-        run: |
-          set -euo pipefail
-          archive="$RUNNER_TEMP/node-v24.20.0-linux-x64.tar.xz"
-          curl --fail --location --silent --show-error https://nodejs.org/dist/v24.20.0/node-v24.20.0-linux-x64.tar.xz --output "$archive"
-          echo '2f2c0da162318f0de47665410c7c8c2ed3d36c8f3105de4bbc61176c70a7cbf2  '"$archive" | sha256sum --check
-          tar -xJf "$archive" -C "$RUNNER_TEMP"
-          echo "$RUNNER_TEMP/node-v24.20.0-linux-x64/bin" >> "$GITHUB_PATH"
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24.20.0
+          check-latest: false
       - name: Verify fixture generation and append-only manifest
         run: node scripts/generate-compare-fixture.mjs --check --base-ref "$COMPARE_FIXTURE_BASE"
       - name: Test comparison fixture contract

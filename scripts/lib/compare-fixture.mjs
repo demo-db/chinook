@@ -320,7 +320,7 @@ export async function verifyFixture({ root, baseRef = null }) {
       assert.deepEqual(generated, candidateBytes, `${entry.id}: regenerated candidate bytes differ`);
       const reproduction = await inspectCandidate(sourcePath, generatedPath);
       assert.deepEqual(reproduction, entry.reproduction, `${entry.id}: regenerated schema/query results differ from manifest`);
-    assertFixtureMetadata(entry, reproduction);
+      assertFixtureMetadata(entry, reproduction);
     } finally {
       await rm(tempDir, { recursive: true, force: true });
     }
