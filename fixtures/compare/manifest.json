@@ -1,0 +1,179 @@
+{
+  "format": "datatug-compare-fixtures/v1",
+  "appendOnly": true,
+  "fixtures": [
+    {
+      "id": "chinook-synthetic-3369d25729dea9e21facc7226aee3d5247fa0f3d8d4be4678aa9247fd064845f",
+      "createdOn": "2026-10-11",
+      "environment": "synthetic fixture environment",
+      "baseline": {
+        "path": "data-source/source.sqlite",
+        "sha256": "7651ba378ac2fcd0dfc3c66fb101f7a7eed3ba39a612ec642b96e20702061f15",
+        "bytes": 1007616
+      },
+      "candidate": {
+        "path": "fixtures/compare/chinook-candidate-3369d25729dea9e21facc7226aee3d5247fa0f3d8d4be4678aa9247fd064845f.sqlite",
+        "sha256": "3369d25729dea9e21facc7226aee3d5247fa0f3d8d4be4678aa9247fd064845f",
+        "bytes": 1007616
+      },
+      "generator": {
+        "script": "scripts/generate-compare-fixture.mjs",
+        "node": "24.20.0",
+        "sqlite": "3.53.4",
+        "derivationVersion": 1
+      },
+      "schemaSha256": "8392c76c7fd8da3bce20d1cec2c60223692a08915787f5c7393cec1c0b6acb94",
+      "rowCounts": {
+        "Album": 347,
+        "Artist": 275,
+        "Customer": 59,
+        "Employee": 8,
+        "Genre": 25,
+        "Invoice": 412,
+        "InvoiceLine": 2240,
+        "MediaType": 5,
+        "Playlist": 18,
+        "PlaylistTrack": 8715,
+        "Track": 3503
+      },
+      "changes": [
+        {
+          "table": "Invoice",
+          "key": {
+            "InvoiceId": 97
+          },
+          "column": "CustomerId",
+          "from": 59,
+          "to": 1
+        },
+        {
+          "table": "Invoice",
+          "key": {
+            "InvoiceId": 98
+          },
+          "column": "InvoiceDate",
+          "from": "2022-03-11 00:00:00",
+          "to": "2022-03-12 00:00:00"
+        },
+        {
+          "table": "Invoice",
+          "key": {
+            "InvoiceId": 121
+          },
+          "column": "CustomerId",
+          "from": 1,
+          "to": 2
+        }
+      ],
+      "reproduction": {
+        "schemaSha256": "8392c76c7fd8da3bce20d1cec2c60223692a08915787f5c7393cec1c0b6acb94",
+        "rowCounts": {
+          "Album": 347,
+          "Artist": 275,
+          "Customer": 59,
+          "Employee": 8,
+          "Genre": 25,
+          "Invoice": 412,
+          "InvoiceLine": 2240,
+          "MediaType": 5,
+          "Playlist": 18,
+          "PlaylistTrack": 8715,
+          "Track": 3503
+        },
+        "changes": [
+          {
+            "table": "Invoice",
+            "key": {
+              "InvoiceId": 97
+            },
+            "column": "CustomerId",
+            "from": 59,
+            "to": 1
+          },
+          {
+            "table": "Invoice",
+            "key": {
+              "InvoiceId": 98
+            },
+            "column": "InvoiceDate",
+            "from": "2022-03-11 00:00:00",
+            "to": "2022-03-12 00:00:00"
+          },
+          {
+            "table": "Invoice",
+            "key": {
+              "InvoiceId": 121
+            },
+            "column": "CustomerId",
+            "from": 1,
+            "to": 2
+          }
+        ],
+        "query": {
+          "id": "invoice-customer-invoices-v1",
+          "sql": "SELECT i.InvoiceId, i.InvoiceDate, c.CustomerId, c.FirstName, c.LastName\nFROM Invoice AS i\nJOIN Customer AS c ON c.CustomerId = i.CustomerId\nWHERE c.CustomerId = ?\nORDER BY i.InvoiceId\nLIMIT 100",
+          "limit": 100,
+          "parameter": {
+            "CustomerId": 1
+          },
+          "baseline": {
+            "rowCount": 7,
+            "invoiceIds": [
+              98,
+              121,
+              143,
+              195,
+              316,
+              327,
+              382
+            ]
+          },
+          "candidate": {
+            "rowCount": 7,
+            "invoiceIds": [
+              97,
+              98,
+              143,
+              195,
+              316,
+              327,
+              382
+            ]
+          },
+          "expectedDifference": {
+            "baselineOnly": [
+              121
+            ],
+            "candidateOnly": [
+              97
+            ],
+            "changed": [
+              {
+                "invoiceId": 98,
+                "columns": [
+                  {
+                    "column": "InvoiceDate",
+                    "baseline": "2022-03-11 00:00:00",
+                    "candidate": "2022-03-12 00:00:00"
+                  }
+                ]
+              }
+            ],
+            "unchanged": [
+              143,
+              195,
+              316,
+              327,
+              382
+            ]
+          }
+        }
+      },
+      "rights": {
+        "upstreamLicense": "MIT",
+        "upstreamLicensePath": "data-source/LICENSE.md",
+        "modificationNotice": "fixtures/compare/NOTICE.md"
+      }
+    }
+  ]
+}
