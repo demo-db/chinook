@@ -1,0 +1,56 @@
+{
+  "attribution": "Chinook Database, Copyright (c) 2008-2024 Luis Rocha, MIT licence, https://github.com/lerocha/chinook-database at revision 7f67772503d71ba90f19283c38e93923addb43fa",
+  "format": "demodb-dialect-scripts/v1",
+  "id": "chinook",
+  "scripts": {
+    "mysql": {
+      "inputs": {
+        "attribution": "Chinook Database, Copyright (c) 2008-2024 Luis Rocha, MIT licence, https://github.com/lerocha/chinook-database at revision 7f67772503d71ba90f19283c38e93923addb43fa",
+        "dialect": "mysql",
+        "edition": "DemoDB contract edition, identical to the SQLite/CSV/JSON",
+        "generator": {
+          "checksumsSha256": "c736ea434e107cdf0189c7f0b82b08e81c1475cb92e593d5aafc6c7b7b434f60",
+          "tag": "v0.97.1"
+        },
+        "license": "MIT",
+        "name": "chinook",
+        "sqliteSha256": "7651ba378ac2fcd0dfc3c66fb101f7a7eed3ba39a612ec642b96e20702061f15"
+      },
+      "inputsSha256": "f27b0ddb15c3cf292bf7ef16c63e569818e94078f2d6c11d39f95eaf6ccb675a",
+      "report": {
+        "bytes": 1975,
+        "path": "dialect-scripts/chinook.mysql.report.json",
+        "sha256": "51e8acd14e3f9227661dbe7d83c97bfd565c51fcbc1527727095311dfcadea8a",
+        "warnings": {
+          "values-normalized": 3
+        }
+      },
+      "stored": {
+        "decodedBytes": 484074,
+        "decodedSha256": "c0ce31e5bbeb0219ca91e14337ea283c7141424c39392cc1147ff586178bc114",
+        "files": [
+          {
+            "bytes": 484074,
+            "path": "dialect-scripts/chinook.mysql.sql",
+            "sha256": "c0ce31e5bbeb0219ca91e14337ea283c7141424c39392cc1147ff586178bc114"
+          }
+        ],
+        "mode": "plain"
+      },
+      "verification": {
+        "date": "2026-10-16",
+        "differences": 0,
+        "engine": "MySQL 8.4.11 (official mysql:8.4 image)",
+        "image": "mysql:8.4@sha256:24989179f58856db763f418010c1169fecc944e3ec1ea7e921572d83eb070f70",
+        "loadedWith": "mysql client of the same image, --default-character-set=utf8mb4 --skip-commands --skip-system-command, stop at first error",
+        "rows": 15607,
+        "scriptSha256": "c0ce31e5bbeb0219ca91e14337ea283c7141424c39392cc1147ff586178bc114",
+        "secondLoadRefusedAtMarkerTable": true,
+        "tables": 11,
+        "valuesCompared": 66439,
+        "verifier": "datatug-cli internal/crossverify TestJourneyMySQL at v0.97.1, run locally over this exact script; reads source and target through Go drivers",
+        "verifierWarnings": 3
+      }
+    }
+  }
+}

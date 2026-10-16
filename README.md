@@ -21,7 +21,7 @@ pnpm test:tools
 
 `pnpm generate` derives the compatibility exports in `artifacts/data/`, schema and combined contract in `metadata/`, and the ModelSpec JSON/checksum from the pinned SQLite bytes. `pnpm validate` opens and checks the database and exports, verifies row counts, keys, foreign keys, views and representative SQL, and verifies generated checksums. The pinned ModelSpec and MeaningGraph releases and their archive hashes are in `scripts/tools.json`; install them with `pnpm tools:install` before their checks.
 
-The provider preserves the existing Chinook downloads: `/data/chinook.sqlite`, `/data/chinook.json`, `/data/chinook.yaml`, and `/data/chinook.{mysql,postgresql,sqlserver}.sql`; per-table `/data/{json,csv,yaml,sql}/chinook.<Table>.<format>`; and model files under `/model/`. Their repository equivalents are under `artifacts/data/` and `model/`. The table names and schema are derived from the actual SQLite database.
+The provider preserves the existing Chinook downloads: `/data/chinook.sqlite`, `/data/chinook.json`, `/data/chinook.yaml`, and `/data/chinook.{postgresql,sqlserver}.sql` (the upstream scripts) and `/data/chinook.mysql.sql` (now the generated, verified script, see below; the upstream MySQL script moved to `/data/upstream/chinook.mysql.sql`); per-table `/data/{json,csv,yaml,sql}/chinook.<Table>.<format>`; and model files under `/model/`. Their repository equivalents are under `artifacts/data/` and `model/`. The table names and schema are derived from the actual SQLite database.
 
 Chinook invoices remain billing records, distinct from the order concept. The `InvoiceLine` concept also declares the shared `commercial-line-item` ancestor in `manifest.json`, allowing similarity with Northwind order details without equating orders and invoices.
 
@@ -63,3 +63,21 @@ python3 ../websites/scripts/hosting-tools/validate_datatug_exports.py . ingitdb 
 ```
 
 The source primary keys, foreign keys, UNIQUE and CHECK constraints, defaults, collations and SQL actions are preserved as source metadata; inGitDB does not enforce their full SQL behavior on later record edits. Source rights and original notices remain in [`data-source/`](data-source/) and [`LICENSE`](LICENSE).
+
+## MySQL script (`dialect-scripts/`)
+
+`dialect-scripts/chinook.mysql.sql` is a MySQL 8 script that creates and fills this database. It is written by the DataTug SQL-script exporter
+(`datatug db copy --to sqlscript:///<file>?dialect=mysql`, release v0.97.1, pinned by SHA-256 in `demo-db/websites` `config/dialect-scripts.json`) from the pinned
+SQLite fixture, loaded into a real MySQL 8.4 and compared with the fixture. It is labelled "DemoDB contract edition, identical to the SQLite/CSV/JSON": the same tables and
+rows, with everything MySQL cannot carry exactly (for example views) listed in the script header and in `dialect-scripts/chinook.mysql.report.json`.
+`dialect-scripts/manifest.json` records the inputs (the SQLite SHA-256, the exporter pin, the label, the licence from `manifest.json` and the attribution below), the stored and
+decoded SHA-256, and the verification run. Nothing else in this repository changes: the files are outside `artifacts/`, so the contract, the checksums and the model are untouched.
+
+```sh
+mysql --default-character-set=utf8mb4 --skip-commands --skip-system-command --database <empty database> < dialect-scripts/chinook.mysql.sql
+node websites/scripts/dialect-scripts.mjs check --provider .   # no datatug binary and no Docker needed
+```
+
+The site serves this script at `/data/chinook.mysql.sql`. lerocha's upstream `artifacts/data/chinook.mysql.sql` (which starts with `DROP DATABASE IF EXISTS`) is still served unchanged, at `/data/upstream/chinook.mysql.sql`, labelled "upstream (unverified, drops database)".
+
+The licence (MIT) and this attribution are in the script header: Chinook Database, Copyright (c) 2008-2024 Luis Rocha, MIT licence, https://github.com/lerocha/chinook-database at revision 7f67772503d71ba90f19283c38e93923addb43fa
