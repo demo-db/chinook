@@ -1,0 +1,90 @@
+{
+  "dataset": "chinook",
+  "dialect": "mysql",
+  "format": "demodb-dialect-report/v1",
+  "generator": "v0.100.0",
+  "tables": [
+    {
+      "columns": 3,
+      "name": "Album",
+      "rows": 347
+    },
+    {
+      "columns": 2,
+      "name": "Artist",
+      "rows": 275
+    },
+    {
+      "columns": 13,
+      "name": "Customer",
+      "rows": 59
+    },
+    {
+      "columns": 15,
+      "name": "Employee",
+      "rows": 8
+    },
+    {
+      "columns": 2,
+      "name": "Genre",
+      "rows": 25
+    },
+    {
+      "columns": 9,
+      "name": "Invoice",
+      "rows": 412
+    },
+    {
+      "columns": 5,
+      "name": "InvoiceLine",
+      "rows": 2240
+    },
+    {
+      "columns": 2,
+      "name": "MediaType",
+      "rows": 5
+    },
+    {
+      "columns": 2,
+      "name": "Playlist",
+      "rows": 18
+    },
+    {
+      "columns": 2,
+      "name": "PlaylistTrack",
+      "rows": 8715
+    },
+    {
+      "columns": 9,
+      "name": "Track",
+      "rows": 3503
+    }
+  ],
+  "totals": {
+    "checkConstraints": 0,
+    "columns": 64,
+    "foreignKeys": 11,
+    "indexes": 11,
+    "primaryKeys": 11,
+    "rows": 15607,
+    "tables": 11,
+    "uniqueConstraints": 0
+  },
+  "warnings": [
+    {
+      "kind": "values-normalized",
+      "message": "412 REAL value(s) are written as the exact decimal of their shortest spelling, for example 1.98: SQLite stores a binary float, DECIMAL(10,2) an exact decimal",
+      "object": "Invoice.Total"
+    },
+    {
+      "kind": "values-normalized",
+      "message": "2240 REAL value(s) are written as the exact decimal of their shortest spelling, for example 0.99: SQLite stores a binary float, DECIMAL(10,2) an exact decimal",
+      "object": "InvoiceLine.UnitPrice"
+    },
+    {
+      "kind": "values-normalized",
+      "message": "3503 REAL value(s) are written as the exact decimal of their shortest spelling, for example 0.99: SQLite stores a binary float, DECIMAL(10,2) an exact decimal",
+      "object": "Track.UnitPrice"
+    }
+  ]
+}
