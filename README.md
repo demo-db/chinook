@@ -67,7 +67,7 @@ The source primary keys, foreign keys, UNIQUE and CHECK constraints, defaults, c
 ## MySQL script (`dialect-scripts/`)
 
 `dialect-scripts/chinook.mysql.sql` is a MySQL 8 script that creates and fills this database. It is written by the DataTug SQL-script exporter
-(`datatug db copy --to sqlscript:///<file>?dialect=mysql`, release v0.97.1, pinned by SHA-256 in `demo-db/websites` `config/dialect-scripts.json`) from the pinned
+(`datatug db copy --to sqlscript:///<file>?dialect=mysql`, release v0.100.0, pinned by SHA-256 in `demo-db/websites` `config/dialect-scripts.json`) from the pinned
 SQLite fixture, loaded into a real MySQL 8.4 and compared with the fixture. It is labelled "DemoDB contract edition, identical to the SQLite/CSV/JSON": the same tables and
 rows, with everything MySQL cannot carry exactly (for example views) listed in the script header and in `dialect-scripts/chinook.mysql.report.json`.
 `dialect-scripts/manifest.json` records the inputs (the SQLite SHA-256, the exporter pin, the label, the licence from `manifest.json` and the attribution below), the stored and
@@ -80,4 +80,4 @@ node websites/scripts/dialect-scripts.mjs check --provider .   # no datatug bina
 
 The site serves this script at `/data/chinook.mysql.sql`. lerocha's upstream `artifacts/data/chinook.mysql.sql` (which starts with `DROP DATABASE IF EXISTS`) is still served unchanged, at `/data/upstream/chinook.mysql.sql`, labelled "upstream (unverified, drops database)".
 
-The licence (MIT) and this attribution are in the script header: Chinook Database, Copyright (c) 2008-2024 Luis Rocha, MIT licence, https://github.com/lerocha/chinook-database at revision 7f67772503d71ba90f19283c38e93923addb43fa
+The licence (MIT), the full licence notice (verbatim from the upstream licence files, kept in `demo-db/websites` `config/dialect-notices/chinook.txt`) and this attribution are in the script header: Chinook Database, Copyright (c) 2008-2024 Luis Rocha, MIT licence, https://github.com/lerocha/chinook-database at revision 7f67772503d71ba90f19283c38e93923addb43fa

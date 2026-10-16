@@ -2,3 +2,5 @@
 artifacts/** -diff
 data-source/sql/*.sql -diff
 data-source/LICENSE.md -diff
+# The generated scripts are LF text whose bytes are pinned by SHA-256: never convert line ends on checkout.
+dialect-scripts/** -text
