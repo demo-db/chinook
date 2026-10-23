@@ -7,8 +7,8 @@
   },
   "files": {
     "chinook.meaning.yaml": {
-      "sha256": "08070167da1626c3fd51f6555e846cd8aa1aa068a533db45c53394127bb0fcad",
-      "bytes": 15817
+      "sha256": "6e7b1813c013f66311195f16672113e8f4d0bfbee77eb7f1776612074c2e54c9",
+      "bytes": 15846
     },
     "chinook.modelspec.hcl": {
       "sha256": "8e507ec6f212e300ddaa7bc12494b97c98301b316e9f545112f5dea85b14f16d",
