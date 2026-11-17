@@ -309,14 +309,16 @@ concepts:
     of: invoice
     values-of: meaning://github.com/meaninggraph/core/country?ref=982916d73f0a35ff2558b0062f58aa3ac4f24d97
     labels:
-      en: Country
-      ru: Страна
+      en: Billing country
+      ru: Страна покупки
     synonyms:
-      en: [billing country, country of purchase, where music is bought, buying country]
-      ru: [страна покупки, страна покупателя]
+      en: [country of purchase, where music is bought, buying country]
+      ru: [страна покупателя]
     description: >-
-      The country an invoice is billed to, as Chinook spells it ("USA",
-      "Czech Republic"). Use this one when a question asks which countries buy
+      Billing country is the country an invoice is billed to: the country in
+      the billing address, which can differ from the shipping country or the
+      customer's home country. Chinook records it by name, spelled as in its
+      data ("USA", "Czech Republic"). Use this one when a question asks which countries buy
       or spend: it is recorded on the sale itself, and it is the column the
       saved per-capita query groups by. In this data it equals the customer's
       country on every invoice, but it would stay right if a customer moved.
